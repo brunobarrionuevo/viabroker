@@ -217,3 +217,7 @@
 - [x] Adicionar ações para consultar todos os dados do cliente (imóveis, leads, etc.)
 - [x] Melhorar contraste de cores para facilitar leitura
 - [x] Organizar exibição dos dados de forma clara e estruturada
+
+
+## Correção Urgente - Edição de Imóveis
+- [x] Corrigir erro ao acessar página de edição de imóveis (/dashboard/properties/:id)

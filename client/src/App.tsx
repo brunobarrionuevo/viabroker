@@ -126,6 +126,7 @@ function Router() {
       </Route>
       <Route path="/dashboard/properties/:id/edit" component={() => <ProtectedRoute component={PropertyForm} />} />
       <Route path="/dashboard/properties/:id/images" component={() => <ProtectedRoute component={PropertyImages} />} />
+      <Route path="/dashboard/properties/:id" component={() => <ProtectedRoute component={PropertyForm} />} />
       
       {/* Leads Routes */}
       <Route path="/dashboard/leads">
