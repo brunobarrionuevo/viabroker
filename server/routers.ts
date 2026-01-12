@@ -281,6 +281,7 @@ export const appRouter = router({
         isPublished: z.boolean().optional(),
         metaTitle: z.string().optional(),
         metaDescription: z.string().optional(),
+        videoUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
@@ -288,7 +289,12 @@ export const appRouter = router({
         if (!property || property.companyId !== ctx.user.companyId) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Imóvel não encontrado" });
         }
-        return db.updateProperty(id, data);
+        // Limpar videoUrl se for string vazia
+        const cleanedData = {
+          ...data,
+          videoUrl: data.videoUrl && data.videoUrl !== "" ? data.videoUrl : null,
+        };
+        return db.updateProperty(id, cleanedData);
       }),
     
     delete: protectedProcedure

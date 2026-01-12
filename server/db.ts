@@ -1,7 +1,7 @@
 import { eq, and, desc, asc, like, or, sql, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
-  InsertUser, users, 
+  InsertUser, users, User,
   companies, InsertCompany, Company,
   plans, InsertPlan, Plan,
   properties, InsertProperty, Property,
@@ -940,3 +940,25 @@ export async function toggleCompanyStatus(companyId: number, isActive: boolean):
   await db.update(companies).set({ isActive }).where(eq(companies.id, companyId));
 }
 
+
+// ==========================================
+// FUNÇÕES PARA PAINEL MASTER - DETALHES DO CLIENTE
+// ==========================================
+
+export async function getUsersByCompanyId(companyId: number): Promise<User[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(users).where(eq(users.companyId, companyId)).orderBy(desc(users.createdAt));
+}
+
+export async function getPropertiesByCompanyId(companyId: number): Promise<Property[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(properties).where(eq(properties.companyId, companyId)).orderBy(desc(properties.createdAt));
+}
+
+export async function getLeadsByCompanyId(companyId: number): Promise<Lead[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(leads).where(eq(leads.companyId, companyId)).orderBy(desc(leads.createdAt));
+}

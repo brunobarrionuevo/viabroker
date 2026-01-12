@@ -283,6 +283,105 @@ export const masterAdminRouter = router({
       });
     }),
 
+  // Obter detalhes completos de um cliente
+  getClientDetail: publicProcedure
+    .input(z.object({
+      token: z.string(),
+      companyId: z.number(),
+    }))
+    .query(async ({ input }) => {
+      await masterAuthMiddleware(input.token);
+      
+      // Buscar empresa
+      const company = await db.getCompanyById(input.companyId);
+      if (!company) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Cliente não encontrado" });
+      }
+      
+      // Buscar usuários da empresa
+      const users = await db.getUsersByCompanyId(input.companyId);
+      
+      // Buscar imóveis da empresa
+      const properties = await db.getPropertiesByCompanyId(input.companyId);
+      
+      // Buscar leads da empresa
+      const leads = await db.getLeadsByCompanyId(input.companyId);
+      
+      // Buscar assinatura
+      const subscription = await db.getSubscriptionByCompanyId(input.companyId);
+      
+      return {
+        company,
+        users,
+        properties,
+        leads,
+        subscription: subscription ? {
+          ...subscription,
+          planName: subscription.planId ? (await db.getPlanById(subscription.planId))?.name : null,
+        } : null,
+        stats: {
+          totalProperties: properties.length,
+          totalLeads: leads.length,
+          totalUsers: users.length,
+        },
+      };
+    }),
+
+  // Alterar plano de um cliente
+  changeClientPlan: publicProcedure
+    .input(z.object({
+      token: z.string(),
+      companyId: z.number(),
+      planId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const admin = await masterAuthMiddleware(input.token);
+      
+      // Verificar se a empresa existe
+      const company = await db.getCompanyById(input.companyId);
+      if (!company) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Cliente não encontrado" });
+      }
+      
+      // Verificar se o plano existe
+      const plan = await db.getPlanById(input.planId);
+      if (!plan) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Plano não encontrado" });
+      }
+      
+      // Buscar ou criar assinatura
+      let subscription = await db.getSubscriptionByCompanyId(input.companyId);
+      
+      if (subscription) {
+        // Atualizar assinatura existente
+        await db.updateSubscription(subscription.id, {
+          planId: input.planId,
+          status: 'active',
+        });
+      } else {
+        // Criar nova assinatura
+        await db.createSubscription({
+          companyId: input.companyId,
+          planId: input.planId,
+          status: 'active',
+          currentPeriodStart: new Date(),
+          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 dias
+        });
+      }
+      
+      // Log de atividade
+      await db.createActivityLog({
+        actorType: "master_admin",
+        actorId: admin.id,
+        action: "change_plan",
+        entityType: "company",
+        entityId: input.companyId,
+        details: { planId: input.planId, planName: plan.name },
+      });
+      
+      return { success: true };
+    }),
+
   // Criar administrador master inicial (só funciona se não existir nenhum)
   setupInitialAdmin: publicProcedure
     .input(z.object({

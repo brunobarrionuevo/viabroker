@@ -23,6 +23,7 @@ import RealtorSite from "./pages/RealtorSite";
 import RealtorPropertyDetail from "./pages/RealtorPropertyDetail";
 import MasterLogin from "./pages/MasterLogin";
 import MasterDashboard from "./pages/MasterDashboard";
+import MasterClientDetail from "./pages/MasterClientDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -170,6 +171,7 @@ function Router() {
       {/* Master Admin Routes - Independente */}
       <Route path="/master" component={MasterLogin} />
       <Route path="/master/dashboard" component={MasterDashboard} />
+      <Route path="/master/client/:id" component={MasterClientDetail} />
       
       {/* Error Routes */}
       <Route path="/404" component={NotFound} />

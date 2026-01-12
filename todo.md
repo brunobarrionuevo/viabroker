@@ -195,3 +195,12 @@
 
 ## Correção do Redirecionamento Após Login
 - [x] Corrigir fluxo de login para redirecionar ao dashboard após autenticação bem-sucedida (integrado cookie de sessão com sistema existente)
+
+
+## Melhorias Painel Master e Correção de Vídeos
+- [x] Acesso completo aos dados pessoais dos clientes (PF e PJ)
+- [x] Visualização de todos os imóveis cadastrados por cliente
+- [x] Visualização de todos os leads de cada cliente
+- [x] Funcionalidade de migração de planos no painel master
+- [x] Corrigir erro de salvamento de links YouTube/Vimeo nos imóveis (adicionado videoUrl ao endpoint update)
+- [x] Testar exibição de vídeos na página de demonstração do imóvel (componente suporta YouTube e Vimeo)
