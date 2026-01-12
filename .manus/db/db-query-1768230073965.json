@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, title, \"videoUrl\" FROM properties WHERE id = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, title, \"videoUrl\" FROM properties WHERE id = 1;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "Apartamento Teste 3 Quartos",
+      "videoUrl": "videoUrl"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tvideoUrl\n1\tApartamento Teste 3 Quartos\tvideoUrl\n",
+  "stderr": "",
+  "execution_time_ms": 264
+}

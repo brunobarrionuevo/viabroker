@@ -204,3 +204,9 @@
 - [x] Funcionalidade de migração de planos no painel master
 - [x] Corrigir erro de salvamento de links YouTube/Vimeo nos imóveis (adicionado videoUrl ao endpoint update)
 - [x] Testar exibição de vídeos na página de demonstração do imóvel (componente suporta YouTube e Vimeo)
+
+
+## Correções Urgentes Reportadas
+- [x] Erro ao salvar link do vídeo YouTube no formulário de imóveis (verificado - está funcionando)
+- [x] Painel master não exibe alterações/dados dos clientes corretamente (implementado MasterClientDetail)
+- [x] Login com Google dando erro 404 - implementar OAuth direto na plataforma (implementado Google OAuth)
