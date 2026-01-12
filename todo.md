@@ -180,3 +180,9 @@
 - [x] Criar templates de email HTML para confirmação
 - [x] Solicitar credenciais SMTP ao usuário
 - [x] Testar envio de emails de confirmação
+
+
+## Reenvio de Email de Confirmação
+- [x] Criar endpoint de reenvio de email de confirmação
+- [x] Adicionar botão/link de reenvio na página de login
+- [x] Criar página dedicada para solicitar reenvio

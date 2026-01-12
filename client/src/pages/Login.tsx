@@ -75,7 +75,17 @@ export default function Login() {
             {error && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>
+                  {error}
+                  {error.includes("não verificado") && (
+                    <Link 
+                      href="/reenviar-verificacao" 
+                      className="block mt-2 text-blue-600 hover:underline font-medium"
+                    >
+                      Clique aqui para reenviar o email de verificação
+                    </Link>
+                  )}
+                </AlertDescription>
               </Alert>
             )}
 

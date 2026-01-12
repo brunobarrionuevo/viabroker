@@ -28,6 +28,7 @@ import Register from "./pages/Register";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import ResendVerification from "./pages/ResendVerification";
 import Plans from "./pages/Plans";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
@@ -104,6 +105,7 @@ function Router() {
       <Route path="/verificar-email" component={VerifyEmail} />
       <Route path="/esqueci-senha" component={ForgotPassword} />
       <Route path="/redefinir-senha" component={ResetPassword} />
+      <Route path="/reenviar-verificacao" component={ResendVerification} />
       <Route path="/planos" component={Plans} />
       
       {/* Onboarding Route */}
