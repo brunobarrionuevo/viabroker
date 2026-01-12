@@ -127,3 +127,10 @@
 - [x] Favicon não aparece na aba do site do corretor (corrigido - useEffect para atualizar favicon dinamicamente)
 - [x] Slug do domínio temporário deve usar o nome da imobiliária/corretor (corrigido - slug gerado automaticamente a partir do nome)
 - [x] Implementar captura de leads no site público do corretor (implementado - formulário completo com nome, email, telefone e mensagem)
+
+
+## Rebranding: ImobiPro para Brokvia
+- [x] Copiar logo para o projeto
+- [x] Substituir todas as referências de ImobiPro por Brokvia
+- [x] Atualizar logo em todos os componentes
+- [x] Atualizar título e metadados da aplicação

@@ -109,10 +109,8 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-xl">ImobiPro</span>
+            <img src="/brokvia-logo.png" alt="Brokvia" className="w-8 h-8 object-contain" />
+            <span className="font-bold text-xl">Brokvia</span>
           </Link>
           
           <nav className="hidden md:flex items-center gap-6">
@@ -285,13 +283,11 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold">ImobiPro</span>
+              <img src="/brokvia-logo.png" alt="Brokvia" className="w-8 h-8 object-contain" />
+              <span className="font-bold">Brokvia</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2025 ImobiPro. Todos os direitos reservados.
+              © 2025 Brokvia. Todos os direitos reservados.
             </p>
           </div>
         </div>

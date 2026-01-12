@@ -269,9 +269,9 @@ export default function Onboarding() {
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center">
           <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <Building2 className="w-8 h-8 text-primary" />
+            <img src="/brokvia-logo.png" alt="Brokvia" className="w-10 h-10 object-contain" />
           </div>
-          <CardTitle className="text-2xl">Bem-vindo ao ImobiPro!</CardTitle>
+          <CardTitle className="text-2xl">Bem-vindo ao Brokvia!</CardTitle>
           <CardDescription>
             {step === 1 && "Vamos configurar seu perfil para começar"}
             {step === 2 && "Complete seus dados para finalizar o cadastro"}
@@ -548,7 +548,7 @@ export default function Onboarding() {
                 <div className="sm:col-span-2">
                   <Label htmlFor="slug">URL do seu site</Label>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">imobipro.com/</span>
+                    <span className="text-sm text-muted-foreground">brokvia.com/</span>
                     <Input
                       id="slug"
                       value={formData.slug}

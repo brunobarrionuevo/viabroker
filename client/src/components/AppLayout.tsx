@@ -73,10 +73,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
       )}>
         <div className="flex items-center justify-between h-16 px-4 border-b">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-lg">ImobiPro</span>
+            <img src="/brokvia-logo.png" alt="Brokvia" className="w-8 h-8 object-contain" />
+            <span className="font-bold text-lg">Brokvia</span>
           </Link>
           <Button 
             variant="ghost" 
