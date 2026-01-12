@@ -72,3 +72,13 @@
 ## Correções Urgentes
 - [x] Botão de incluir fotos não aparece no formulário de cadastro (corrigido - link para gerenciar fotos aparece na edição)
 - [x] Erro ao finalizar o cadastro de imóveis (corrigido - valores monetários e videoUrl)
+
+## Página de Exibição do Imóvel
+- [x] Redesenhar página pública de detalhes do imóvel
+- [x] Galeria de fotos com navegação e zoom
+- [x] Player de vídeo incorporado
+- [x] Informações detalhadas do imóvel (características, valores, localização)
+- [x] Mapa de localização integrado (link para Google Maps)
+- [x] Formulário de contato/interesse
+- [x] Botão de WhatsApp
+- [x] Design responsivo e profissional

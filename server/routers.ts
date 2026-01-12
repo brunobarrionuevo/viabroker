@@ -353,7 +353,18 @@ export const appRouter = router({
         if (!property || !property.isPublished) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Imóvel não encontrado" });
         }
-        return property;
+        // Buscar dados da empresa para contato
+        const company = await db.getCompanyById(property.companyId);
+        return {
+          ...property,
+          company: company ? {
+            name: company.name,
+            phone: company.phone,
+            whatsapp: company.whatsapp,
+            email: company.email,
+            logoUrl: company.logoUrl,
+          } : null,
+        };
       }),
     
     getImagesPublic: publicProcedure
