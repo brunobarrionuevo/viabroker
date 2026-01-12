@@ -186,3 +186,8 @@
 - [x] Criar endpoint de reenvio de email de confirmação
 - [x] Adicionar botão/link de reenvio na página de login
 - [x] Criar página dedicada para solicitar reenvio
+
+
+## Correção da Verificação de Email
+- [x] Diagnosticar problema na confirmação de email (colunas faltando no banco + URL errada)
+- [x] Corrigir endpoint/página de verificação (adicionadas colunas + URL corrigida)

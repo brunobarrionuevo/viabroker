@@ -1,0 +1,26 @@
+{
+  "query": "SELECT id, name, email, emailVerified, emailVerificationToken, emailVerificationExpires FROM users ORDER BY id DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, name, email, emailVerified, emailVerificationToken, emailVerificationExpires FROM users ORDER BY id DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "30506",
+      "name": "Bruno Uzeda",
+      "email": "busb@hotmail.com",
+      "emailVerified": "0",
+      "emailVerificationToken": "1eebafa50721ccc0b7d9c8e3b6a30e4ad78fc78f263bcf64250169722d66792c",
+      "emailVerificationExpires": "2026-01-13 09:16:16"
+    },
+    {
+      "id": "1",
+      "name": "Bruno Barrionuevo",
+      "email": "brunobarrionuevo@gmail.com",
+      "emailVerified": "0",
+      "emailVerificationToken": "NULL",
+      "emailVerificationExpires": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\temailVerified\temailVerificationToken\temailVerificationExpires\n30506\tBruno Uzeda\tbusb@hotmail.com\t0\t1eebafa50721ccc0b7d9c8e3b6a30e4ad78fc78f263bcf64250169722d66792c\t2026-01-13 09:16:16\n1\tBruno Barrionuevo\tbrunobarrionuevo@gmail.com\t0\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

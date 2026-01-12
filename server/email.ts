@@ -2,7 +2,8 @@ import nodemailer from "nodemailer";
 import { notifyOwner } from "./_core/notification";
 
 const APP_NAME = "Brokvia";
-const APP_URL = process.env.VITE_APP_URL || "https://brokvia.com";
+// Usar a URL do ambiente ou fallback para a URL publicada
+const APP_URL = process.env.VITE_APP_URL || process.env.APP_URL || "https://imobpitch-2bvimoer.manus.space";
 
 // Configuração do transporter de email
 // Em produção, configure SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS

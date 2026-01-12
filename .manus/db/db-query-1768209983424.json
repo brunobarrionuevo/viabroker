@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users \nADD COLUMN IF NOT EXISTS passwordHash VARCHAR(255),\nADD COLUMN IF NOT EXISTS emailVerified BOOLEAN DEFAULT false NOT NULL,\nADD COLUMN IF NOT EXISTS emailVerificationToken VARCHAR(100),\nADD COLUMN IF NOT EXISTS emailVerificationExpires TIMESTAMP,\nADD COLUMN IF NOT EXISTS passwordResetToken VARCHAR(100),\nADD COLUMN IF NOT EXISTS passwordResetExpires TIMESTAMP,\nADD COLUMN IF NOT EXISTS googleId VARCHAR(100),\nADD COLUMN IF NOT EXISTS trialStartDate TIMESTAMP,\nADD COLUMN IF NOT EXISTS trialEndDate TIMESTAMP,\nADD COLUMN IF NOT EXISTS isTrialExpired BOOLEAN DEFAULT false NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute ALTER TABLE users \nADD COLUMN IF NOT EXISTS passwordHash VARCHAR(255),\nADD COLUMN IF NOT EXISTS emailVerified BOOLEAN DEFAULT false NOT NULL,\nADD COLUMN IF NOT EXISTS emailVerificationToken VARCHAR(100),\nADD COLUMN IF NOT EXISTS emailVerificationExpires TIMESTAMP,\nADD COLUMN IF NOT EXISTS passwordResetToken VARCHAR(100),\nADD COLUMN IF NOT EXISTS passwordResetExpires TIMESTAMP,\nADD COLUMN IF NOT EXISTS googleId VARCHAR(100),\nADD COLUMN IF NOT EXISTS trialStartDate TIMESTAMP,\nADD COLUMN IF NOT EXISTS trialEndDate TIMESTAMP,\nADD COLUMN IF NOT EXISTS isTrialExpired BOOLEAN DEFAULT false NOT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 53
+}
