@@ -136,10 +136,10 @@ export default function Home() {
             ) : (
               <>
                 <Button variant="ghost" asChild>
-                  <a href={getLoginUrl()}>Entrar</a>
+                  <Link href="/login">Entrar</Link>
                 </Button>
                 <Button asChild>
-                  <a href={getLoginUrl()}>Começar Grátis</a>
+                  <Link href="/cadastro">Começar Grátis</Link>
                 </Button>
               </>
             )}
@@ -164,10 +164,10 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button size="lg" asChild>
-                <a href={getLoginUrl()}>
+                <Link href="/cadastro">
                   Começar Gratuitamente
                   <ArrowRight className="w-5 h-5 ml-2" />
-                </a>
+                </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <a href="#features">Ver Recursos</a>
@@ -250,7 +250,7 @@ export default function Home() {
                     variant={plan.highlight ? "default" : "outline"}
                     asChild
                   >
-                    <a href={getLoginUrl()}>Começar Agora</a>
+                    <Link href="/cadastro">Começar Agora</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -270,10 +270,10 @@ export default function Home() {
             a forma de vender imóveis.
           </p>
           <Button size="lg" variant="secondary" asChild>
-            <a href={getLoginUrl()}>
+            <Link href="/cadastro">
               Criar Conta Gratuita
               <ArrowRight className="w-5 h-5 ml-2" />
-            </a>
+            </Link>
           </Button>
         </div>
       </section>

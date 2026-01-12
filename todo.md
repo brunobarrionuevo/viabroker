@@ -167,3 +167,9 @@
 - [x] Implementar lógica de 7 dias de trial gratuito
 - [x] Bloquear acesso após expiração do trial sem assinatura
 - [x] Criar página de escolha de plano após trial
+
+
+## Correção de Links de Cadastro/Login
+- [x] Corrigir botão "Começar Gratuitamente" na Home para ir para /cadastro
+- [x] Corrigir botão "Acessar Dashboard" para ir para /login
+- [x] Verificar outros links que redirecionam para OAuth da Manus
