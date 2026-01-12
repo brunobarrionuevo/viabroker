@@ -23,8 +23,9 @@ import {
   Share2,
   Settings
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
+import { X, ImagePlus } from "lucide-react";
 
 const fontOptions = [
   { value: "Inter", label: "Inter" },
@@ -41,6 +42,12 @@ export default function SiteCustomization() {
   const { data: company, isLoading: loadingCompany } = trpc.company.get.useQuery();
   const { data: siteSettings, isLoading: loadingSettings, refetch } = trpc.siteSettings.get.useQuery();
   const [copied, setCopied] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
+  const [uploadingHero, setUploadingHero] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const faviconInputRef = useRef<HTMLInputElement>(null);
+  const heroInputRef = useRef<HTMLInputElement>(null);
 
   const [settingsData, setSettingsData] = useState({
     // Cores
@@ -132,6 +139,84 @@ export default function SiteCustomization() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateSettingsMutation.mutate(settingsData);
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload/site/logo", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Erro no upload");
+
+      const data = await response.json();
+      setSettingsData(prev => ({ ...prev, logoUrl: data.url }));
+      toast.success("Logo enviado com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao enviar logo");
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleFaviconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingFavicon(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload/site/favicon", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Erro no upload");
+
+      const data = await response.json();
+      setSettingsData(prev => ({ ...prev, faviconUrl: data.url }));
+      toast.success("Favicon enviado com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao enviar favicon");
+    } finally {
+      setUploadingFavicon(false);
+    }
+  };
+
+  const handleHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingHero(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload/site/hero", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Erro no upload");
+
+      const data = await response.json();
+      setSettingsData(prev => ({ ...prev, heroImageUrl: data.url }));
+      toast.success("Imagem de capa enviada com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao enviar imagem de capa");
+    } finally {
+      setUploadingHero(false);
+    }
   };
 
   const siteUrl = company?.slug 
@@ -421,73 +506,179 @@ export default function SiteCustomization() {
                     <Image className="w-5 h-5" />
                     Imagens e Branding
                   </CardTitle>
-                  <CardDescription>Configure o logo, favicon e imagem de capa do seu site</CardDescription>
+                  <CardDescription>Faça upload do logo, favicon e imagem de capa do seu site</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {/* Logo */}
+                    {/* Logo Upload */}
                     <div className="space-y-2">
-                      <Label htmlFor="logoUrl">Logo</Label>
-                      <p className="text-xs text-muted-foreground">URL da imagem do logo (recomendado: 200x60px)</p>
-                      <Input
-                        id="logoUrl"
-                        value={settingsData.logoUrl}
-                        onChange={(e) => setSettingsData(prev => ({ ...prev, logoUrl: e.target.value }))}
-                        placeholder="https://exemplo.com/logo.png"
+                      <Label>Logo</Label>
+                      <p className="text-xs text-muted-foreground">Recomendado: 200x60px, PNG ou JPG</p>
+                      <input
+                        ref={logoInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="hidden"
                       />
-                      {settingsData.logoUrl && (
-                        <div className="mt-2 p-4 bg-muted rounded-lg">
+                      {settingsData.logoUrl ? (
+                        <div className="relative p-4 bg-muted rounded-lg border-2 border-dashed">
                           <img 
                             src={settingsData.logoUrl} 
                             alt="Logo preview" 
-                            className="max-h-16 object-contain"
-                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                            className="max-h-16 object-contain mx-auto"
                           />
+                          <div className="flex gap-2 mt-3 justify-center">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => logoInputRef.current?.click()}
+                              disabled={uploadingLogo}
+                            >
+                              {uploadingLogo ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                              <span className="ml-1">Alterar</span>
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setSettingsData(prev => ({ ...prev, logoUrl: "" }))}
+                            >
+                              <X className="w-4 h-4" />
+                              <span className="ml-1">Remover</span>
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div 
+                          className="p-8 bg-muted rounded-lg border-2 border-dashed cursor-pointer hover:bg-muted/80 transition-colors flex flex-col items-center justify-center gap-2"
+                          onClick={() => logoInputRef.current?.click()}
+                        >
+                          {uploadingLogo ? (
+                            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                          ) : (
+                            <>
+                              <ImagePlus className="w-8 h-8 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">Clique para enviar o logo</span>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
 
-                    {/* Favicon */}
+                    {/* Favicon Upload */}
                     <div className="space-y-2">
-                      <Label htmlFor="faviconUrl">Favicon</Label>
-                      <p className="text-xs text-muted-foreground">URL do ícone do site (recomendado: 32x32px)</p>
-                      <Input
-                        id="faviconUrl"
-                        value={settingsData.faviconUrl}
-                        onChange={(e) => setSettingsData(prev => ({ ...prev, faviconUrl: e.target.value }))}
-                        placeholder="https://exemplo.com/favicon.ico"
+                      <Label>Favicon</Label>
+                      <p className="text-xs text-muted-foreground">Recomendado: 32x32px, PNG ou ICO</p>
+                      <input
+                        ref={faviconInputRef}
+                        type="file"
+                        accept="image/*,.ico"
+                        onChange={handleFaviconUpload}
+                        className="hidden"
                       />
-                      {settingsData.faviconUrl && (
-                        <div className="mt-2 p-4 bg-muted rounded-lg">
+                      {settingsData.faviconUrl ? (
+                        <div className="relative p-4 bg-muted rounded-lg border-2 border-dashed">
                           <img 
                             src={settingsData.faviconUrl} 
                             alt="Favicon preview" 
-                            className="w-8 h-8 object-contain"
-                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                            className="w-8 h-8 object-contain mx-auto"
                           />
+                          <div className="flex gap-2 mt-3 justify-center">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => faviconInputRef.current?.click()}
+                              disabled={uploadingFavicon}
+                            >
+                              {uploadingFavicon ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                              <span className="ml-1">Alterar</span>
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setSettingsData(prev => ({ ...prev, faviconUrl: "" }))}
+                            >
+                              <X className="w-4 h-4" />
+                              <span className="ml-1">Remover</span>
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div 
+                          className="p-8 bg-muted rounded-lg border-2 border-dashed cursor-pointer hover:bg-muted/80 transition-colors flex flex-col items-center justify-center gap-2"
+                          onClick={() => faviconInputRef.current?.click()}
+                        >
+                          {uploadingFavicon ? (
+                            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                          ) : (
+                            <>
+                              <ImagePlus className="w-8 h-8 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">Clique para enviar o favicon</span>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Hero Image */}
+                  {/* Hero Image Upload */}
                   <div className="space-y-2">
-                    <Label htmlFor="heroImageUrl">Imagem de Capa (Hero)</Label>
-                    <p className="text-xs text-muted-foreground">URL da imagem de fundo da seção principal (recomendado: 1920x800px)</p>
-                    <Input
-                      id="heroImageUrl"
-                      value={settingsData.heroImageUrl}
-                      onChange={(e) => setSettingsData(prev => ({ ...prev, heroImageUrl: e.target.value }))}
-                      placeholder="https://exemplo.com/hero.jpg"
+                    <Label>Imagem de Capa (Hero)</Label>
+                    <p className="text-xs text-muted-foreground">Recomendado: 1920x800px, JPG ou PNG</p>
+                    <input
+                      ref={heroInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleHeroUpload}
+                      className="hidden"
                     />
-                    {settingsData.heroImageUrl && (
-                      <div className="mt-2 rounded-lg overflow-hidden">
+                    {settingsData.heroImageUrl ? (
+                      <div className="relative rounded-lg overflow-hidden border-2 border-dashed">
                         <img 
                           src={settingsData.heroImageUrl} 
                           alt="Hero preview" 
                           className="w-full h-48 object-cover"
-                          onError={(e) => (e.currentTarget.style.display = 'none')}
                         />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => heroInputRef.current?.click()}
+                            disabled={uploadingHero}
+                          >
+                            {uploadingHero ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                            <span className="ml-1">Alterar</span>
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setSettingsData(prev => ({ ...prev, heroImageUrl: "" }))}
+                          >
+                            <X className="w-4 h-4" />
+                            <span className="ml-1">Remover</span>
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div 
+                        className="p-12 bg-muted rounded-lg border-2 border-dashed cursor-pointer hover:bg-muted/80 transition-colors flex flex-col items-center justify-center gap-2"
+                        onClick={() => heroInputRef.current?.click()}
+                      >
+                        {uploadingHero ? (
+                          <Loader2 className="w-10 h-10 animate-spin text-muted-foreground" />
+                        ) : (
+                          <>
+                            <ImagePlus className="w-10 h-10 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">Clique para enviar a imagem de capa</span>
+                            <span className="text-xs text-muted-foreground">Esta imagem aparecerá no topo do seu site</span>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>

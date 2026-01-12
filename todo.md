@@ -113,3 +113,11 @@
 - [x] Seção de busca com filtros avançados
 - [x] Listagem de imóveis com paginação
 - [x] Footer com informações de contato do corretor
+
+
+## Upload de Imagens para Personalização do Site
+- [x] Criar endpoint de upload para logo do site
+- [x] Criar endpoint de upload para favicon
+- [x] Criar endpoint de upload para imagem de capa (hero)
+- [x] Atualizar página de personalização com componentes de upload
+- [x] Preview das imagens após upload
