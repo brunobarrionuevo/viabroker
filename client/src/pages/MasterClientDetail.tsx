@@ -126,17 +126,17 @@ export default function MasterClientDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-white">Carregando...</div>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-gray-700 text-lg">Carregando...</div>
       </div>
     );
   }
 
   if (!client) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white mb-4">Cliente não encontrado</p>
+          <p className="text-gray-700 mb-4 text-lg">Cliente não encontrado</p>
           <Button onClick={() => setLocation("/master/dashboard")}>Voltar</Button>
         </div>
       </div>
@@ -144,27 +144,27 @@ export default function MasterClientDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/master/dashboard">
-              <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white">
+              <Button variant="outline" size="sm" className="text-gray-700 hover:text-gray-900 border-gray-300">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Voltar
               </Button>
             </Link>
-            <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-              <Shield className="w-6 h-6 text-primary" />
+            <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+              <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-white">Detalhes do Cliente</h1>
-              <p className="text-xs text-slate-400">{client.company.name}</p>
+              <h1 className="font-bold text-gray-900">Detalhes do Cliente</h1>
+              <p className="text-xs text-gray-500">{client.company.name}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => refetch()} className="border-slate-600">
+            <Button variant="outline" size="sm" onClick={() => refetch()} className="border-gray-300 text-gray-700 hover:bg-gray-50">
               <RefreshCw className="w-4 h-4 mr-2" />
               Atualizar
             </Button>
@@ -175,15 +175,15 @@ export default function MasterClientDetail() {
       <main className="container mx-auto px-4 py-8">
         {/* Company Info Card */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-slate-800 border-slate-700 lg:col-span-2">
+          <Card className="bg-white border-gray-200 shadow-sm lg:col-span-2">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Building2 className="w-5 h-5" />
+                  <CardTitle className="text-gray-900 flex items-center gap-2 text-xl">
+                    <Building2 className="w-5 h-5 text-blue-600" />
                     {client.company.name}
                   </CardTitle>
-                  <CardDescription className="text-slate-400">
+                  <CardDescription className="text-gray-500">
                     {client.company.personType === 'juridica' ? 'Pessoa Jurídica' : 'Pessoa Física'}
                   </CardDescription>
                 </div>
@@ -193,7 +193,7 @@ export default function MasterClientDetail() {
                     onCheckedChange={handleToggleStatus}
                     disabled={toggleStatusMutation.isPending}
                   />
-                  <span className={client.company.isActive ? "text-green-500" : "text-red-500"}>
+                  <span className={`font-semibold ${client.company.isActive ? "text-green-600" : "text-red-600"}`}>
                     {client.company.isActive ? "Ativo" : "Inativo"}
                   </span>
                 </div>
@@ -202,61 +202,56 @@ export default function MasterClientDetail() {
             <CardContent className="space-y-6">
               {/* Dados Pessoais / Empresariais */}
               <div>
-                <h3 className="text-sm font-medium text-slate-300 mb-3">Dados Cadastrais</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <FileText className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-400">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Dados Cadastrais</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-blue-600" />
+                    <span className="text-gray-500 font-medium">
                       {client.company.personType === 'juridica' ? 'CNPJ:' : 'CPF:'}
                     </span>
-                    <span>{formatCPFCNPJ(client.company.personType === 'juridica' ? client.company.cnpj : client.company.cpf)}</span>
+                    <span className="text-gray-900 font-semibold">{formatCPFCNPJ(client.company.personType === 'juridica' ? client.company.cnpj : client.company.cpf)}</span>
                   </div>
                   {client.company.creci && (
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <FileText className="w-4 h-4 text-slate-400" />
-                      <span className="text-slate-400">CRECI:</span>
-                      <span>{client.company.creci}</span>
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-blue-600" />
+                      <span className="text-gray-500 font-medium">CRECI:</span>
+                      <span className="text-gray-900 font-semibold">{client.company.creci}</span>
                     </div>
                   )}
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Mail className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-400">Email:</span>
-                    <span>{client.company.email || "-"}</span>
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-blue-600" />
+                    <span className="text-gray-500 font-medium">Email:</span>
+                    <span className="text-gray-900">{client.company.email || "-"}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Phone className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-400">Telefone:</span>
-                    <span>{formatPhone(client.company.phone)}</span>
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-blue-600" />
+                    <span className="text-gray-500 font-medium">Telefone:</span>
+                    <span className="text-gray-900">{formatPhone(client.company.phone)}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Phone className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-400">WhatsApp:</span>
-                    <span>{formatPhone(client.company.whatsapp)}</span>
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-green-600" />
+                    <span className="text-gray-500 font-medium">WhatsApp:</span>
+                    <span className="text-gray-900">{formatPhone(client.company.whatsapp)}</span>
                   </div>
-                  {client.company.creci && (
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <FileText className="w-4 h-4 text-slate-400" />
-                      <span className="text-slate-400">CRECI:</span>
-                      <span>{client.company.creci}</span>
-                    </div>
-                  )}
                 </div>
               </div>
 
               {/* Endereço */}
               <div>
-                <h3 className="text-sm font-medium text-slate-300 mb-3">Endereço</h3>
-                <div className="flex items-start gap-2 text-slate-300">
-                  <MapPin className="w-4 h-4 text-slate-400 mt-1" />
-                  <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Endereço</h3>
+                <div className="flex items-start gap-2 bg-gray-50 p-4 rounded-lg">
+                  <MapPin className="w-4 h-4 text-blue-600 mt-1" />
+                  <div className="text-gray-900">
                     {client.company.address ? (
                       <>
-                        <p>{client.company.address}</p>
-                        <p>{client.company.city}/{client.company.state}</p>
-                        {client.company.zipCode && <p>CEP: {client.company.zipCode}</p>}
+                        <p className="font-medium">{client.company.address}</p>
+                        {client.company.city && client.company.state && (
+                          <p className="text-gray-600">{client.company.city} - {client.company.state}</p>
+                        )}
+                        {client.company.zipCode && <p className="text-gray-500">CEP: {client.company.zipCode}</p>}
                       </>
                     ) : (
-                      <p className="text-slate-400">Endereço não cadastrado</p>
+                      <p className="text-gray-500">Endereço não cadastrado</p>
                     )}
                   </div>
                 </div>
@@ -264,17 +259,17 @@ export default function MasterClientDetail() {
 
               {/* Datas */}
               <div>
-                <h3 className="text-sm font-medium text-slate-300 mb-3">Informações do Sistema</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Calendar className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-400">Cadastro:</span>
-                    <span>{formatDateTime(client.company.createdAt)}</span>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Informações do Sistema</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-blue-600" />
+                    <span className="text-gray-500 font-medium">Cadastro:</span>
+                    <span className="text-gray-900">{formatDateTime(client.company.createdAt)}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <ExternalLink className="w-4 h-4 text-slate-400" />
-                    <span className="text-slate-400">Slug:</span>
-                    <span>{client.company.slug}</span>
+                  <div className="flex items-center gap-2">
+                    <ExternalLink className="w-4 h-4 text-blue-600" />
+                    <span className="text-gray-500 font-medium">Slug:</span>
+                    <span className="text-gray-900 font-mono bg-gray-200 px-2 py-0.5 rounded">{client.company.slug}</span>
                   </div>
                 </div>
               </div>
@@ -282,77 +277,77 @@ export default function MasterClientDetail() {
           </Card>
 
           {/* Stats Card */}
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-white">Resumo</CardTitle>
+              <CardTitle className="text-gray-900 text-lg">Resumo</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-100">
                 <div className="flex items-center gap-2">
-                  <Home className="w-5 h-5 text-blue-400" />
-                  <span className="text-slate-300">Imóveis</span>
+                  <Home className="w-5 h-5 text-blue-600" />
+                  <span className="text-gray-700 font-medium">Imóveis</span>
                 </div>
-                <span className="text-2xl font-bold text-white">{client.stats.totalProperties}</span>
+                <span className="text-3xl font-bold text-blue-600">{client.stats.totalProperties}</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-100">
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-green-400" />
-                  <span className="text-slate-300">Leads</span>
+                  <Users className="w-5 h-5 text-green-600" />
+                  <span className="text-gray-700 font-medium">Leads</span>
                 </div>
-                <span className="text-2xl font-bold text-white">{client.stats.totalLeads}</span>
+                <span className="text-3xl font-bold text-green-600">{client.stats.totalLeads}</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2">
-                  <User className="w-5 h-5 text-purple-400" />
-                  <span className="text-slate-300">Usuários</span>
+                  <User className="w-5 h-5 text-purple-600" />
+                  <span className="text-gray-700 font-medium">Usuários</span>
                 </div>
-                <span className="text-2xl font-bold text-white">{client.stats.totalUsers}</span>
+                <span className="text-3xl font-bold text-purple-600">{client.stats.totalUsers}</span>
               </div>
 
               {/* Plano Atual */}
-              <div className="pt-4 border-t border-slate-700">
-                <h4 className="text-sm font-medium text-slate-300 mb-2">Plano Atual</h4>
+              <div className="pt-4 border-t border-gray-200">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Plano Atual</h4>
                 {client.subscription ? (
-                  <div className="space-y-2">
-                    <Badge variant="default" className="text-sm">
+                  <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
+                    <Badge className="bg-blue-600 text-white text-sm px-3 py-1">
                       {client.subscription.planName}
                     </Badge>
-                    <p className="text-sm text-slate-400">
-                      Status: {client.subscription.status === 'active' ? 'Ativo' : 
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Status:</span> {client.subscription.status === 'active' ? 'Ativo' : 
                                client.subscription.status === 'trialing' ? 'Trial' : client.subscription.status}
                     </p>
                     {client.subscription.currentPeriodEnd && (
-                      <p className="text-sm text-slate-400">
-                        Próxima cobrança: {formatDate(client.subscription.currentPeriodEnd)}
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Próxima cobrança:</span> {formatDate(client.subscription.currentPeriodEnd)}
                       </p>
                     )}
                   </div>
                 ) : (
-                  <p className="text-slate-400">Sem assinatura ativa</p>
+                  <p className="text-gray-500 bg-gray-50 p-4 rounded-lg">Sem assinatura ativa</p>
                 )}
                 
                 <Dialog open={showPlanDialog} onOpenChange={setShowPlanDialog}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="w-full mt-3 border-slate-600">
+                    <Button variant="outline" size="sm" className="w-full mt-3 border-blue-300 text-blue-600 hover:bg-blue-50">
                       <CreditCard className="w-4 h-4 mr-2" />
                       Alterar Plano
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-slate-800 border-slate-700">
+                  <DialogContent className="bg-white border-gray-200">
                     <DialogHeader>
-                      <DialogTitle className="text-white">Alterar Plano</DialogTitle>
-                      <DialogDescription className="text-slate-400">
+                      <DialogTitle className="text-gray-900">Alterar Plano</DialogTitle>
+                      <DialogDescription className="text-gray-500">
                         Selecione o novo plano para este cliente
                       </DialogDescription>
                     </DialogHeader>
                     <div className="py-4">
                       <Select value={selectedPlan} onValueChange={setSelectedPlan}>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                        <SelectTrigger className="bg-white border-gray-300 text-gray-900">
                           <SelectValue placeholder="Selecione um plano" />
                         </SelectTrigger>
-                        <SelectContent className="bg-slate-700 border-slate-600">
+                        <SelectContent className="bg-white border-gray-200">
                           {plans?.map((plan: any) => (
-                            <SelectItem key={plan.id} value={plan.id.toString()} className="text-white">
+                            <SelectItem key={plan.id} value={plan.id.toString()} className="text-gray-900">
                               {plan.name} - {formatCurrency(plan.price)}/mês
                             </SelectItem>
                           ))}
@@ -360,10 +355,10 @@ export default function MasterClientDetail() {
                       </Select>
                     </div>
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => setShowPlanDialog(false)} className="border-slate-600">
+                      <Button variant="outline" onClick={() => setShowPlanDialog(false)} className="border-gray-300 text-gray-700">
                         Cancelar
                       </Button>
-                      <Button onClick={handleChangePlan} disabled={!selectedPlan || changePlanMutation.isPending}>
+                      <Button onClick={handleChangePlan} disabled={!selectedPlan || changePlanMutation.isPending} className="bg-blue-600 text-white hover:bg-blue-700">
                         {changePlanMutation.isPending ? "Alterando..." : "Confirmar"}
                       </Button>
                     </DialogFooter>
@@ -376,16 +371,16 @@ export default function MasterClientDetail() {
 
         {/* Tabs for Properties, Leads, Users */}
         <Tabs defaultValue="properties" className="space-y-4">
-          <TabsList className="bg-slate-800 border-slate-700">
-            <TabsTrigger value="properties" className="data-[state=active]:bg-slate-700">
+          <TabsList className="bg-white border border-gray-200 shadow-sm">
+            <TabsTrigger value="properties" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700">
               <Home className="w-4 h-4 mr-2" />
               Imóveis ({client.stats.totalProperties})
             </TabsTrigger>
-            <TabsTrigger value="leads" className="data-[state=active]:bg-slate-700">
+            <TabsTrigger value="leads" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700">
               <Users className="w-4 h-4 mr-2" />
               Leads ({client.stats.totalLeads})
             </TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:bg-slate-700">
+            <TabsTrigger value="users" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700">
               <User className="w-4 h-4 mr-2" />
               Usuários ({client.stats.totalUsers})
             </TabsTrigger>
@@ -393,57 +388,59 @@ export default function MasterClientDetail() {
 
           {/* Properties Tab */}
           <TabsContent value="properties">
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white">Imóveis Cadastrados</CardTitle>
-                <CardDescription className="text-slate-400">
+                <CardTitle className="text-gray-900 text-xl">Imóveis Cadastrados</CardTitle>
+                <CardDescription className="text-gray-500">
                   Lista de todos os imóveis deste cliente
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-slate-700">
-                      <TableHead className="text-slate-300">Título</TableHead>
-                      <TableHead className="text-slate-300">Tipo</TableHead>
-                      <TableHead className="text-slate-300">Finalidade</TableHead>
-                      <TableHead className="text-slate-300">Preço</TableHead>
-                      <TableHead className="text-slate-300">Cidade</TableHead>
-                      <TableHead className="text-slate-300">Status</TableHead>
-                      <TableHead className="text-slate-300">Criado em</TableHead>
+                    <TableRow className="border-gray-200 bg-gray-50">
+                      <TableHead className="text-gray-700 font-semibold">Título</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Tipo</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Finalidade</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Preço</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Cidade</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Status</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Criado em</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {client.properties.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center text-slate-400">
+                        <TableCell colSpan={7} className="text-center text-gray-500 py-8">
                           Nenhum imóvel cadastrado
                         </TableCell>
                       </TableRow>
                     ) : (
                       client.properties.map((property: any) => (
-                        <TableRow key={property.id} className="border-slate-700">
-                          <TableCell className="text-white font-medium">
+                        <TableRow key={property.id} className="border-gray-200 hover:bg-gray-50">
+                          <TableCell className="text-gray-900 font-semibold">
                             {property.title}
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {property.propertyType}
                           </TableCell>
-                          <TableCell className="text-slate-300">
-                            {property.purpose === 'sale' ? 'Venda' : 'Aluguel'}
+                          <TableCell className="text-gray-700">
+                            <Badge className={property.purpose === 'sale' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}>
+                              {property.purpose === 'sale' ? 'Venda' : 'Aluguel'}
+                            </Badge>
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-900 font-semibold">
                             {formatCurrency(property.price)}
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {property.city}/{property.state}
                           </TableCell>
                           <TableCell>
-                            <Badge variant={property.isPublished ? "default" : "secondary"}>
+                            <Badge className={property.isPublished ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}>
                               {property.isPublished ? "Publicado" : "Rascunho"}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-600">
                             {formatDate(property.createdAt)}
                           </TableCell>
                         </TableRow>
@@ -457,59 +454,59 @@ export default function MasterClientDetail() {
 
           {/* Leads Tab */}
           <TabsContent value="leads">
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white">Leads Capturados</CardTitle>
-                <CardDescription className="text-slate-400">
+                <CardTitle className="text-gray-900 text-xl">Leads Capturados</CardTitle>
+                <CardDescription className="text-gray-500">
                   Lista de todos os leads deste cliente
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-slate-700">
-                      <TableHead className="text-slate-300">Nome</TableHead>
-                      <TableHead className="text-slate-300">Email</TableHead>
-                      <TableHead className="text-slate-300">Telefone</TableHead>
-                      <TableHead className="text-slate-300">Origem</TableHead>
-                      <TableHead className="text-slate-300">Status</TableHead>
-                      <TableHead className="text-slate-300">Criado em</TableHead>
+                    <TableRow className="border-gray-200 bg-gray-50">
+                      <TableHead className="text-gray-700 font-semibold">Nome</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Email</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Telefone</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Origem</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Status</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Criado em</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {client.leads.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-slate-400">
+                        <TableCell colSpan={6} className="text-center text-gray-500 py-8">
                           Nenhum lead capturado
                         </TableCell>
                       </TableRow>
                     ) : (
                       client.leads.map((lead: any) => (
-                        <TableRow key={lead.id} className="border-slate-700">
-                          <TableCell className="text-white font-medium">
+                        <TableRow key={lead.id} className="border-gray-200 hover:bg-gray-50">
+                          <TableCell className="text-gray-900 font-semibold">
                             {lead.name}
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {lead.email}
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {formatPhone(lead.phone)}
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {lead.source || "-"}
                           </TableCell>
                           <TableCell>
-                            <Badge variant={
-                              lead.status === 'new' ? "default" :
-                              lead.status === 'contacted' ? "secondary" :
-                              lead.status === 'converted' ? "default" : "outline"
+                            <Badge className={
+                              lead.status === 'new' ? "bg-blue-100 text-blue-700" :
+                              lead.status === 'contacted' ? "bg-yellow-100 text-yellow-700" :
+                              lead.status === 'converted' ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
                             }>
                               {lead.status === 'new' ? 'Novo' :
                                lead.status === 'contacted' ? 'Contatado' :
                                lead.status === 'converted' ? 'Convertido' : lead.status}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-600">
                             {formatDateTime(lead.createdAt)}
                           </TableCell>
                         </TableRow>
@@ -523,49 +520,49 @@ export default function MasterClientDetail() {
 
           {/* Users Tab */}
           <TabsContent value="users">
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white">Usuários</CardTitle>
-                <CardDescription className="text-slate-400">
+                <CardTitle className="text-gray-900 text-xl">Usuários</CardTitle>
+                <CardDescription className="text-gray-500">
                   Lista de usuários vinculados a este cliente
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-slate-700">
-                      <TableHead className="text-slate-300">Nome</TableHead>
-                      <TableHead className="text-slate-300">Email</TableHead>
-                      <TableHead className="text-slate-300">Função</TableHead>
-                      <TableHead className="text-slate-300">Último Acesso</TableHead>
-                      <TableHead className="text-slate-300">Criado em</TableHead>
+                    <TableRow className="border-gray-200 bg-gray-50">
+                      <TableHead className="text-gray-700 font-semibold">Nome</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Email</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Função</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Último Acesso</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Criado em</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {client.users.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-slate-400">
+                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
                           Nenhum usuário cadastrado
                         </TableCell>
                       </TableRow>
                     ) : (
                       client.users.map((user: any) => (
-                        <TableRow key={user.id} className="border-slate-700">
-                          <TableCell className="text-white font-medium">
+                        <TableRow key={user.id} className="border-gray-200 hover:bg-gray-50">
+                          <TableCell className="text-gray-900 font-semibold">
                             {user.name}
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {user.email}
                           </TableCell>
                           <TableCell>
-                            <Badge variant={user.role === 'admin' ? "default" : "secondary"}>
+                            <Badge className={user.role === 'admin' ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600"}>
                               {user.role === 'admin' ? 'Administrador' : 'Usuário'}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-600">
                             {formatDateTime(user.lastLoginAt)}
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-600">
                             {formatDate(user.createdAt)}
                           </TableCell>
                         </TableRow>

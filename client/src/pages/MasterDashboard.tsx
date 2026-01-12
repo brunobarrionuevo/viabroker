@@ -12,7 +12,8 @@ import { toast } from "sonner";
 import { 
   Shield, Building2, Users, CreditCard, Activity, 
   LogOut, Search, RefreshCw, ChevronRight, DollarSign,
-  TrendingUp, CheckCircle, XCircle, Clock, AlertCircle
+  TrendingUp, CheckCircle, XCircle, Clock, AlertCircle,
+  Eye, Home, UserCheck
 } from "lucide-react";
 
 interface MasterAdmin {
@@ -90,6 +91,10 @@ export default function MasterDashboard() {
     toggleStatusMutation.mutate({ token, companyId, isActive: !currentStatus });
   };
 
+  const handleViewClient = (companyId: number) => {
+    setLocation(`/master/client/${companyId}`);
+  };
+
   const formatCurrency = (value: number | string | null | undefined) => {
     const num = typeof value === 'string' ? parseFloat(value) : (value || 0);
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
@@ -120,22 +125,22 @@ export default function MasterDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-              <Shield className="w-6 h-6 text-primary" />
+            <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+              <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-white">Brokvia Admin</h1>
-              <p className="text-xs text-slate-400">Painel Master</p>
+              <h1 className="font-bold text-gray-900">Brokvia Admin</h1>
+              <p className="text-xs text-gray-500">Painel Master</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-300">{admin?.name}</span>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-300 hover:text-white">
+            <span className="text-sm text-gray-700 font-medium">{admin?.name}</span>
+            <Button variant="outline" size="sm" onClick={handleLogout} className="text-gray-700 hover:text-gray-900 border-gray-300">
               <LogOut className="w-4 h-4 mr-2" />
               Sair
             </Button>
@@ -146,64 +151,64 @@ export default function MasterDashboard() {
       <main className="container mx-auto px-4 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-300">Total de Clientes</CardTitle>
-              <Building2 className="w-4 h-4 text-slate-400" />
+              <CardTitle className="text-sm font-medium text-gray-600">Total de Clientes</CardTitle>
+              <Building2 className="w-5 h-5 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{stats?.totalCompanies || 0}</div>
-              <p className="text-xs text-slate-400">Corretores e imobiliárias</p>
+              <div className="text-3xl font-bold text-gray-900">{stats?.totalCompanies || 0}</div>
+              <p className="text-sm text-gray-500 mt-1">Corretores e imobiliárias</p>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-300">Assinaturas Ativas</CardTitle>
-              <CheckCircle className="w-4 h-4 text-green-500" />
+              <CardTitle className="text-sm font-medium text-gray-600">Assinaturas Ativas</CardTitle>
+              <CheckCircle className="w-5 h-5 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{stats?.activeSubscriptions || 0}</div>
-              <p className="text-xs text-slate-400">Pagantes ativos</p>
+              <div className="text-3xl font-bold text-gray-900">{stats?.activeSubscriptions || 0}</div>
+              <p className="text-sm text-gray-500 mt-1">Pagantes ativos</p>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-300">Receita Total</CardTitle>
-              <DollarSign className="w-4 h-4 text-emerald-500" />
+              <CardTitle className="text-sm font-medium text-gray-600">Receita Total</CardTitle>
+              <DollarSign className="w-5 h-5 text-emerald-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{formatCurrency(stats?.totalRevenue)}</div>
-              <p className="text-xs text-slate-400">Pagamentos confirmados</p>
+              <div className="text-3xl font-bold text-gray-900">{formatCurrency(stats?.totalRevenue)}</div>
+              <p className="text-sm text-gray-500 mt-1">Pagamentos confirmados</p>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-300">Total de Usuários</CardTitle>
-              <Users className="w-4 h-4 text-slate-400" />
+              <CardTitle className="text-sm font-medium text-gray-600">Total de Usuários</CardTitle>
+              <Users className="w-5 h-5 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{stats?.totalUsers || 0}</div>
-              <p className="text-xs text-slate-400">Usuários cadastrados</p>
+              <div className="text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</div>
+              <p className="text-sm text-gray-500 mt-1">Usuários cadastrados</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="companies" className="space-y-4">
-          <TabsList className="bg-slate-800 border-slate-700">
-            <TabsTrigger value="companies" className="data-[state=active]:bg-slate-700">
+          <TabsList className="bg-white border border-gray-200 shadow-sm">
+            <TabsTrigger value="companies" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700">
               <Building2 className="w-4 h-4 mr-2" />
               Clientes
             </TabsTrigger>
-            <TabsTrigger value="plans" className="data-[state=active]:bg-slate-700">
+            <TabsTrigger value="plans" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700">
               <CreditCard className="w-4 h-4 mr-2" />
               Planos
             </TabsTrigger>
-            <TabsTrigger value="payments" className="data-[state=active]:bg-slate-700">
+            <TabsTrigger value="payments" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700">
               <DollarSign className="w-4 h-4 mr-2" />
               Pagamentos
             </TabsTrigger>
-            <TabsTrigger value="logs" className="data-[state=active]:bg-slate-700">
+            <TabsTrigger value="logs" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700">
               <Activity className="w-4 h-4 mr-2" />
               Atividades
             </TabsTrigger>
@@ -211,28 +216,28 @@ export default function MasterDashboard() {
 
           {/* Companies Tab */}
           <TabsContent value="companies">
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-white">Clientes</CardTitle>
-                    <CardDescription className="text-slate-400">
+                    <CardTitle className="text-gray-900 text-xl">Clientes</CardTitle>
+                    <CardDescription className="text-gray-500">
                       Gerencie corretores e imobiliárias cadastradas
                     </CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => refetchCompanies()} className="border-slate-600">
+                  <Button variant="outline" size="sm" onClick={() => refetchCompanies()} className="border-gray-300 text-gray-700 hover:bg-gray-50">
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Atualizar
                   </Button>
                 </div>
                 <div className="flex gap-4 mt-4">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
                       placeholder="Buscar por nome, email ou slug..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 bg-slate-700 border-slate-600 text-white"
+                      className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
                     />
                   </div>
                   <div className="flex items-center gap-2">
@@ -240,7 +245,7 @@ export default function MasterDashboard() {
                       variant={activeFilter === undefined ? "default" : "outline"}
                       size="sm"
                       onClick={() => setActiveFilter(undefined)}
-                      className="border-slate-600"
+                      className={activeFilter === undefined ? "bg-blue-600 text-white" : "border-gray-300 text-gray-700"}
                     >
                       Todos
                     </Button>
@@ -248,7 +253,7 @@ export default function MasterDashboard() {
                       variant={activeFilter === true ? "default" : "outline"}
                       size="sm"
                       onClick={() => setActiveFilter(true)}
-                      className="border-slate-600"
+                      className={activeFilter === true ? "bg-green-600 text-white" : "border-gray-300 text-gray-700"}
                     >
                       Ativos
                     </Button>
@@ -256,7 +261,7 @@ export default function MasterDashboard() {
                       variant={activeFilter === false ? "default" : "outline"}
                       size="sm"
                       onClick={() => setActiveFilter(false)}
-                      className="border-slate-600"
+                      className={activeFilter === false ? "bg-red-600 text-white" : "border-gray-300 text-gray-700"}
                     >
                       Inativos
                     </Button>
@@ -266,51 +271,51 @@ export default function MasterDashboard() {
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-slate-700">
-                      <TableHead className="text-slate-300">Empresa</TableHead>
-                      <TableHead className="text-slate-300">Contato</TableHead>
-                      <TableHead className="text-slate-300">Assinatura</TableHead>
-                      <TableHead className="text-slate-300">Criado em</TableHead>
-                      <TableHead className="text-slate-300">Status</TableHead>
-                      <TableHead className="text-slate-300 text-right">Ações</TableHead>
+                    <TableRow className="border-gray-200 bg-gray-50">
+                      <TableHead className="text-gray-700 font-semibold">Empresa</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Contato</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Assinatura</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Criado em</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Status</TableHead>
+                      <TableHead className="text-gray-700 font-semibold text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {companiesLoading ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-slate-400">
+                        <TableCell colSpan={6} className="text-center text-gray-500 py-8">
                           Carregando...
                         </TableCell>
                       </TableRow>
                     ) : companies?.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-slate-400">
+                        <TableCell colSpan={6} className="text-center text-gray-500 py-8">
                           Nenhum cliente encontrado
                         </TableCell>
                       </TableRow>
                     ) : (
                       companies?.map((company: any) => (
-                        <TableRow key={company.id} className="border-slate-700">
+                        <TableRow key={company.id} className="border-gray-200 hover:bg-gray-50">
                           <TableCell>
                             <div>
-                              <p className="font-medium text-white">{company.name}</p>
-                              <p className="text-sm text-slate-400">{company.slug}</p>
+                              <p className="font-semibold text-gray-900">{company.name}</p>
+                              <p className="text-sm text-gray-500">{company.slug}</p>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div>
-                              <p className="text-sm text-slate-300">{company.email || "-"}</p>
-                              <p className="text-sm text-slate-400">{company.phone || "-"}</p>
+                              <p className="text-sm text-gray-900">{company.email || "-"}</p>
+                              <p className="text-sm text-gray-500">{company.phone || "-"}</p>
                             </div>
                           </TableCell>
                           <TableCell>
                             {company.subscription ? (
                               getStatusBadge(company.subscription.status)
                             ) : (
-                              <Badge variant="outline">Sem assinatura</Badge>
+                              <Badge variant="outline" className="border-gray-300 text-gray-600">Sem assinatura</Badge>
                             )}
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {formatDate(company.createdAt)}
                           </TableCell>
                           <TableCell>
@@ -320,14 +325,20 @@ export default function MasterDashboard() {
                                 onCheckedChange={() => handleToggleStatus(company.id, company.isActive)}
                                 disabled={toggleStatusMutation.isPending}
                               />
-                              <span className={company.isActive ? "text-green-500" : "text-red-500"}>
+                              <span className={`font-medium ${company.isActive ? "text-green-600" : "text-red-600"}`}>
                                 {company.isActive ? "Ativo" : "Inativo"}
                               </span>
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white">
-                              <ChevronRight className="w-4 h-4" />
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleViewClient(company.id)}
+                              className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              Ver Detalhes
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -341,66 +352,66 @@ export default function MasterDashboard() {
 
           {/* Plans Tab */}
           <TabsContent value="plans">
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white">Planos</CardTitle>
-                <CardDescription className="text-slate-400">
+                <CardTitle className="text-gray-900 text-xl">Planos</CardTitle>
+                <CardDescription className="text-gray-500">
                   Gerencie os planos de assinatura disponíveis
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-slate-700">
-                      <TableHead className="text-slate-300">Plano</TableHead>
-                      <TableHead className="text-slate-300">Preço</TableHead>
-                      <TableHead className="text-slate-300">Imóveis</TableHead>
-                      <TableHead className="text-slate-300">Usuários</TableHead>
-                      <TableHead className="text-slate-300">Recursos</TableHead>
-                      <TableHead className="text-slate-300">Status</TableHead>
+                    <TableRow className="border-gray-200 bg-gray-50">
+                      <TableHead className="text-gray-700 font-semibold">Plano</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Preço</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Imóveis</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Usuários</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Recursos</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {plansLoading ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-slate-400">
+                        <TableCell colSpan={6} className="text-center text-gray-500 py-8">
                           Carregando...
                         </TableCell>
                       </TableRow>
                     ) : plans?.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-slate-400">
+                        <TableCell colSpan={6} className="text-center text-gray-500 py-8">
                           Nenhum plano cadastrado
                         </TableCell>
                       </TableRow>
                     ) : (
                       plans?.map((plan: any) => (
-                        <TableRow key={plan.id} className="border-slate-700">
+                        <TableRow key={plan.id} className="border-gray-200 hover:bg-gray-50">
                           <TableCell>
                             <div>
-                              <p className="font-medium text-white">{plan.name}</p>
-                              <p className="text-sm text-slate-400">{plan.slug}</p>
+                              <p className="font-semibold text-gray-900">{plan.name}</p>
+                              <p className="text-sm text-gray-500">{plan.slug}</p>
                             </div>
                           </TableCell>
-                          <TableCell className="text-white font-medium">
+                          <TableCell className="text-gray-900 font-semibold">
                             {formatCurrency(plan.price)}/mês
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {plan.maxProperties === -1 ? "Ilimitado" : plan.maxProperties}
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {plan.maxUsers === -1 ? "Ilimitado" : plan.maxUsers}
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
-                              {plan.hasAI && <Badge variant="secondary" className="text-xs">IA</Badge>}
-                              {plan.hasWhatsappIntegration && <Badge variant="secondary" className="text-xs">WhatsApp</Badge>}
-                              {plan.hasPortalIntegration && <Badge variant="secondary" className="text-xs">Portais</Badge>}
-                              {plan.hasCustomDomain && <Badge variant="secondary" className="text-xs">Domínio</Badge>}
+                              {plan.hasAI && <Badge className="bg-purple-100 text-purple-700 text-xs">IA</Badge>}
+                              {plan.hasWhatsappIntegration && <Badge className="bg-green-100 text-green-700 text-xs">WhatsApp</Badge>}
+                              {plan.hasPortalIntegration && <Badge className="bg-blue-100 text-blue-700 text-xs">Portais</Badge>}
+                              {plan.hasCustomDomain && <Badge className="bg-orange-100 text-orange-700 text-xs">Domínio</Badge>}
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant={plan.isActive ? "default" : "destructive"}>
+                            <Badge className={plan.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
                               {plan.isActive ? "Ativo" : "Inativo"}
                             </Badge>
                           </TableCell>
@@ -415,50 +426,61 @@ export default function MasterDashboard() {
 
           {/* Payments Tab */}
           <TabsContent value="payments">
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white">Histórico de Pagamentos</CardTitle>
-                <CardDescription className="text-slate-400">
-                  Visualize todos os pagamentos realizados
+                <CardTitle className="text-gray-900 text-xl">Pagamentos</CardTitle>
+                <CardDescription className="text-gray-500">
+                  Histórico de pagamentos recebidos
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-slate-700">
-                      <TableHead className="text-slate-300">ID</TableHead>
-                      <TableHead className="text-slate-300">Empresa</TableHead>
-                      <TableHead className="text-slate-300">Valor</TableHead>
-                      <TableHead className="text-slate-300">Status</TableHead>
-                      <TableHead className="text-slate-300">Data</TableHead>
+                    <TableRow className="border-gray-200 bg-gray-50">
+                      <TableHead className="text-gray-700 font-semibold">Cliente</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Valor</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Status</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Data</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Método</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {paymentsLoading ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-slate-400">
+                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
                           Carregando...
                         </TableCell>
                       </TableRow>
                     ) : payments?.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-slate-400">
-                          Nenhum pagamento encontrado
+                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                          Nenhum pagamento registrado
                         </TableCell>
                       </TableRow>
                     ) : (
                       payments?.map((payment: any) => (
-                        <TableRow key={payment.id} className="border-slate-700">
-                          <TableCell className="text-slate-300">#{payment.id}</TableCell>
-                          <TableCell className="text-slate-300">#{payment.companyId}</TableCell>
-                          <TableCell className="text-white font-medium">
+                        <TableRow key={payment.id} className="border-gray-200 hover:bg-gray-50">
+                          <TableCell className="text-gray-900 font-medium">
+                            {payment.companyName || `Empresa #${payment.companyId}`}
+                          </TableCell>
+                          <TableCell className="text-gray-900 font-semibold">
                             {formatCurrency(payment.amount)}
                           </TableCell>
                           <TableCell>
-                            {getStatusBadge(payment.status)}
+                            <Badge className={
+                              payment.status === 'succeeded' ? "bg-green-100 text-green-700" :
+                              payment.status === 'pending' ? "bg-yellow-100 text-yellow-700" :
+                              "bg-red-100 text-red-700"
+                            }>
+                              {payment.status === 'succeeded' ? 'Confirmado' :
+                               payment.status === 'pending' ? 'Pendente' : payment.status}
+                            </Badge>
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {formatDate(payment.createdAt)}
+                          </TableCell>
+                          <TableCell className="text-gray-700">
+                            {payment.paymentMethod || "Stripe"}
                           </TableCell>
                         </TableRow>
                       ))
@@ -471,48 +493,57 @@ export default function MasterDashboard() {
 
           {/* Activity Logs Tab */}
           <TabsContent value="logs">
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white">Logs de Atividade</CardTitle>
-                <CardDescription className="text-slate-400">
-                  Histórico de ações realizadas no sistema
+                <CardTitle className="text-gray-900 text-xl">Atividades</CardTitle>
+                <CardDescription className="text-gray-500">
+                  Registro de atividades do sistema
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-slate-700">
-                      <TableHead className="text-slate-300">Ator</TableHead>
-                      <TableHead className="text-slate-300">Ação</TableHead>
-                      <TableHead className="text-slate-300">Entidade</TableHead>
-                      <TableHead className="text-slate-300">Data</TableHead>
+                    <TableRow className="border-gray-200 bg-gray-50">
+                      <TableHead className="text-gray-700 font-semibold">Ação</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Ator</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Entidade</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Data</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Detalhes</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {logsLoading ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-slate-400">
+                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
                           Carregando...
                         </TableCell>
                       </TableRow>
                     ) : activityLogs?.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-slate-400">
+                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
                           Nenhuma atividade registrada
                         </TableCell>
                       </TableRow>
                     ) : (
                       activityLogs?.map((log: any) => (
-                        <TableRow key={log.id} className="border-slate-700">
+                        <TableRow key={log.id} className="border-gray-200 hover:bg-gray-50">
                           <TableCell>
-                            <Badge variant="outline">{log.actorType}</Badge>
+                            <Badge className="bg-blue-100 text-blue-700">
+                              {log.action}
+                            </Badge>
                           </TableCell>
-                          <TableCell className="text-white">{log.action}</TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-900">
+                            {log.actorType === 'master_admin' ? 'Admin Master' : log.actorType}
+                            {log.actorId && ` #${log.actorId}`}
+                          </TableCell>
+                          <TableCell className="text-gray-700">
                             {log.entityType ? `${log.entityType} #${log.entityId}` : "-"}
                           </TableCell>
-                          <TableCell className="text-slate-300">
+                          <TableCell className="text-gray-700">
                             {formatDate(log.createdAt)}
+                          </TableCell>
+                          <TableCell className="text-gray-600 text-sm max-w-xs truncate">
+                            {log.details ? JSON.stringify(log.details) : "-"}
                           </TableCell>
                         </TableRow>
                       ))
