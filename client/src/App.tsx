@@ -23,6 +23,12 @@ import RealtorSite from "./pages/RealtorSite";
 import RealtorPropertyDetail from "./pages/RealtorPropertyDetail";
 import MasterLogin from "./pages/MasterLogin";
 import MasterDashboard from "./pages/MasterDashboard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import VerifyEmail from "./pages/VerifyEmail";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Plans from "./pages/Plans";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
@@ -91,6 +97,14 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/imoveis" component={PublicProperties} />
       <Route path="/imovel/:id" component={PublicPropertyDetail} />
+      
+      {/* Autenticação Própria */}
+      <Route path="/login" component={Login} />
+      <Route path="/cadastro" component={Register} />
+      <Route path="/verificar-email" component={VerifyEmail} />
+      <Route path="/esqueci-senha" component={ForgotPassword} />
+      <Route path="/redefinir-senha" component={ResetPassword} />
+      <Route path="/planos" component={Plans} />
       
       {/* Onboarding Route */}
       <Route path="/onboarding" component={OnboardingRoute} />

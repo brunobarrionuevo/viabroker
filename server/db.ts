@@ -116,6 +116,103 @@ export async function updateUserCompany(userId: number, companyId: number): Prom
   await db.update(users).set({ companyId }).where(eq(users.id, userId));
 }
 
+// Funções de autenticação própria
+export async function createUser(data: InsertUser) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(users).values(data);
+  const inserted = await db.select().from(users).where(eq(users.id, Number(result[0].insertId))).limit(1);
+  return inserted[0];
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByGoogleId(googleId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.googleId, googleId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByVerificationToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.emailVerificationToken, token)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByPasswordResetToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.passwordResetToken, token)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function verifyUserEmail(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ 
+    emailVerified: true, 
+    emailVerificationToken: null,
+    emailVerificationExpires: null 
+  }).where(eq(users.id, userId));
+}
+
+export async function updateUserVerificationToken(userId: number, token: string, expires: Date): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ 
+    emailVerificationToken: token,
+    emailVerificationExpires: expires 
+  }).where(eq(users.id, userId));
+}
+
+export async function updateUserPasswordResetToken(userId: number, token: string, expires: Date): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ 
+    passwordResetToken: token,
+    passwordResetExpires: expires 
+  }).where(eq(users.id, userId));
+}
+
+export async function updateUserPassword(userId: number, passwordHash: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ 
+    passwordHash,
+    passwordResetToken: null,
+    passwordResetExpires: null 
+  }).where(eq(users.id, userId));
+}
+
+export async function updateUserLastLogin(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
+}
+
+export async function linkGoogleAccount(userId: number, googleId: string, avatarUrl?: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ 
+    googleId,
+    avatarUrl: avatarUrl || undefined,
+    emailVerified: true 
+  }).where(eq(users.id, userId));
+}
+
+export async function updateUserTrialExpired(userId: number, isExpired: boolean): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ isTrialExpired: isExpired }).where(eq(users.id, userId));
+}
+
 // ==========================================
 // EMPRESAS / IMOBILIÁRIAS
 // ==========================================

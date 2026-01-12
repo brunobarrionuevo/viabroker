@@ -152,3 +152,18 @@
 
 ## Configuração Inicial Admin Master
 - [x] Criar script para gerar usuário admin master inicial
+
+
+## Sistema de Autenticação Própria
+- [x] Atualizar schema do banco para usuários próprios (email, senha hash, confirmação)
+- [x] Adicionar campos de trial (trialStartDate, trialEndDate, isTrialExpired)
+- [x] Criar sistema de envio de emails (confirmação de conta)
+- [x] Implementar endpoint de registro manual
+- [x] Implementar endpoint de login com email/senha
+- [x] Implementar login com Google OAuth
+- [x] Criar página de confirmação de email
+- [x] Criar página de login personalizada
+- [x] Criar página de cadastro personalizada
+- [x] Implementar lógica de 7 dias de trial gratuito
+- [x] Bloquear acesso após expiração do trial sem assinatura
+- [x] Criar página de escolha de plano após trial

@@ -13,6 +13,22 @@ export const users = mysqlTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   companyId: int("companyId"),
+  
+  // Campos de autenticação própria
+  passwordHash: varchar("passwordHash", { length: 255 }),
+  emailVerified: boolean("emailVerified").default(false).notNull(),
+  emailVerificationToken: varchar("emailVerificationToken", { length: 100 }),
+  emailVerificationExpires: timestamp("emailVerificationExpires"),
+  passwordResetToken: varchar("passwordResetToken", { length: 100 }),
+  passwordResetExpires: timestamp("passwordResetExpires"),
+  googleId: varchar("googleId", { length: 100 }),
+  avatarUrl: text("avatarUrl"),
+  
+  // Campos de trial
+  trialStartDate: timestamp("trialStartDate"),
+  trialEndDate: timestamp("trialEndDate"),
+  isTrialExpired: boolean("isTrialExpired").default(false).notNull(),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

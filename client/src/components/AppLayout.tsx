@@ -26,6 +26,7 @@ import {
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import TrialBanner from "./TrialBanner";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -164,6 +165,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
         {/* Page content */}
         <main className="p-4 lg:p-6">
+          <TrialBanner />
           {children}
         </main>
       </div>

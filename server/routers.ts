@@ -11,6 +11,7 @@ import { validateCPF, validateCNPJ, cleanCPF, cleanCNPJ } from "../shared/valida
 import { generateVivaRealXML, generateOLXXML, generateGenericXML } from "./xmlGenerator";
 import { masterAdminRouter } from "./masterAdmin";
 import { createCheckoutSession, createBillingPortalSession } from "./stripe";
+import { authRouter } from "./auth";
 
 // Schemas de validação
 const propertyTypeEnum = z.enum(["casa", "apartamento", "terreno", "comercial", "rural", "cobertura", "flat", "kitnet", "sobrado", "galpao", "sala_comercial", "loja", "outro"]);
@@ -906,6 +907,9 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
 
   // Administração Master
   masterAdmin: masterAdminRouter,
+  
+  // Autenticação própria
+  customAuth: authRouter,
 
   // Stripe Checkout
   stripe: router({
