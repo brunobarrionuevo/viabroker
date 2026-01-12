@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO master_admins (username, passwordHash, email, name, role, isActive, createdAt, updatedAt) \nVALUES ('admin', '$2a$10$8K1p/a0dL1LXMIgoEDFrwOfMQHLaV.xLdMCaYqMGvLDiYvzVJFZGy', 'admin@brokvia.com', 'Administrador', 'super_admin', true, NOW(), NOW())\nON DUPLICATE KEY UPDATE updatedAt = NOW();",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute INSERT INTO master_admins (username, passwordHash, email, name, role, isActive, createdAt, updatedAt) \nVALUES ('admin', '$2a$10$8K1p/a0dL1LXMIgoEDFrwOfMQHLaV.xLdMCaYqMGvLDiYvzVJFZGy', 'admin@brokvia.com', 'Administrador', 'super_admin', true, NOW(), NOW())\nON DUPLICATE KEY UPDATE updatedAt = NOW();",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'role' in 'field list'"
+  ]
+}

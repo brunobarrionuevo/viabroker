@@ -148,3 +148,7 @@
 - [x] Histórico de pagamentos
 - [x] Integração com Stripe para pagamentos recorrentes
 - [x] Logs de atividades do sistema
+
+
+## Configuração Inicial Admin Master
+- [x] Criar script para gerar usuário admin master inicial

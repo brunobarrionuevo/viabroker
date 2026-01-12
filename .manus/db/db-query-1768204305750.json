@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO master_admins (username, passwordHash, name, email, isActive, createdAt, updatedAt) \nVALUES ('admin', '$2a$10$8K1p/a0dL1LXMIgoEDFrwOfMQHLaV.xLdMCaYqMGvLDiYvzVJFZGy', 'Administrador', 'admin@brokvia.com', true, NOW(), NOW())\nON DUPLICATE KEY UPDATE updatedAt = NOW();",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute INSERT INTO master_admins (username, passwordHash, name, email, isActive, createdAt, updatedAt) \nVALUES ('admin', '$2a$10$8K1p/a0dL1LXMIgoEDFrwOfMQHLaV.xLdMCaYqMGvLDiYvzVJFZGy', 'Administrador', 'admin@brokvia.com', true, NOW(), NOW())\nON DUPLICATE KEY UPDATE updatedAt = NOW();",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 62
+}
