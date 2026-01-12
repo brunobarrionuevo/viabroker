@@ -80,7 +80,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
     if (process.env.SMTP_HOST) {
       const transporter = getTransporter();
       await transporter.sendMail({
-        from: `"${APP_NAME}" <${process.env.SMTP_FROM || "noreply@brokvia.com"}>`,
+        from: `"${APP_NAME}" <${process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@brokvia.com"}>`,
         to,
         subject,
         html,

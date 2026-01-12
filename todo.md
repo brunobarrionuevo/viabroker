@@ -173,3 +173,10 @@
 - [x] Corrigir botão "Começar Gratuitamente" na Home para ir para /cadastro
 - [x] Corrigir botão "Acessar Dashboard" para ir para /login
 - [x] Verificar outros links que redirecionam para OAuth da Manus
+
+
+## Configuração de Email SMTP
+- [x] Implementar serviço de email com Nodemailer
+- [x] Criar templates de email HTML para confirmação
+- [x] Solicitar credenciais SMTP ao usuário
+- [x] Testar envio de emails de confirmação
