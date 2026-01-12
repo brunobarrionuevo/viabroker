@@ -118,6 +118,7 @@ export const properties = mysqlTable("properties", {
   isPublished: boolean("isPublished").default(true).notNull(),
   metaTitle: varchar("metaTitle", { length: 70 }),
   metaDescription: varchar("metaDescription", { length: 160 }),
+  videoUrl: text("videoUrl"),
   publishedAt: timestamp("publishedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

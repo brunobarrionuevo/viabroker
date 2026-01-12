@@ -285,6 +285,28 @@ export const appRouter = router({
         return db.deletePropertyImage(input.id);
       }),
     
+    setMainImage: protectedProcedure
+      .input(z.object({ propertyId: z.number(), imageId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const property = await db.getPropertyById(input.propertyId);
+        if (!property || property.companyId !== ctx.user.companyId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Imóvel não encontrado" });
+        }
+        return db.setMainPropertyImage(input.propertyId, input.imageId);
+      }),
+    
+    updateImageOrder: protectedProcedure
+      .input(z.object({ id: z.number(), order: z.number() }))
+      .mutation(async ({ input }) => {
+        return db.updatePropertyImageOrder(input.id, input.order);
+      }),
+    
+    countImages: protectedProcedure
+      .input(z.object({ propertyId: z.number() }))
+      .query(async ({ input }) => {
+        return db.countPropertyImages(input.propertyId);
+      }),
+    
     listPublic: publicProcedure
       .input(z.object({
         type: z.string().optional(),

@@ -16,7 +16,7 @@
 - [x] CRUD de Agendamentos
 - [x] API de Busca de Imóveis (filtros avançados)
 - [x] API de Dashboard (estatísticas)
-- [ ] API de Upload de Imagens (S3)
+- [x] API de Upload de Imagens (S3)
 - [x] Geração de Descrições com IA
 
 ## Fase 3: Frontend - Painel do Cliente (Dashboard/CRM)
@@ -55,3 +55,10 @@
 - [x] Formatação de moedas para preços (R$ 1.234.567,89)
 - [x] Integração com API dos Correios (ViaCEP) para preenchimento automático de endereço
 - [x] Armazenar CPF/CNPJ apenas com dígitos no banco de dados
+
+## Correções e Melhorias (Nova Iteração)
+- [x] Corrigir erro de inserção de imóveis (valores monetários formatados não aceitos pelo banco)
+- [x] Criar tabela de fotos de imóveis (property_images)
+- [x] Implementar upload de até 20 fotos por imóvel
+- [x] Implementar campo de vídeo do imóvel (URL do YouTube/Vimeo)
+- [x] Exibir galeria de fotos na página de detalhes do imóvel

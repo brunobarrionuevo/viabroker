@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Properties from "./pages/Properties";
 import PropertyForm from "./pages/PropertyForm";
+import PropertyImages from "./pages/PropertyImages";
 import Leads from "./pages/Leads";
 import LeadForm from "./pages/LeadForm";
 import Appointments from "./pages/Appointments";
@@ -100,9 +101,8 @@ function Router() {
       <Route path="/dashboard/properties/new">
         {() => <ProtectedRoute component={PropertyForm} />}
       </Route>
-      <Route path="/dashboard/properties/:id">
-        {() => <ProtectedRoute component={PropertyForm} />}
-      </Route>
+      <Route path="/dashboard/properties/:id/edit" component={() => <ProtectedRoute component={PropertyForm} />} />
+      <Route path="/dashboard/properties/:id/images" component={() => <ProtectedRoute component={PropertyImages} />} />
       
       {/* Leads Routes */}
       <Route path="/dashboard/leads">

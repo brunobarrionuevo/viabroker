@@ -295,6 +295,30 @@ export async function deletePropertyImage(id: number): Promise<boolean> {
   return true;
 }
 
+export async function updatePropertyImageOrder(id: number, order: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  await db.update(propertyImages).set({ order }).where(eq(propertyImages.id, id));
+  return true;
+}
+
+export async function setMainPropertyImage(propertyId: number, imageId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  // Primeiro, remove o flag isMain de todas as imagens do imóvel
+  await db.update(propertyImages).set({ isMain: false }).where(eq(propertyImages.propertyId, propertyId));
+  // Depois, define a imagem selecionada como principal
+  await db.update(propertyImages).set({ isMain: true }).where(eq(propertyImages.id, imageId));
+  return true;
+}
+
+export async function countPropertyImages(propertyId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.select({ count: sql<number>`count(*)` }).from(propertyImages).where(eq(propertyImages.propertyId, propertyId));
+  return result[0]?.count || 0;
+}
+
 // ==========================================
 // LEADS
 // ==========================================

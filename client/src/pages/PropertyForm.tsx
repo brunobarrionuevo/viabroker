@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Loader2, Sparkles, Search } from "lucide-react";
+import { ArrowLeft, Loader2, Wand2, Search, Image, Sparkles } from "lucide-react";
 import { Link, useLocation, useParams } from "wouter";
 import { useState, useEffect } from "react";
 
@@ -104,6 +104,7 @@ export default function PropertyForm() {
     isPublished: true,
     metaTitle: "",
     metaDescription: "",
+    videoUrl: "",
   });
 
   const { data: property, isLoading: loadingProperty } = trpc.properties.get.useQuery(
@@ -171,17 +172,34 @@ export default function PropertyForm() {
         isPublished: property.isPublished,
         metaTitle: property.metaTitle || "",
         metaDescription: property.metaDescription || "",
+        videoUrl: property.videoUrl || "",
       });
     }
   }, [property]);
 
+  // Função para converter valor formatado (1.000,00) para string numérica (1000.00)
+  const parseCurrencyToString = (value: string): string => {
+    if (!value) return "";
+    const cleaned = value.replace(/\./g, "").replace(",", ".");
+    return cleaned;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Converter valores monetários formatados para formato numérico
+    const dataToSubmit = {
+      ...formData,
+      salePrice: parseCurrencyToString(formData.salePrice),
+      rentPrice: parseCurrencyToString(formData.rentPrice),
+      condoFee: parseCurrencyToString(formData.condoFee),
+      iptuAnnual: parseCurrencyToString(formData.iptuAnnual),
+    };
+    
     if (isEditing) {
-      updateMutation.mutate({ id: Number(params.id), ...formData });
+      updateMutation.mutate({ id: Number(params.id), ...dataToSubmit });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(dataToSubmit);
     }
   };
 
@@ -604,6 +622,28 @@ export default function PropertyForm() {
               </CardContent>
             </Card>
 
+            {/* Mídia - Vídeo */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Vídeo do Imóvel</CardTitle>
+                <CardDescription>Cole o link do YouTube ou Vimeo</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div>
+                  <Label htmlFor="videoUrl">URL do Vídeo</Label>
+                  <Input
+                    id="videoUrl"
+                    value={formData.videoUrl}
+                    onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Suporta YouTube e Vimeo
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Settings */}
             <Card>
               <CardHeader>
@@ -641,6 +681,14 @@ export default function PropertyForm() {
                 {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {isEditing ? "Salvar Alterações" : "Cadastrar Imóvel"}
               </Button>
+              {isEditing && (
+                <Button type="button" variant="secondary" asChild>
+                  <Link href={`/dashboard/properties/${params.id}/images`}>
+                    <Image className="w-4 h-4 mr-2" />
+                    Gerenciar Fotos
+                  </Link>
+                </Button>
+              )}
               <Button type="button" variant="outline" asChild>
                 <Link href="/dashboard/properties">Cancelar</Link>
               </Button>
