@@ -47,3 +47,11 @@
 ## Correções Solicitadas
 - [x] Cadastro flexível: pessoa física (CPF) ou pessoa jurídica (CNPJ)
 - [x] Corrigir bug que impede finalizar o cadastro
+
+## Melhorias Solicitadas (Nova Iteração)
+- [x] Validação completa de CPF com algoritmo de dígitos verificadores
+- [x] Validação completa de CNPJ com algoritmo de dígitos verificadores
+- [x] Rejeição de números inválidos conhecidos (sequências repetidas)
+- [x] Formatação de moedas para preços (R$ 1.234.567,89)
+- [x] Integração com API dos Correios (ViaCEP) para preenchimento automático de endereço
+- [x] Armazenar CPF/CNPJ apenas com dígitos no banco de dados

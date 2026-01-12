@@ -4,17 +4,82 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Building2, User, Loader2, ArrowRight, CheckCircle } from "lucide-react";
-import { useState } from "react";
+import { Building2, User, Loader2, ArrowRight, CheckCircle, Search, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+
+// Funções de validação de CPF/CNPJ
+function cleanDocument(doc: string): string {
+  return doc.replace(/\D/g, '');
+}
+
+function isInvalidSequence(doc: string): boolean {
+  const invalidSequences = [
+    '00000000000', '11111111111', '22222222222', '33333333333',
+    '44444444444', '55555555555', '66666666666', '77777777777',
+    '88888888888', '99999999999', '00000000000000', '11111111111111',
+    '22222222222222', '33333333333333', '44444444444444', '55555555555555',
+    '66666666666666', '77777777777777', '88888888888888', '99999999999999',
+  ];
+  return invalidSequences.includes(doc);
+}
+
+function validateCPF(cpf: string): boolean {
+  const cleaned = cleanDocument(cpf);
+  if (cleaned.length !== 11 || isInvalidSequence(cleaned)) return false;
+  
+  const digits = cleaned.split('').map(Number);
+  
+  // Primeiro dígito verificador
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += digits[i] * (10 - i);
+  let remainder = sum % 11;
+  const firstVerifier = remainder < 2 ? 0 : 11 - remainder;
+  if (digits[9] !== firstVerifier) return false;
+  
+  // Segundo dígito verificador
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += digits[i] * (11 - i);
+  remainder = sum % 11;
+  const secondVerifier = remainder < 2 ? 0 : 11 - remainder;
+  if (digits[10] !== secondVerifier) return false;
+  
+  return true;
+}
+
+function validateCNPJ(cnpj: string): boolean {
+  const cleaned = cleanDocument(cnpj);
+  if (cleaned.length !== 14 || isInvalidSequence(cleaned)) return false;
+  
+  const digits = cleaned.split('').map(Number);
+  const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  
+  // Primeiro dígito verificador
+  let sum = 0;
+  for (let i = 0; i < 12; i++) sum += digits[i] * weights1[i];
+  let remainder = sum % 11;
+  const firstVerifier = remainder < 2 ? 0 : 11 - remainder;
+  if (digits[12] !== firstVerifier) return false;
+  
+  // Segundo dígito verificador
+  sum = 0;
+  for (let i = 0; i < 13; i++) sum += digits[i] * weights2[i];
+  remainder = sum % 11;
+  const secondVerifier = remainder < 2 ? 0 : 11 - remainder;
+  if (digits[13] !== secondVerifier) return false;
+  
+  return true;
+}
 
 export default function Onboarding() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [step, setStep] = useState(1);
+  const [documentError, setDocumentError] = useState<string | null>(null);
+  const [cepLoading, setCepLoading] = useState(false);
   const [formData, setFormData] = useState({
     personType: "juridica" as "fisica" | "juridica",
     name: "",
@@ -25,6 +90,9 @@ export default function Onboarding() {
     email: user?.email || "",
     phone: "",
     whatsapp: "",
+    cep: "",
+    address: "",
+    neighborhood: "",
     city: "",
     state: "",
   });
@@ -86,6 +154,67 @@ export default function Onboarding() {
       .replace(/(\d{5})(\d)/, "$1-$2");
   };
 
+  const formatCEP = (value: string) => {
+    const numbers = value.replace(/\D/g, "").slice(0, 8);
+    return numbers.replace(/(\d{5})(\d)/, "$1-$2");
+  };
+
+  // Validar documento ao sair do campo
+  const handleDocumentBlur = () => {
+    setDocumentError(null);
+    
+    if (formData.personType === "fisica" && formData.cpf) {
+      if (!validateCPF(formData.cpf)) {
+        setDocumentError("CPF inválido. Verifique os dígitos informados.");
+      }
+    } else if (formData.personType === "juridica" && formData.cnpj) {
+      if (!validateCNPJ(formData.cnpj)) {
+        setDocumentError("CNPJ inválido. Verifique os dígitos informados.");
+      }
+    }
+  };
+
+  // Buscar endereço pelo CEP
+  const searchCEP = async () => {
+    const cleanedCep = formData.cep.replace(/\D/g, "");
+    if (cleanedCep.length !== 8) {
+      toast.error("CEP deve ter 8 dígitos");
+      return;
+    }
+
+    setCepLoading(true);
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanedCep}/json/`);
+      const data = await response.json();
+      
+      if (data.erro) {
+        toast.error("CEP não encontrado");
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        address: data.logradouro || "",
+        neighborhood: data.bairro || "",
+        city: data.localidade || "",
+        state: data.uf || "",
+      }));
+      toast.success("Endereço preenchido automaticamente!");
+    } catch (error) {
+      toast.error("Erro ao buscar CEP");
+    } finally {
+      setCepLoading(false);
+    }
+  };
+
+  // Auto-buscar CEP quando tiver 8 dígitos
+  useEffect(() => {
+    const cleanedCep = formData.cep.replace(/\D/g, "");
+    if (cleanedCep.length === 8) {
+      searchCEP();
+    }
+  }, [formData.cep]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -94,14 +223,26 @@ export default function Onboarding() {
       return;
     }
 
-    if (formData.personType === "fisica" && !formData.cpf) {
-      toast.error("Por favor, informe o CPF");
-      return;
+    if (formData.personType === "fisica") {
+      if (!formData.cpf) {
+        toast.error("Por favor, informe o CPF");
+        return;
+      }
+      if (!validateCPF(formData.cpf)) {
+        toast.error("CPF inválido. Verifique os dígitos informados.");
+        return;
+      }
     }
 
-    if (formData.personType === "juridica" && !formData.cnpj) {
-      toast.error("Por favor, informe o CNPJ");
-      return;
+    if (formData.personType === "juridica") {
+      if (!formData.cnpj) {
+        toast.error("Por favor, informe o CNPJ");
+        return;
+      }
+      if (!validateCNPJ(formData.cnpj)) {
+        toast.error("CNPJ inválido. Verifique os dígitos informados.");
+        return;
+      }
     }
 
     const slug = formData.slug || generateSlug(formData.name);
@@ -110,14 +251,16 @@ export default function Onboarding() {
       name: formData.name,
       slug,
       personType: formData.personType,
-      cpf: formData.personType === "fisica" ? formData.cpf : undefined,
-      cnpj: formData.personType === "juridica" ? formData.cnpj : undefined,
+      cpf: formData.personType === "fisica" ? formData.cpf.replace(/\D/g, "") : undefined,
+      cnpj: formData.personType === "juridica" ? formData.cnpj.replace(/\D/g, "") : undefined,
       creci: formData.creci || undefined,
       email: formData.email || undefined,
       phone: formData.phone || undefined,
       whatsapp: formData.whatsapp || undefined,
+      address: formData.address || undefined,
       city: formData.city || undefined,
       state: formData.state || undefined,
+      zipCode: formData.cep.replace(/\D/g, "") || undefined,
     });
   };
 
@@ -142,12 +285,15 @@ export default function Onboarding() {
                 <Label className="text-base font-semibold mb-4 block">Você é:</Label>
                 <RadioGroup
                   value={formData.personType}
-                  onValueChange={(value) => setFormData(prev => ({ 
-                    ...prev, 
-                    personType: value as "fisica" | "juridica",
-                    cpf: "",
-                    cnpj: ""
-                  }))}
+                  onValueChange={(value) => {
+                    setFormData(prev => ({ 
+                      ...prev, 
+                      personType: value as "fisica" | "juridica",
+                      cpf: "",
+                      cnpj: ""
+                    }));
+                    setDocumentError(null);
+                  }}
                   className="grid grid-cols-1 sm:grid-cols-2 gap-4"
                 >
                   <Label
@@ -217,9 +363,20 @@ export default function Onboarding() {
                     <Input
                       id="cpf"
                       value={formData.cpf}
-                      onChange={(e) => setFormData(prev => ({ ...prev, cpf: formatCPF(e.target.value) }))}
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, cpf: formatCPF(e.target.value) }));
+                        setDocumentError(null);
+                      }}
+                      onBlur={handleDocumentBlur}
                       placeholder="000.000.000-00"
+                      className={documentError ? "border-red-500" : ""}
                     />
+                    {documentError && (
+                      <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {documentError}
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <div>
@@ -227,9 +384,20 @@ export default function Onboarding() {
                     <Input
                       id="cnpj"
                       value={formData.cnpj}
-                      onChange={(e) => setFormData(prev => ({ ...prev, cnpj: formatCNPJ(e.target.value) }))}
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, cnpj: formatCNPJ(e.target.value) }));
+                        setDocumentError(null);
+                      }}
+                      onBlur={handleDocumentBlur}
                       placeholder="00.000.000/0000-00"
+                      className={documentError ? "border-red-500" : ""}
                     />
+                    {documentError && (
+                      <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {documentError}
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -252,13 +420,25 @@ export default function Onboarding() {
                     toast.error("Por favor, informe o nome");
                     return;
                   }
-                  if (formData.personType === "fisica" && !formData.cpf) {
-                    toast.error("Por favor, informe o CPF");
-                    return;
+                  if (formData.personType === "fisica") {
+                    if (!formData.cpf) {
+                      toast.error("Por favor, informe o CPF");
+                      return;
+                    }
+                    if (!validateCPF(formData.cpf)) {
+                      toast.error("CPF inválido. Verifique os dígitos informados.");
+                      return;
+                    }
                   }
-                  if (formData.personType === "juridica" && !formData.cnpj) {
-                    toast.error("Por favor, informe o CNPJ");
-                    return;
+                  if (formData.personType === "juridica") {
+                    if (!formData.cnpj) {
+                      toast.error("Por favor, informe o CNPJ");
+                      return;
+                    }
+                    if (!validateCNPJ(formData.cnpj)) {
+                      toast.error("CNPJ inválido. Verifique os dígitos informados.");
+                      return;
+                    }
                   }
                   setStep(2);
                 }}
@@ -300,6 +480,52 @@ export default function Onboarding() {
                     placeholder="(00) 00000-0000"
                   />
                 </div>
+
+                {/* CEP com busca automática */}
+                <div className="sm:col-span-2">
+                  <Label htmlFor="cep">CEP</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="cep"
+                      value={formData.cep}
+                      onChange={(e) => setFormData(prev => ({ ...prev, cep: formatCEP(e.target.value) }))}
+                      placeholder="00000-000"
+                      className="flex-1"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={searchCEP}
+                      disabled={cepLoading}
+                    >
+                      {cepLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Digite o CEP para preencher o endereço automaticamente
+                  </p>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <Label htmlFor="address">Endereço</Label>
+                  <Input
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                    placeholder="Rua, Avenida, etc."
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="neighborhood">Bairro</Label>
+                  <Input
+                    id="neighborhood"
+                    value={formData.neighborhood}
+                    onChange={(e) => setFormData(prev => ({ ...prev, neighborhood: e.target.value }))}
+                    placeholder="Bairro"
+                  />
+                </div>
+
                 <div>
                   <Label htmlFor="city">Cidade</Label>
                   <Input
@@ -314,7 +540,7 @@ export default function Onboarding() {
                   <Input
                     id="state"
                     value={formData.state}
-                    onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value.toUpperCase().slice(0, 2) }))}
+                    onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
                     placeholder="SP"
                     maxLength={2}
                   />
@@ -326,7 +552,7 @@ export default function Onboarding() {
                     <Input
                       id="slug"
                       value={formData.slug}
-                      onChange={(e) => setFormData(prev => ({ ...prev, slug: generateSlug(e.target.value) }))}
+                      onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") }))}
                       placeholder="sua-imobiliaria"
                       className="flex-1"
                     />
@@ -374,12 +600,9 @@ export default function Onboarding() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Tudo pronto!</h3>
               <p className="text-muted-foreground mb-6">
-                Seu cadastro foi concluído com sucesso. Você será redirecionado para o dashboard.
+                Seu cadastro foi realizado com sucesso. Você será redirecionado para o dashboard em instantes...
               </p>
-              <div className="flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                <span className="text-sm text-muted-foreground">Redirecionando...</span>
-              </div>
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
             </div>
           )}
         </CardContent>

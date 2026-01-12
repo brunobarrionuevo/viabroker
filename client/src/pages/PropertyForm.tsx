@@ -7,9 +7,31 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles, Search } from "lucide-react";
 import { Link, useLocation, useParams } from "wouter";
 import { useState, useEffect } from "react";
+
+// Funções de formatação
+const formatCurrency = (value: string): string => {
+  const numbers = value.replace(/\D/g, "");
+  if (!numbers) return "";
+  const cents = parseInt(numbers, 10);
+  const reais = cents / 100;
+  return new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(reais);
+};
+
+const parseCurrencyToNumber = (value: string): number => {
+  const cleaned = value.replace(/\./g, "").replace(",", ".");
+  return parseFloat(cleaned) || 0;
+};
+
+const formatCEP = (value: string): string => {
+  const numbers = value.replace(/\D/g, "").slice(0, 8);
+  return numbers.replace(/(\d{5})(\d)/, "$1-$2");
+};
 import { toast } from "sonner";
 
 const propertyTypes = [
@@ -51,6 +73,8 @@ export default function PropertyForm() {
   const params = useParams<{ id?: string }>();
   const [, navigate] = useLocation();
   const isEditing = !!params.id;
+
+  const [cepLoading, setCepLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -176,6 +200,39 @@ export default function PropertyForm() {
       totalArea: formData.totalArea,
       builtArea: formData.builtArea,
     });
+  };
+
+  // Função para buscar endereço pelo CEP
+  const searchCEP = async (cep: string) => {
+    const cleanedCep = cep.replace(/\D/g, "");
+    if (cleanedCep.length !== 8) {
+      toast.error("CEP deve ter 8 dígitos");
+      return;
+    }
+
+    setCepLoading(true);
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanedCep}/json/`);
+      const data = await response.json();
+      
+      if (data.erro) {
+        toast.error("CEP não encontrado");
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        address: data.logradouro || prev.address,
+        neighborhood: data.bairro || prev.neighborhood,
+        city: data.localidade || prev.city,
+        state: data.uf || prev.state,
+      }));
+      toast.success("Endereço preenchido automaticamente!");
+    } catch (error) {
+      toast.error("Erro ao buscar CEP");
+    } finally {
+      setCepLoading(false);
+    }
   };
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
@@ -358,12 +415,31 @@ export default function PropertyForm() {
                   </div>
                   <div>
                     <Label htmlFor="zipCode">CEP</Label>
-                    <Input
-                      id="zipCode"
-                      value={formData.zipCode}
-                      onChange={(e) => setFormData(prev => ({ ...prev, zipCode: e.target.value }))}
-                      placeholder="00000-000"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="zipCode"
+                        value={formData.zipCode}
+                        onChange={(e) => {
+                          const formatted = formatCEP(e.target.value);
+                          setFormData(prev => ({ ...prev, zipCode: formatted }));
+                          // Auto-buscar quando tiver 8 dígitos
+                          if (formatted.replace(/\D/g, "").length === 8) {
+                            searchCEP(formatted);
+                          }
+                        }}
+                        placeholder="00000-000"
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => searchCEP(formData.zipCode)}
+                        disabled={cepLoading}
+                      >
+                        {cepLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                      </Button>
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="city">Cidade *</Label>
@@ -471,43 +547,59 @@ export default function PropertyForm() {
               <CardContent className="space-y-4">
                 {(formData.purpose === "venda" || formData.purpose === "venda_aluguel") && (
                   <div>
-                    <Label htmlFor="salePrice">Preço de Venda (R$)</Label>
-                    <Input
-                      id="salePrice"
-                      value={formData.salePrice}
-                      onChange={(e) => setFormData(prev => ({ ...prev, salePrice: e.target.value }))}
-                      placeholder="0,00"
-                    />
+                    <Label htmlFor="salePrice">Preço de Venda</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                      <Input
+                        id="salePrice"
+                        value={formData.salePrice}
+                        onChange={(e) => setFormData(prev => ({ ...prev, salePrice: formatCurrency(e.target.value) }))}
+                        placeholder="0,00"
+                        className="pl-10"
+                      />
+                    </div>
                   </div>
                 )}
                 {(formData.purpose === "aluguel" || formData.purpose === "venda_aluguel") && (
                   <div>
-                    <Label htmlFor="rentPrice">Valor do Aluguel (R$)</Label>
-                    <Input
-                      id="rentPrice"
-                      value={formData.rentPrice}
-                      onChange={(e) => setFormData(prev => ({ ...prev, rentPrice: e.target.value }))}
-                      placeholder="0,00"
-                    />
+                    <Label htmlFor="rentPrice">Valor do Aluguel</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                      <Input
+                        id="rentPrice"
+                        value={formData.rentPrice}
+                        onChange={(e) => setFormData(prev => ({ ...prev, rentPrice: formatCurrency(e.target.value) }))}
+                        placeholder="0,00"
+                        className="pl-10"
+                      />
+                    </div>
                   </div>
                 )}
                 <div>
-                  <Label htmlFor="condoFee">Condomínio (R$)</Label>
-                  <Input
-                    id="condoFee"
-                    value={formData.condoFee}
-                    onChange={(e) => setFormData(prev => ({ ...prev, condoFee: e.target.value }))}
-                    placeholder="0,00"
-                  />
+                  <Label htmlFor="condoFee">Condomínio</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                    <Input
+                      id="condoFee"
+                      value={formData.condoFee}
+                      onChange={(e) => setFormData(prev => ({ ...prev, condoFee: formatCurrency(e.target.value) }))}
+                      placeholder="0,00"
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Label htmlFor="iptuAnnual">IPTU Anual (R$)</Label>
-                  <Input
-                    id="iptuAnnual"
-                    value={formData.iptuAnnual}
-                    onChange={(e) => setFormData(prev => ({ ...prev, iptuAnnual: e.target.value }))}
-                    placeholder="0,00"
-                  />
+                  <Label htmlFor="iptuAnnual">IPTU Anual</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                    <Input
+                      id="iptuAnnual"
+                      value={formData.iptuAnnual}
+                      onChange={(e) => setFormData(prev => ({ ...prev, iptuAnnual: formatCurrency(e.target.value) }))}
+                      placeholder="0,00"
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>

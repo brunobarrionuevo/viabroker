@@ -6,6 +6,8 @@ import { z } from "zod";
 import * as db from "./db";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "./_core/llm";
+import { fetchAddressByCEP } from "./viaCep";
+import { validateCPF, validateCNPJ, cleanCPF, cleanCNPJ } from "../shared/validators";
 
 // Schemas de validação
 const propertyTypeEnum = z.enum(["casa", "apartamento", "terreno", "comercial", "rural", "cobertura", "flat", "kitnet", "sobrado", "galpao", "sala_comercial", "loja", "outro"]);
@@ -26,6 +28,34 @@ export const appRouter = router({
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
+  }),
+
+  // Utilitários públicos
+  utils: router({
+    searchCEP: publicProcedure
+      .input(z.object({ cep: z.string() }))
+      .query(async ({ input }) => {
+        const address = await fetchAddressByCEP(input.cep);
+        if (!address) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "CEP não encontrado",
+          });
+        }
+        return address;
+      }),
+    
+    validateDocument: publicProcedure
+      .input(z.object({
+        document: z.string(),
+        type: z.enum(["cpf", "cnpj"]),
+      }))
+      .query(({ input }) => {
+        if (input.type === "cpf") {
+          return { valid: validateCPF(input.document) };
+        }
+        return { valid: validateCNPJ(input.document) };
+      }),
   }),
 
   // Dashboard
