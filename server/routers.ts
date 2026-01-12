@@ -335,6 +335,17 @@ export const appRouter = router({
         }
         return property;
       }),
+    
+    getImagesPublic: publicProcedure
+      .input(z.object({ propertyId: z.number() }))
+      .query(async ({ input }) => {
+        // Verificar se o imóvel existe e está publicado
+        const property = await db.getPropertyById(input.propertyId);
+        if (!property || !property.isPublished) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Imóvel não encontrado" });
+        }
+        return db.getPropertyImages(input.propertyId);
+      }),
 
     generateDescription: protectedProcedure
       .input(z.object({

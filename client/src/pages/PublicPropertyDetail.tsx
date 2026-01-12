@@ -18,14 +18,41 @@ import {
   MessageCircle,
   Share2,
   Heart,
-  Loader2
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  X,
+  Image as ImageIcon
 } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
 
+// Função para extrair ID do vídeo do YouTube ou Vimeo
+function getVideoEmbedUrl(url: string | null): string | null {
+  if (!url) return null;
+  
+  // YouTube
+  const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (youtubeMatch) {
+    return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+  }
+  
+  // Vimeo
+  const vimeoMatch = url.match(/(?:vimeo\.com\/)(\d+)/);
+  if (vimeoMatch) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  }
+  
+  return null;
+}
+
 export default function PublicPropertyDetail() {
   const params = useParams<{ id: string }>();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
@@ -35,6 +62,11 @@ export default function PublicPropertyDetail() {
 
   const { data: property, isLoading, error } = trpc.properties.getPublic.useQuery(
     { id: Number(params.id) },
+    { enabled: !!params.id }
+  );
+
+  const { data: images } = trpc.properties.getImagesPublic.useQuery(
+    { propertyId: Number(params.id) },
     { enabled: !!params.id }
   );
 
@@ -66,6 +98,20 @@ export default function PublicPropertyDetail() {
       companyId: property.companyId,
     });
   };
+
+  const nextImage = () => {
+    if (images && images.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (images && images.length > 0) {
+      setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    }
+  };
+
+  const videoEmbedUrl = property?.videoUrl ? getVideoEmbedUrl(property.videoUrl) : null;
 
   if (isLoading) {
     return (
@@ -100,6 +146,9 @@ export default function PublicPropertyDetail() {
     );
   }
 
+  const hasImages = images && images.length > 0;
+  const currentImage = hasImages ? images[currentImageIndex] : null;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -124,9 +173,98 @@ export default function PublicPropertyDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Image Gallery Placeholder */}
-            <div className="aspect-video bg-muted rounded-xl flex items-center justify-center">
-              <Building2 className="w-16 h-16 text-muted-foreground/50" />
+            {/* Image Gallery */}
+            <div className="space-y-4">
+              {/* Main Image */}
+              <div 
+                className="relative aspect-video bg-muted rounded-xl overflow-hidden cursor-pointer group"
+                onClick={() => hasImages && setShowImageModal(true)}
+              >
+                {hasImages && currentImage ? (
+                  <>
+                    <img
+                      src={currentImage.url}
+                      alt={currentImage.caption || property.title}
+                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    />
+                    {/* Navigation Arrows */}
+                    {images.length > 1 && (
+                      <>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                        >
+                          <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                        >
+                          <ChevronRight className="w-6 h-6" />
+                        </button>
+                      </>
+                    )}
+                    {/* Image Counter */}
+                    <div className="absolute bottom-4 right-4 bg-black/70 text-white text-sm px-3 py-1 rounded-full">
+                      {currentImageIndex + 1} / {images.length}
+                    </div>
+                    {/* Expand hint */}
+                    <div className="absolute bottom-4 left-4 bg-black/70 text-white text-sm px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                      Clique para ampliar
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Building2 className="w-16 h-16 text-muted-foreground/50" />
+                  </div>
+                )}
+              </div>
+
+              {/* Thumbnails */}
+              {hasImages && images.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {images.map((image, index) => (
+                    <button
+                      key={image.id}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                        index === currentImageIndex 
+                          ? "border-primary ring-2 ring-primary/30" 
+                          : "border-transparent hover:border-primary/50"
+                      }`}
+                    >
+                      <img
+                        src={image.url}
+                        alt={image.caption || `Foto ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                  {/* Video Thumbnail */}
+                  {videoEmbedUrl && (
+                    <button
+                      onClick={() => setShowVideoModal(true)}
+                      className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-transparent hover:border-primary/50 bg-muted relative"
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <Play className="w-8 h-8 text-white" />
+                      </div>
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Video Button (if no images but has video) */}
+              {!hasImages && videoEmbedUrl && (
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setShowVideoModal(true)}
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Assistir vídeo do imóvel
+                </Button>
+              )}
             </div>
 
             {/* Title and Location */}
@@ -268,6 +406,24 @@ export default function PublicPropertyDetail() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Video Section */}
+            {videoEmbedUrl && (
+              <Card>
+                <CardContent className="pt-6">
+                  <h2 className="text-lg font-semibold mb-4">Vídeo do Imóvel</h2>
+                  <div className="aspect-video rounded-lg overflow-hidden">
+                    <iframe
+                      src={videoEmbedUrl}
+                      title="Vídeo do imóvel"
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar - Contact Form */}
@@ -282,7 +438,6 @@ export default function PublicPropertyDetail() {
                       id="name"
                       value={contactForm.name}
                       onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Seu nome"
                       required
                     />
                   </div>
@@ -293,17 +448,16 @@ export default function PublicPropertyDetail() {
                       type="email"
                       value={contactForm.email}
                       onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="seu@email.com"
                       required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone">Telefone</Label>
+                    <Label htmlFor="phone">Telefone *</Label>
                     <Input
                       id="phone"
                       value={contactForm.phone}
                       onChange={(e) => setContactForm(prev => ({ ...prev, phone: e.target.value }))}
-                      placeholder="(00) 00000-0000"
+                      required
                     />
                   </div>
                   <div>
@@ -312,7 +466,7 @@ export default function PublicPropertyDetail() {
                       id="message"
                       value={contactForm.message}
                       onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                      placeholder="Olá, tenho interesse neste imóvel..."
+                      placeholder={`Olá, tenho interesse no imóvel "${property.title}". Gostaria de mais informações.`}
                       rows={4}
                     />
                   </div>
@@ -322,13 +476,23 @@ export default function PublicPropertyDetail() {
                     ) : (
                       <Mail className="w-4 h-4 mr-2" />
                     )}
-                    Enviar Mensagem
+                    Enviar mensagem
                   </Button>
                 </form>
 
                 <div className="mt-6 pt-6 border-t space-y-3">
                   <Button variant="outline" className="w-full" asChild>
-                    <a href={`https://wa.me/?text=Olá! Tenho interesse no imóvel: ${property.title}`} target="_blank" rel="noopener noreferrer">
+                    <a href="tel:+5511999999999">
+                      <Phone className="w-4 h-4 mr-2" />
+                      Ligar agora
+                    </a>
+                  </Button>
+                  <Button variant="outline" className="w-full bg-green-50 hover:bg-green-100 text-green-700 border-green-200" asChild>
+                    <a 
+                      href={`https://wa.me/5511999999999?text=${encodeURIComponent(`Olá! Vi o imóvel "${property.title}" (Cód: ${property.code || property.id}) no site e gostaria de mais informações.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <MessageCircle className="w-4 h-4 mr-2" />
                       WhatsApp
                     </a>
@@ -340,12 +504,73 @@ export default function PublicPropertyDetail() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="py-8 border-t mt-16">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          © 2025 ImobiPro. Todos os direitos reservados.
+      {/* Image Modal */}
+      {showImageModal && hasImages && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setShowImageModal(false)}
+        >
+          <button
+            onClick={() => setShowImageModal(false)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <button
+            onClick={(e) => { e.stopPropagation(); prevImage(); }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20"
+          >
+            <ChevronLeft className="w-8 h-8" />
+          </button>
+          
+          <img
+            src={currentImage?.url}
+            alt={currentImage?.caption || property.title}
+            className="max-w-[90vw] max-h-[90vh] object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+          
+          <button
+            onClick={(e) => { e.stopPropagation(); nextImage(); }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20"
+          >
+            <ChevronRight className="w-8 h-8" />
+          </button>
+          
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white text-sm px-4 py-2 rounded-full">
+            {currentImageIndex + 1} / {images.length}
+          </div>
         </div>
-      </footer>
+      )}
+
+      {/* Video Modal */}
+      {showVideoModal && videoEmbedUrl && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setShowVideoModal(false)}
+        >
+          <button
+            onClick={() => setShowVideoModal(false)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <div 
+            className="w-full max-w-4xl aspect-video"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <iframe
+              src={videoEmbedUrl}
+              title="Vídeo do imóvel"
+              className="w-full h-full rounded-lg"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

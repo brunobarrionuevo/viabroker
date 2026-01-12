@@ -62,3 +62,9 @@
 - [x] Implementar upload de até 20 fotos por imóvel
 - [x] Implementar campo de vídeo do imóvel (URL do YouTube/Vimeo)
 - [x] Exibir galeria de fotos na página de detalhes do imóvel
+
+## Galeria Pública de Imóveis
+- [x] API pública para buscar imagens do imóvel
+- [x] Carrossel de fotos com navegação e miniaturas
+- [x] Player de vídeo incorporado (YouTube/Vimeo)
+- [x] Exibição responsiva da galeria
