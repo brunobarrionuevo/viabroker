@@ -289,11 +289,26 @@ export const appRouter = router({
         if (!property || property.companyId !== ctx.user.companyId) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Imóvel não encontrado" });
         }
-        // Limpar videoUrl se for string vazia
-        const cleanedData = {
-          ...data,
-          videoUrl: data.videoUrl && data.videoUrl !== "" ? data.videoUrl : null,
-        };
+        // Limpar campos opcionais vazios
+        const cleanedData: Record<string, any> = {};
+        const optionalStringFields = ['code', 'complement', 'zipCode', 'videoUrl', 'metaTitle', 'metaDescription', 'builtArea', 'address', 'number', 'neighborhood'];
+        const optionalDecimalFields = ['salePrice', 'rentPrice', 'condoFee', 'iptuAnnual', 'totalArea', 'builtArea'];
+        
+        for (const [key, value] of Object.entries(data)) {
+          if (value === undefined) continue;
+          
+          // Campos de texto opcionais - converter string vazia para null
+          if (typeof value === 'string' && value === '' && optionalStringFields.includes(key)) {
+            cleanedData[key] = null;
+          }
+          // Campos decimais - converter string vazia para null
+          else if (typeof value === 'string' && value === '' && optionalDecimalFields.includes(key)) {
+            cleanedData[key] = null;
+          }
+          else {
+            cleanedData[key] = value;
+          }
+        }
         return db.updateProperty(id, cleanedData);
       }),
     

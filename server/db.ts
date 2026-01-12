@@ -213,6 +213,12 @@ export async function updateUserTrialExpired(userId: number, isExpired: boolean)
   await db.update(users).set({ isTrialExpired: isExpired }).where(eq(users.id, userId));
 }
 
+export async function updateUser(userId: number, data: Partial<InsertUser>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set(data).where(eq(users.id, userId));
+}
+
 // ==========================================
 // EMPRESAS / IMOBILIÁRIAS
 // ==========================================

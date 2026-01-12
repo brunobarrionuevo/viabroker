@@ -88,6 +88,7 @@ export const plans = mysqlTable("plans", {
   hasWhatsappIntegration: boolean("hasWhatsappIntegration").default(false).notNull(),
   hasPortalIntegration: boolean("hasPortalIntegration").default(false).notNull(),
   hasCustomDomain: boolean("hasCustomDomain").default(false).notNull(),
+  isCourtesy: boolean("isCourtesy").default(false).notNull(),
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

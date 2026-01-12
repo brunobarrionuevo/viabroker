@@ -425,8 +425,8 @@ export default function MasterClientDetail() {
                             {property.propertyType}
                           </TableCell>
                           <TableCell className="text-gray-700">
-                            <Badge className={property.purpose === 'sale' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}>
-                              {property.purpose === 'sale' ? 'Venda' : 'Aluguel'}
+                            <Badge className={property.purpose === 'venda' ? 'bg-blue-100 text-blue-700' : property.purpose === 'aluguel' ? 'bg-orange-100 text-orange-700' : 'bg-purple-100 text-purple-700'}>
+                              {property.purpose === 'venda' ? 'Venda' : property.purpose === 'aluguel' ? 'Aluguel' : 'Venda e Aluguel'}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-gray-900 font-semibold">

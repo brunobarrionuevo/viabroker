@@ -221,3 +221,9 @@
 
 ## Correção Urgente - Edição de Imóveis
 - [x] Corrigir erro ao acessar página de edição de imóveis (/dashboard/properties/:id)
+
+
+## Correções e Melhorias (12/01/2026)
+- [x] Corrigir erro ao salvar descrição gerada com IA no formulário de imóveis (campo estado não carregava corretamente)
+- [x] Corrigir exibição de finalidade no painel master (mostra "aluguel" ao invés de "venda")
+- [x] Criar plano de cortesia no painel admin master (funcionalidades completas, tempo indeterminado, controlável pelo admin)

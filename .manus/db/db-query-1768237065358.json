@@ -1,0 +1,29 @@
+{
+  "query": "SELECT * FROM plans WHERE name LIKE '%Cortesia%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT * FROM plans WHERE name LIKE '%Cortesia%';",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Cortesia Premium",
+      "slug": "cortesia-premium",
+      "description": "Plano de cortesia com todas as funcionalidades - sem expiração",
+      "price": "0.00",
+      "maxProperties": "-1",
+      "maxUsers": "-1",
+      "maxPhotosPerProperty": "50",
+      "hasAI": "1",
+      "aiCreditsPerDay": "100",
+      "hasWhatsappIntegration": "1",
+      "hasPortalIntegration": "1",
+      "hasCustomDomain": "1",
+      "isActive": "1",
+      "createdAt": "2026-01-12 16:52:02",
+      "updatedAt": "2026-01-12 16:52:02",
+      "isCourtesy": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tslug\tdescription\tprice\tmaxProperties\tmaxUsers\tmaxPhotosPerProperty\thasAI\taiCreditsPerDay\thasWhatsappIntegration\thasPortalIntegration\thasCustomDomain\tisActive\tcreatedAt\tupdatedAt\tisCourtesy\n1\tCortesia Premium\tcortesia-premium\tPlano de cortesia com todas as funcionalidades - sem expiração\t0.00\t-1\t-1\t50\t1\t100\t1\t1\t1\t1\t2026-01-12 16:52:02\t2026-01-12 16:52:02\t1\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

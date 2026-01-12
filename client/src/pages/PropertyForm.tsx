@@ -470,7 +470,11 @@ export default function PropertyForm() {
                   </div>
                   <div>
                     <Label htmlFor="state">Estado *</Label>
-                    <Select value={formData.state} onValueChange={(v) => setFormData(prev => ({ ...prev, state: v }))}>
+                    <Select 
+                      key={`state-${formData.state}`}
+                      value={formData.state} 
+                      onValueChange={(v) => setFormData(prev => ({ ...prev, state: v }))}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione" />
                       </SelectTrigger>

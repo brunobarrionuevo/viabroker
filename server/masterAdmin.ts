@@ -166,14 +166,15 @@ export const masterAdminRouter = router({
       slug: z.string().min(1),
       description: z.string().optional(),
       price: z.string(),
-      maxProperties: z.number().min(1),
-      maxUsers: z.number().min(1),
+      maxProperties: z.number().min(-1), // -1 = ilimitado
+      maxUsers: z.number().min(-1), // -1 = ilimitado
       maxPhotosPerProperty: z.number().min(1).default(20),
       hasAI: z.boolean().default(false),
       aiCreditsPerDay: z.number().default(0),
       hasWhatsappIntegration: z.boolean().default(false),
       hasPortalIntegration: z.boolean().default(false),
       hasCustomDomain: z.boolean().default(false),
+      isCourtesy: z.boolean().default(false),
     }))
     .mutation(async ({ input }) => {
       const admin = await masterAuthMiddleware(input.token);
@@ -201,14 +202,15 @@ export const masterAdminRouter = router({
       name: z.string().min(1).optional(),
       description: z.string().optional(),
       price: z.string().optional(),
-      maxProperties: z.number().min(1).optional(),
-      maxUsers: z.number().min(1).optional(),
+      maxProperties: z.number().min(-1).optional(), // -1 = ilimitado
+      maxUsers: z.number().min(-1).optional(), // -1 = ilimitado
       maxPhotosPerProperty: z.number().min(1).optional(),
       hasAI: z.boolean().optional(),
       aiCreditsPerDay: z.number().optional(),
       hasWhatsappIntegration: z.boolean().optional(),
       hasPortalIntegration: z.boolean().optional(),
       hasCustomDomain: z.boolean().optional(),
+      isCourtesy: z.boolean().optional(),
       isActive: z.boolean().optional(),
     }))
     .mutation(async ({ input }) => {
@@ -350,13 +352,20 @@ export const masterAdminRouter = router({
       }
       
       // Buscar ou criar assinatura
-      let subscription = await db.getSubscriptionByCompanyId(input.companyId);
+      const subscription = await db.getSubscriptionByCompanyId(input.companyId);
+      
+      // Se é plano de cortesia, não define data de expiração
+      const isCourtesy = (plan as any).isCourtesy;
+      const periodEnd = isCourtesy 
+        ? new Date('2037-12-31') // Data distante para planos de cortesia (limite do MySQL timestamp)
+        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 dias para planos normais
       
       if (subscription) {
         // Atualizar assinatura existente
         await db.updateSubscription(subscription.id, {
           planId: input.planId,
           status: 'active',
+          currentPeriodEnd: periodEnd,
         });
       } else {
         // Criar nova assinatura
@@ -365,7 +374,16 @@ export const masterAdminRouter = router({
           planId: input.planId,
           status: 'active',
           currentPeriodStart: new Date(),
-          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 dias
+          currentPeriodEnd: periodEnd,
+        });
+      }
+      
+      // Atualizar também o usuário principal para remover trial expirado
+      const users = await db.getUsersByCompanyId(input.companyId);
+      if (users.length > 0) {
+        await db.updateUser(users[0].id, {
+          isTrialExpired: false,
+          trialEndDate: periodEnd,
         });
       }
       
@@ -376,7 +394,7 @@ export const masterAdminRouter = router({
         action: "change_plan",
         entityType: "company",
         entityId: input.companyId,
-        details: { planId: input.planId, planName: plan.name },
+        details: { planId: input.planId, planName: plan.name, isCourtesy },
       });
       
       return { success: true };

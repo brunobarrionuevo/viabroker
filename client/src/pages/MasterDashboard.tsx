@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { 
   Shield, Building2, Users, CreditCard, Activity, 
@@ -29,6 +32,22 @@ export default function MasterDashboard() {
   const [admin, setAdmin] = useState<MasterAdmin | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState<boolean | undefined>(undefined);
+  const [showCreatePlanDialog, setShowCreatePlanDialog] = useState(false);
+  const [newPlan, setNewPlan] = useState({
+    name: "",
+    slug: "",
+    description: "",
+    price: "0",
+    maxProperties: -1,
+    maxUsers: -1,
+    maxPhotosPerProperty: 50,
+    hasAI: true,
+    aiCreditsPerDay: 100,
+    hasWhatsappIntegration: true,
+    hasPortalIntegration: true,
+    hasCustomDomain: true,
+    isCourtesy: false,
+  });
 
   useEffect(() => {
     const storedToken = localStorage.getItem("masterToken");
@@ -55,7 +74,7 @@ export default function MasterDashboard() {
     { enabled: !!token }
   );
 
-  const { data: plans, isLoading: plansLoading } = trpc.masterAdmin.listPlans.useQuery(
+  const { data: plans, isLoading: plansLoading, refetch: refetchPlans } = trpc.masterAdmin.listPlans.useQuery(
     { token: token || "" },
     { enabled: !!token }
   );
@@ -79,6 +98,44 @@ export default function MasterDashboard() {
       toast.error(error.message || "Erro ao atualizar status");
     },
   });
+
+  const createPlanMutation = trpc.masterAdmin.createPlan.useMutation({
+    onSuccess: () => {
+      toast.success("Plano criado com sucesso!");
+      setShowCreatePlanDialog(false);
+      setNewPlan({
+        name: "",
+        slug: "",
+        description: "",
+        price: "0",
+        maxProperties: -1,
+        maxUsers: -1,
+        maxPhotosPerProperty: 50,
+        hasAI: true,
+        aiCreditsPerDay: 100,
+        hasWhatsappIntegration: true,
+        hasPortalIntegration: true,
+        hasCustomDomain: true,
+        isCourtesy: false,
+      });
+      refetchPlans();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao criar plano");
+    },
+  });
+
+  const handleCreatePlan = () => {
+    if (!token) return;
+    if (!newPlan.name || !newPlan.slug) {
+      toast.error("Nome e slug são obrigatórios");
+      return;
+    }
+    createPlanMutation.mutate({
+      token,
+      ...newPlan,
+    });
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("masterToken");
@@ -354,10 +411,21 @@ export default function MasterDashboard() {
           <TabsContent value="plans">
             <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-gray-900 text-xl">Planos</CardTitle>
-                <CardDescription className="text-gray-500">
-                  Gerencie os planos de assinatura disponíveis
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-gray-900 text-xl">Planos</CardTitle>
+                    <CardDescription className="text-gray-500">
+                      Gerencie os planos de assinatura disponíveis
+                    </CardDescription>
+                  </div>
+                  <Button 
+                    onClick={() => setShowCreatePlanDialog(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Novo Plano
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -411,9 +479,16 @@ export default function MasterDashboard() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge className={plan.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
-                              {plan.isActive ? "Ativo" : "Inativo"}
-                            </Badge>
+                            <div className="flex gap-1">
+                              <Badge className={plan.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
+                                {plan.isActive ? "Ativo" : "Inativo"}
+                              </Badge>
+                              {plan.isCourtesy && (
+                                <Badge className="bg-yellow-100 text-yellow-700">
+                                  Cortesia
+                                </Badge>
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))
@@ -555,6 +630,177 @@ export default function MasterDashboard() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Dialog para criar novo plano */}
+      <Dialog open={showCreatePlanDialog} onOpenChange={setShowCreatePlanDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-gray-900">Criar Novo Plano</DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Preencha as informações do novo plano de assinatura
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="planName" className="text-gray-700">Nome do Plano *</Label>
+                <Input
+                  id="planName"
+                  value={newPlan.name}
+                  onChange={(e) => setNewPlan(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Ex: Cortesia Premium"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="planSlug" className="text-gray-700">Slug *</Label>
+                <Input
+                  id="planSlug"
+                  value={newPlan.slug}
+                  onChange={(e) => setNewPlan(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))}
+                  placeholder="Ex: cortesia-premium"
+                  className="mt-1"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="planDescription" className="text-gray-700">Descrição</Label>
+              <Input
+                id="planDescription"
+                value={newPlan.description}
+                onChange={(e) => setNewPlan(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Descrição do plano"
+                className="mt-1"
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="planPrice" className="text-gray-700">Preço (R$)</Label>
+                <Input
+                  id="planPrice"
+                  type="number"
+                  step="0.01"
+                  value={newPlan.price}
+                  onChange={(e) => setNewPlan(prev => ({ ...prev, price: e.target.value }))}
+                  placeholder="0.00"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="maxProperties" className="text-gray-700">Máx. Imóveis (-1 = ilimitado)</Label>
+                <Input
+                  id="maxProperties"
+                  type="number"
+                  value={newPlan.maxProperties}
+                  onChange={(e) => setNewPlan(prev => ({ ...prev, maxProperties: parseInt(e.target.value) || -1 }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="maxUsers" className="text-gray-700">Máx. Usuários (-1 = ilimitado)</Label>
+                <Input
+                  id="maxUsers"
+                  type="number"
+                  value={newPlan.maxUsers}
+                  onChange={(e) => setNewPlan(prev => ({ ...prev, maxUsers: parseInt(e.target.value) || -1 }))}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="maxPhotos" className="text-gray-700">Máx. Fotos por Imóvel</Label>
+                <Input
+                  id="maxPhotos"
+                  type="number"
+                  value={newPlan.maxPhotosPerProperty}
+                  onChange={(e) => setNewPlan(prev => ({ ...prev, maxPhotosPerProperty: parseInt(e.target.value) || 20 }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="aiCredits" className="text-gray-700">Créditos IA/dia</Label>
+                <Input
+                  id="aiCredits"
+                  type="number"
+                  value={newPlan.aiCreditsPerDay}
+                  onChange={(e) => setNewPlan(prev => ({ ...prev, aiCreditsPerDay: parseInt(e.target.value) || 0 }))}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <Label className="text-gray-700 font-semibold mb-3 block">Recursos</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hasAI"
+                    checked={newPlan.hasAI}
+                    onCheckedChange={(checked) => setNewPlan(prev => ({ ...prev, hasAI: !!checked }))}
+                  />
+                  <Label htmlFor="hasAI" className="text-gray-600">Inteligência Artificial</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hasWhatsapp"
+                    checked={newPlan.hasWhatsappIntegration}
+                    onCheckedChange={(checked) => setNewPlan(prev => ({ ...prev, hasWhatsappIntegration: !!checked }))}
+                  />
+                  <Label htmlFor="hasWhatsapp" className="text-gray-600">Integração WhatsApp</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hasPortal"
+                    checked={newPlan.hasPortalIntegration}
+                    onCheckedChange={(checked) => setNewPlan(prev => ({ ...prev, hasPortalIntegration: !!checked }))}
+                  />
+                  <Label htmlFor="hasPortal" className="text-gray-600">Integração Portais</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hasCustomDomain"
+                    checked={newPlan.hasCustomDomain}
+                    onCheckedChange={(checked) => setNewPlan(prev => ({ ...prev, hasCustomDomain: !!checked }))}
+                  />
+                  <Label htmlFor="hasCustomDomain" className="text-gray-600">Domínio Personalizado</Label>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <div className="flex items-center space-x-2 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                <Checkbox
+                  id="isCourtesy"
+                  checked={newPlan.isCourtesy}
+                  onCheckedChange={(checked) => setNewPlan(prev => ({ ...prev, isCourtesy: !!checked, price: checked ? "0" : prev.price }))}
+                />
+                <div>
+                  <Label htmlFor="isCourtesy" className="text-yellow-800 font-semibold">Plano de Cortesia</Label>
+                  <p className="text-yellow-700 text-sm">Planos de cortesia não expiram e podem ser atribuídos/removidos a qualquer momento pelo admin master.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreatePlanDialog(false)} className="text-gray-700">
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleCreatePlan} 
+              disabled={createPlanMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {createPlanMutation.isPending ? "Criando..." : "Criar Plano"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
