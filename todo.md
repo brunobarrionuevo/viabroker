@@ -191,3 +191,7 @@
 ## Correção da Verificação de Email
 - [x] Diagnosticar problema na confirmação de email (colunas faltando no banco + URL errada)
 - [x] Corrigir endpoint/página de verificação (adicionadas colunas + URL corrigida)
+
+
+## Correção do Redirecionamento Após Login
+- [x] Corrigir fluxo de login para redirecionar ao dashboard após autenticação bem-sucedida (integrado cookie de sessão com sistema existente)
