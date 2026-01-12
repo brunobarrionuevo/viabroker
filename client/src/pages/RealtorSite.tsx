@@ -2,10 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 import { 
   Building2, 
   Search, 
@@ -26,7 +28,9 @@ import {
   X,
   Loader2,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Send,
+  CheckCircle
 } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { useState, useMemo, useEffect } from "react";
@@ -78,6 +82,29 @@ export default function RealtorSite() {
   const [minPriceFilter, setMinPriceFilter] = useState<number | undefined>();
   const [maxPriceFilter, setMaxPriceFilter] = useState<number | undefined>();
   const [parkingFilter, setParkingFilter] = useState("");
+
+  // Formulário de Lead
+  const [leadName, setLeadName] = useState("");
+  const [leadEmail, setLeadEmail] = useState("");
+  const [leadPhone, setLeadPhone] = useState("");
+  const [leadMessage, setLeadMessage] = useState("");
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
+
+  // Mutation para criar lead
+  const createLeadMutation = trpc.leads.createPublic.useMutation({
+    onSuccess: () => {
+      setLeadSubmitted(true);
+      setLeadName("");
+      setLeadEmail("");
+      setLeadPhone("");
+      setLeadMessage("");
+      toast.success("Mensagem enviada com sucesso! Entraremos em contato em breve.");
+      setTimeout(() => setLeadSubmitted(false), 5000);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao enviar mensagem. Tente novamente.");
+    },
+  });
 
   // Buscar configurações do site
   const { data: siteData, isLoading: loadingSite, error: siteError } = trpc.siteSettings.getPublic.useQuery(
@@ -161,12 +188,23 @@ export default function RealtorSite() {
     fontFamily: siteData?.settings?.fontFamily || "Inter",
   };
 
-  // Atualizar título da página
+  // Atualizar título da página e favicon
   useEffect(() => {
     if (siteData?.settings?.siteTitle) {
       document.title = siteData.settings.siteTitle;
     } else if (siteData?.company?.name) {
       document.title = siteData.company.name;
+    }
+
+    // Atualizar favicon
+    if (siteData?.settings?.faviconUrl) {
+      let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = siteData.settings.faviconUrl;
     }
   }, [siteData]);
 
@@ -658,46 +696,156 @@ export default function RealtorSite() {
 
       {/* Contact Section */}
       {settings?.showContactForm && (
-        <section id="contato" className="py-16">
+        <section id="contato" className="py-16 bg-slate-50">
           <div className="container mx-auto px-4">
-            <div className="max-w-xl mx-auto text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6">Entre em Contato</h2>
-              <div className="space-y-4">
-                {(settings?.contactPhone || company.phone) && (
-                  <a 
-                    href={`tel:${settings?.contactPhone || company.phone}`}
-                    className="flex items-center justify-center gap-3 p-4 border rounded-lg hover:bg-slate-50 transition-colors"
-                  >
-                    <Phone className="w-5 h-5" style={{ color: theme.primaryColor }} />
-                    <span>{settings?.contactPhone || company.phone}</span>
-                  </a>
-                )}
-                {(settings?.contactEmail || company.email) && (
-                  <a 
-                    href={`mailto:${settings?.contactEmail || company.email}`}
-                    className="flex items-center justify-center gap-3 p-4 border rounded-lg hover:bg-slate-50 transition-colors"
-                  >
-                    <Mail className="w-5 h-5" style={{ color: theme.primaryColor }} />
-                    <span>{settings?.contactEmail || company.email}</span>
-                  </a>
-                )}
-                {whatsappNumber && (
-                  <a 
-                    href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(settings?.whatsappDefaultMessage || "Olá!")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-3 p-4 border rounded-lg hover:bg-green-50 transition-colors text-green-600"
-                  >
-                    <MessageCircle className="w-5 h-5" />
-                    <span>WhatsApp</span>
-                  </a>
-                )}
-                {(settings?.contactAddress || company.address) && (
-                  <div className="flex items-center justify-center gap-3 p-4 border rounded-lg text-muted-foreground">
-                    <MapPin className="w-5 h-5" style={{ color: theme.primaryColor }} />
-                    <span>{settings?.contactAddress || `${company.address}, ${company.city} - ${company.state}`}</span>
-                  </div>
-                )}
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-2xl md:text-3xl font-bold mb-2 text-center">Entre em Contato</h2>
+              <p className="text-muted-foreground text-center mb-8">Preencha o formulário abaixo ou entre em contato diretamente</p>
+              
+              <div className="grid md:grid-cols-2 gap-8">
+                {/* Formulário de Lead */}
+                <Card className="shadow-lg">
+                  <CardContent className="p-6">
+                    {leadSubmitted ? (
+                      <div className="text-center py-8">
+                        <CheckCircle className="w-16 h-16 mx-auto mb-4" style={{ color: theme.secondaryColor }} />
+                        <h3 className="text-xl font-semibold mb-2">Mensagem Enviada!</h3>
+                        <p className="text-muted-foreground">Entraremos em contato em breve.</p>
+                      </div>
+                    ) : (
+                      <form onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!leadName || !leadEmail || !leadPhone) {
+                          toast.error("Preencha todos os campos obrigatórios");
+                          return;
+                        }
+                        createLeadMutation.mutate({
+                          companySlug: params.slug || "",
+                          name: leadName,
+                          email: leadEmail,
+                          phone: leadPhone,
+                          message: leadMessage || "Contato via site",
+                          source: "site",
+                        });
+                      }} className="space-y-4">
+                        <div>
+                          <Label htmlFor="leadName">Nome *</Label>
+                          <Input
+                            id="leadName"
+                            value={leadName}
+                            onChange={(e) => setLeadName(e.target.value)}
+                            placeholder="Seu nome completo"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="leadEmail">E-mail *</Label>
+                          <Input
+                            id="leadEmail"
+                            type="email"
+                            value={leadEmail}
+                            onChange={(e) => setLeadEmail(e.target.value)}
+                            placeholder="seu@email.com"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="leadPhone">Telefone *</Label>
+                          <Input
+                            id="leadPhone"
+                            value={leadPhone}
+                            onChange={(e) => setLeadPhone(e.target.value)}
+                            placeholder="(11) 99999-9999"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="leadMessage">Mensagem</Label>
+                          <Textarea
+                            id="leadMessage"
+                            value={leadMessage}
+                            onChange={(e) => setLeadMessage(e.target.value)}
+                            placeholder="Estou interessado em..."
+                            rows={4}
+                          />
+                        </div>
+                        <Button 
+                          type="submit" 
+                          className="w-full"
+                          style={{ backgroundColor: theme.primaryColor }}
+                          disabled={createLeadMutation.isPending}
+                        >
+                          {createLeadMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          ) : (
+                            <Send className="w-4 h-4 mr-2" />
+                          )}
+                          Enviar Mensagem
+                        </Button>
+                      </form>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Informações de Contato */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold mb-4">Outras formas de contato</h3>
+                  {(settings?.contactPhone || company.phone) && (
+                    <a 
+                      href={`tel:${settings?.contactPhone || company.phone}`}
+                      className="flex items-center gap-3 p-4 bg-white border rounded-lg hover:shadow-md transition-shadow"
+                    >
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${theme.primaryColor}20` }}>
+                        <Phone className="w-5 h-5" style={{ color: theme.primaryColor }} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Telefone</p>
+                        <p className="font-medium">{settings?.contactPhone || company.phone}</p>
+                      </div>
+                    </a>
+                  )}
+                  {(settings?.contactEmail || company.email) && (
+                    <a 
+                      href={`mailto:${settings?.contactEmail || company.email}`}
+                      className="flex items-center gap-3 p-4 bg-white border rounded-lg hover:shadow-md transition-shadow"
+                    >
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${theme.primaryColor}20` }}>
+                        <Mail className="w-5 h-5" style={{ color: theme.primaryColor }} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">E-mail</p>
+                        <p className="font-medium">{settings?.contactEmail || company.email}</p>
+                      </div>
+                    </a>
+                  )}
+                  {whatsappNumber && (
+                    <a 
+                      href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(settings?.whatsappDefaultMessage || "Olá!")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg hover:shadow-md transition-shadow"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                        <MessageCircle className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-green-600">WhatsApp</p>
+                        <p className="font-medium text-green-700">Clique para conversar</p>
+                      </div>
+                    </a>
+                  )}
+                  {(settings?.contactAddress || company.address) && (
+                    <div className="flex items-center gap-3 p-4 bg-white border rounded-lg">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${theme.primaryColor}20` }}>
+                        <MapPin className="w-5 h-5" style={{ color: theme.primaryColor }} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Endereço</p>
+                        <p className="font-medium">{settings?.contactAddress || `${company.address}, ${company.city} - ${company.state}`}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

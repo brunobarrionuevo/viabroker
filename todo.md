@@ -121,3 +121,9 @@
 - [x] Criar endpoint de upload para imagem de capa (hero)
 - [x] Atualizar página de personalização com componentes de upload
 - [x] Preview das imagens após upload
+
+
+## Correções Site do Corretor
+- [x] Favicon não aparece na aba do site do corretor (corrigido - useEffect para atualizar favicon dinamicamente)
+- [x] Slug do domínio temporário deve usar o nome da imobiliária/corretor (corrigido - slug gerado automaticamente a partir do nome)
+- [x] Implementar captura de leads no site público do corretor (implementado - formulário completo com nome, email, telefone e mensagem)

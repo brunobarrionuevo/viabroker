@@ -119,6 +119,12 @@ export async function updateUserCompany(userId: number, companyId: number): Prom
 export async function createCompany(data: InsertCompany): Promise<Company> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // Se não foi fornecido slug, gerar a partir do nome
+  if (!data.slug && data.name) {
+    data.slug = generateSlug(data.name);
+  }
+  
   const result = await db.insert(companies).values(data);
   const inserted = await db.select().from(companies).where(eq(companies.id, Number(result[0].insertId))).limit(1);
   return inserted[0];

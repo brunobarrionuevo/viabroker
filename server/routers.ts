@@ -80,7 +80,7 @@ export const appRouter = router({
     create: protectedProcedure
       .input(z.object({
         name: z.string().min(2),
-        slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+        slug: z.string().min(2).regex(/^[a-z0-9-]+$/).optional(),
         personType: z.enum(["fisica", "juridica"]).default("juridica"),
         cpf: z.string().optional(),
         cnpj: z.string().optional(),
@@ -95,11 +95,22 @@ export const appRouter = router({
         description: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const existing = await db.getCompanyBySlug(input.slug);
+        // Gerar slug a partir do nome se não foi fornecido
+        const slug = input.slug || input.name
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '')
+          .substring(0, 100);
+        
+        // Verificar se slug já existe
+        const existing = await db.getCompanyBySlug(slug);
         if (existing) {
           throw new TRPCError({ code: "CONFLICT", message: "Este slug já está em uso" });
         }
-        const company = await db.createCompany(input);
+        
+        const company = await db.createCompany({ ...input, slug });
         // Associar o usuário à empresa criada
         if (company && company.id) {
           await db.updateUserCompany(ctx.user.id, company.id);
@@ -513,18 +524,34 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
         source: z.string().default("site"),
         sourceDetail: z.string().optional(),
         propertyId: z.number().optional(),
-        companyId: z.number(),
+        companyId: z.number().optional(),
+        companySlug: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
+        let companyId = input.companyId;
+        
+        // Se passou slug, buscar o ID da empresa
+        if (!companyId && input.companySlug) {
+          const company = await db.getCompanyBySlug(input.companySlug);
+          if (!company) {
+            throw new TRPCError({ code: "NOT_FOUND", message: "Empresa não encontrada" });
+          }
+          companyId = company.id;
+        }
+        
+        if (!companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "ID ou slug da empresa é obrigatório" });
+        }
+        
         return db.createLead({
           name: input.name,
           email: input.email,
           phone: input.phone,
           message: input.message,
-          source: "site",
+          source: "site" as const,
           sourceDetail: input.sourceDetail,
           propertyId: input.propertyId,
-          companyId: input.companyId,
+          companyId: companyId,
           stage: "novo",
         });
       }),
