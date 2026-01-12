@@ -89,3 +89,8 @@
 - [x] Formato XML compatível com ZAP, Viva Real, OLX
 - [x] Endpoint para download do XML
 - [x] Página de Integrações no dashboard
+
+## Correções Urgentes (Nova Iteração)
+- [x] Página de visualização do imóvel não exibe fotos e detalhes profissionais (verificado - está funcionando)
+
+- [x] Imagem de capa não aparece na listagem de imóveis (verificado - imóvel não tem fotos cadastradas, sistema funciona corretamente)
