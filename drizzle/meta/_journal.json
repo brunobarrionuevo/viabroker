@@ -15,6 +15,13 @@
       "when": 1768188836657,
       "tag": "0001_windy_romulus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1768191128087,
+      "tag": "0002_mature_hairball",
+      "breakpoints": true
     }
   ]
 }

@@ -43,3 +43,7 @@
 
 ## Testes
 - [x] Testes unitários das APIs (properties, leads, appointments, company, siteSettings)
+
+## Correções Solicitadas
+- [x] Cadastro flexível: pessoa física (CPF) ou pessoa jurídica (CNPJ)
+- [x] Corrigir bug que impede finalizar o cadastro

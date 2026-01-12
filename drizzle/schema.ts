@@ -29,6 +29,8 @@ export const companies = mysqlTable("companies", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 100 }).notNull().unique(),
+  personType: mysqlEnum("personType", ["fisica", "juridica"]).default("juridica").notNull(),
+  cpf: varchar("cpf", { length: 14 }),
   cnpj: varchar("cnpj", { length: 18 }),
   creci: varchar("creci", { length: 50 }),
   email: varchar("email", { length: 320 }),

@@ -106,6 +106,12 @@ export async function getUserById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function updateUserCompany(userId: number, companyId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ companyId }).where(eq(users.id, userId));
+}
+
 // ==========================================
 // EMPRESAS / IMOBILIÁRIAS
 // ==========================================

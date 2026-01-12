@@ -50,6 +50,8 @@ export const appRouter = router({
       .input(z.object({
         name: z.string().min(2),
         slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+        personType: z.enum(["fisica", "juridica"]).default("juridica"),
+        cpf: z.string().optional(),
         cnpj: z.string().optional(),
         creci: z.string().optional(),
         email: z.string().email().optional(),
@@ -61,17 +63,24 @@ export const appRouter = router({
         zipCode: z.string().optional(),
         description: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
         const existing = await db.getCompanyBySlug(input.slug);
         if (existing) {
           throw new TRPCError({ code: "CONFLICT", message: "Este slug já está em uso" });
         }
-        return db.createCompany(input);
+        const company = await db.createCompany(input);
+        // Associar o usuário à empresa criada
+        if (company && company.id) {
+          await db.updateUserCompany(ctx.user.id, company.id);
+        }
+        return company;
       }),
     
     update: protectedProcedure
       .input(z.object({
         name: z.string().min(2).optional(),
+        personType: z.enum(["fisica", "juridica"]).optional(),
+        cpf: z.string().optional(),
         cnpj: z.string().optional(),
         creci: z.string().optional(),
         email: z.string().email().optional(),
