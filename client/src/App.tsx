@@ -18,6 +18,9 @@ import PublicProperties from "./pages/PublicProperties";
 import PublicPropertyDetail from "./pages/PublicPropertyDetail";
 import Onboarding from "./pages/Onboarding";
 import Integrations from "./pages/Integrations";
+import SiteCustomization from "./pages/SiteCustomization";
+import RealtorSite from "./pages/RealtorSite";
+import RealtorPropertyDetail from "./pages/RealtorPropertyDetail";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
@@ -136,6 +139,15 @@ function Router() {
       <Route path="/dashboard/integrations">
         {() => <ProtectedRoute component={Integrations} />}
       </Route>
+      
+      {/* Site Customization Routes */}
+      <Route path="/dashboard/site">
+        {() => <ProtectedRoute component={SiteCustomization} />}
+      </Route>
+      
+      {/* Realtor Public Site Routes */}
+      <Route path="/site/:slug" component={RealtorSite} />
+      <Route path="/site/:slug/imovel/:id" component={RealtorPropertyDetail} />
       
       {/* Error Routes */}
       <Route path="/404" component={NotFound} />

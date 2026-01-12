@@ -340,21 +340,81 @@ export const appRouter = router({
     
     listPublic: publicProcedure
       .input(z.object({
+        companySlug: z.string().optional(),
         type: z.string().optional(),
         purpose: z.string().optional(),
         city: z.string().optional(),
+        state: z.string().optional(),
+        neighborhood: z.string().optional(),
+        minPrice: z.number().optional(),
+        maxPrice: z.number().optional(),
+        minBedrooms: z.number().optional(),
+        maxBedrooms: z.number().optional(),
+        minArea: z.number().optional(),
+        maxArea: z.number().optional(),
+        parkingSpaces: z.number().optional(),
+        isHighlight: z.boolean().optional(),
         search: z.string().optional(),
-        isPublished: z.boolean().optional(),
         limit: z.number().min(1).max(100).default(50),
         offset: z.number().min(0).default(0),
       }).optional())
       .query(async ({ input }) => {
+        let companyId: number | undefined;
+        
+        // Se passou slug da empresa, buscar o ID
+        if (input?.companySlug) {
+          const company = await db.getCompanyBySlug(input.companySlug);
+          if (!company) {
+            throw new TRPCError({ code: "NOT_FOUND", message: "Empresa não encontrada" });
+          }
+          companyId = company.id;
+        }
+        
         const filters: db.PropertyFilters = {
-          ...input,
+          companyId,
+          type: input?.type,
+          purpose: input?.purpose,
+          city: input?.city,
+          state: input?.state,
+          neighborhood: input?.neighborhood,
           isPublished: true,
-          status: "disponivel",
+          isHighlight: input?.isHighlight,
+          search: input?.search,
         };
-        const propertiesList = await db.getProperties(filters, input?.limit || 50, input?.offset || 0);
+        
+        let propertiesList = await db.getProperties(filters, input?.limit || 50, input?.offset || 0);
+        
+        // Filtros adicionais que não estão no banco
+        if (input?.minPrice || input?.maxPrice) {
+          propertiesList = propertiesList.filter(p => {
+            const price = p.purpose === 'aluguel' 
+              ? parseFloat(p.rentPrice || '0') 
+              : parseFloat(p.salePrice || '0');
+            if (input.minPrice && price < input.minPrice) return false;
+            if (input.maxPrice && price > input.maxPrice) return false;
+            return true;
+          });
+        }
+        
+        if (input?.minBedrooms !== undefined) {
+          propertiesList = propertiesList.filter(p => (p.bedrooms || 0) >= (input.minBedrooms || 0));
+        }
+        
+        if (input?.maxBedrooms !== undefined) {
+          propertiesList = propertiesList.filter(p => (p.bedrooms || 0) <= (input.maxBedrooms || 99));
+        }
+        
+        if (input?.minArea !== undefined) {
+          propertiesList = propertiesList.filter(p => parseFloat(p.totalArea || '0') >= (input.minArea || 0));
+        }
+        
+        if (input?.maxArea !== undefined) {
+          propertiesList = propertiesList.filter(p => parseFloat(p.totalArea || '0') <= (input.maxArea || 999999));
+        }
+        
+        if (input?.parkingSpaces !== undefined) {
+          propertiesList = propertiesList.filter(p => (p.parkingSpaces || 0) >= (input.parkingSpaces || 0));
+        }
         
         // Buscar imagens principais de todos os imóveis
         const propertyIds = propertiesList.map(p => p.id);
@@ -683,21 +743,107 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
       if (!ctx.user.companyId) return null;
       return db.getSiteSettings(ctx.user.companyId);
     }),
+    
+    getPublic: publicProcedure
+      .input(z.object({ companySlug: z.string() }))
+      .query(async ({ input }) => {
+        const company = await db.getCompanyBySlug(input.companySlug);
+        if (!company) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Empresa não encontrada" });
+        }
+        const settings = await db.getSiteSettings(company.id);
+        return {
+          company: {
+            id: company.id,
+            name: company.name,
+            slug: company.slug,
+            phone: company.phone,
+            whatsapp: company.whatsapp,
+            email: company.email,
+            address: company.address,
+            city: company.city,
+            state: company.state,
+            creci: company.creci,
+            description: company.description,
+            logoUrl: company.logoUrl,
+          },
+          settings: settings || {
+            primaryColor: "#0F52BA",
+            secondaryColor: "#50C878",
+            accentColor: "#FF6B35",
+            backgroundColor: "#FFFFFF",
+            textColor: "#1F2937",
+            fontFamily: "Inter",
+            showHeroSearch: true,
+            showFeaturedProperties: true,
+            showAboutSection: true,
+            showContactForm: true,
+            showTestimonials: false,
+            logoUrl: null,
+            faviconUrl: null,
+            heroImageUrl: null,
+            heroTitle: null,
+            heroSubtitle: null,
+            siteTitle: null,
+            siteDescription: null,
+            aboutText: null,
+            contactEmail: null,
+            contactPhone: null,
+            contactAddress: null,
+            whatsappDefaultMessage: null,
+            customDomain: null,
+            facebookUrl: null,
+            instagramUrl: null,
+            linkedinUrl: null,
+            youtubeUrl: null,
+            tiktokUrl: null,
+          },
+        };
+      }),
+    
     update: protectedProcedure
       .input(z.object({
+        // Cores
         primaryColor: z.string().optional(),
         secondaryColor: z.string().optional(),
+        accentColor: z.string().optional(),
+        backgroundColor: z.string().optional(),
+        textColor: z.string().optional(),
+        // Tipografia
         fontFamily: z.string().optional(),
+        // Imagens e branding
+        logoUrl: z.string().optional(),
+        faviconUrl: z.string().optional(),
+        heroImageUrl: z.string().optional(),
+        heroTitle: z.string().optional(),
+        heroSubtitle: z.string().optional(),
+        // SEO
         siteTitle: z.string().optional(),
         siteDescription: z.string().optional(),
+        // Analytics
         googleAnalyticsId: z.string().optional(),
         facebookPixelId: z.string().optional(),
+        // Redes sociais
         facebookUrl: z.string().optional(),
         instagramUrl: z.string().optional(),
         linkedinUrl: z.string().optional(),
         youtubeUrl: z.string().optional(),
+        tiktokUrl: z.string().optional(),
+        // WhatsApp
         whatsappDefaultMessage: z.string().optional(),
+        // Domínio
         customDomain: z.string().optional(),
+        // Layout
+        showHeroSearch: z.boolean().optional(),
+        showFeaturedProperties: z.boolean().optional(),
+        showTestimonials: z.boolean().optional(),
+        showAboutSection: z.boolean().optional(),
+        aboutText: z.string().optional(),
+        // Contato
+        showContactForm: z.boolean().optional(),
+        contactEmail: z.string().optional(),
+        contactPhone: z.string().optional(),
+        contactAddress: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         if (!ctx.user.companyId) {

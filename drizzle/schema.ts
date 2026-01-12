@@ -226,19 +226,59 @@ export type InsertAppointment = typeof appointments.$inferInsert;
 export const siteSettings = mysqlTable("site_settings", {
   id: int("id").autoincrement().primaryKey(),
   companyId: int("companyId").notNull().unique(),
+  
+  // Cores do tema
   primaryColor: varchar("primaryColor", { length: 7 }).default("#0F52BA"),
   secondaryColor: varchar("secondaryColor", { length: 7 }).default("#50C878"),
+  accentColor: varchar("accentColor", { length: 7 }).default("#FF6B35"),
+  backgroundColor: varchar("backgroundColor", { length: 7 }).default("#FFFFFF"),
+  textColor: varchar("textColor", { length: 7 }).default("#1F2937"),
+  
+  // Tipografia
   fontFamily: varchar("fontFamily", { length: 100 }).default("Inter"),
+  
+  // Imagens e branding
+  logoUrl: text("logoUrl"),
+  faviconUrl: text("faviconUrl"),
+  heroImageUrl: text("heroImageUrl"),
+  heroTitle: varchar("heroTitle", { length: 100 }),
+  heroSubtitle: varchar("heroSubtitle", { length: 200 }),
+  
+  // SEO
   siteTitle: varchar("siteTitle", { length: 70 }),
   siteDescription: varchar("siteDescription", { length: 160 }),
+  
+  // Analytics
   googleAnalyticsId: varchar("googleAnalyticsId", { length: 50 }),
   facebookPixelId: varchar("facebookPixelId", { length: 50 }),
+  
+  // Redes sociais
   facebookUrl: varchar("facebookUrl", { length: 255 }),
   instagramUrl: varchar("instagramUrl", { length: 255 }),
   linkedinUrl: varchar("linkedinUrl", { length: 255 }),
   youtubeUrl: varchar("youtubeUrl", { length: 255 }),
+  tiktokUrl: varchar("tiktokUrl", { length: 255 }),
+  
+  // WhatsApp
   whatsappDefaultMessage: text("whatsappDefaultMessage"),
+  
+  // Domínio
   customDomain: varchar("customDomain", { length: 255 }),
+  domainVerified: boolean("domainVerified").default(false),
+  
+  // Layout e estilo
+  showHeroSearch: boolean("showHeroSearch").default(true),
+  showFeaturedProperties: boolean("showFeaturedProperties").default(true),
+  showTestimonials: boolean("showTestimonials").default(false),
+  showAboutSection: boolean("showAboutSection").default(true),
+  aboutText: text("aboutText"),
+  
+  // Contato
+  showContactForm: boolean("showContactForm").default(true),
+  contactEmail: varchar("contactEmail", { length: 320 }),
+  contactPhone: varchar("contactPhone", { length: 20 }),
+  contactAddress: text("contactAddress"),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

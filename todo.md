@@ -98,3 +98,18 @@
 ## Correções Urgentes (Site Publicado)
 - [x] Imagem de capa não aparece na listagem de imóveis do dashboard (corrigido - API atualizada para retornar mainImageUrl)
 - [x] Página de exibição do imóvel não funciona corretamente (verificado - está funcionando)
+
+
+## Site Externo Personalizado do Corretor/Imobiliária
+- [x] Atualizar schema do banco para campos de personalização (cores, logo, favicon, capa, domínio)
+- [x] Criar API para salvar e buscar configurações de personalização
+- [x] Página de configurações de personalização no dashboard (cores, logo, favicon, capa)
+- [x] Sistema de domínio personalizado (slug gratuito + opção de domínio próprio)
+- [x] Filtros avançados de busca (tipo, finalidade, preço, quartos, bairro, cidade)
+- [x] Layout do site público com cores e imagens personalizáveis
+- [x] Aplicar tema dinâmico baseado nas configurações do corretor
+- [x] Header com logo e navegação personalizados
+- [x] Hero section com imagem de capa personalizada
+- [x] Seção de busca com filtros avançados
+- [x] Listagem de imóveis com paginação
+- [x] Footer com informações de contato do corretor

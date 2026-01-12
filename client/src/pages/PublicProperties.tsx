@@ -50,7 +50,6 @@ export default function PublicProperties() {
     type: typeFilter || undefined,
     purpose: purposeFilter || undefined,
     city: cityFilter || undefined,
-    isPublished: true,
   });
 
   const formatPrice = (price: string | null) => {
