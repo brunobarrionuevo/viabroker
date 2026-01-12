@@ -98,15 +98,15 @@ export default function Layout({ children }: LayoutProps) {
             </p>
             <div className="flex gap-4">
               {/* Social Icons placeholders */}
-              <div className="w-8 h-8 rounded-full neu-flat flex items-center justify-center text-muted-foreground hover:text-primary cursor-pointer transition-colors">
+              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary cursor-pointer transition-colors">
                 <span className="sr-only">LinkedIn</span>
                 in
               </div>
-              <div className="w-8 h-8 rounded-full neu-flat flex items-center justify-center text-muted-foreground hover:text-primary cursor-pointer transition-colors">
+              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary cursor-pointer transition-colors">
                 <span className="sr-only">Twitter</span>
                 𝕏
               </div>
-              <div className="w-8 h-8 rounded-full neu-flat flex items-center justify-center text-muted-foreground hover:text-primary cursor-pointer transition-colors">
+              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary cursor-pointer transition-colors">
                 <span className="sr-only">Instagram</span>
                 ig
               </div>

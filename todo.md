@@ -1,0 +1,45 @@
+# Plataforma Imobiliária - TODO
+
+## Fase 1: Estrutura de Banco de Dados
+- [x] Tabela de Imobiliárias/Empresas (tenants)
+- [x] Tabela de Corretores (usuários do sistema)
+- [x] Tabela de Imóveis
+- [x] Tabela de Leads/Clientes
+- [x] Tabela de Interações (histórico de contatos)
+- [x] Tabela de Agendamentos (visitas)
+- [ ] Tabela de Planos de Assinatura
+- [x] Tabela de Configurações do Site
+
+## Fase 2: Backend - APIs
+- [x] CRUD de Imóveis (criar, listar, editar, excluir)
+- [x] CRUD de Leads/Clientes
+- [x] CRUD de Agendamentos
+- [x] API de Busca de Imóveis (filtros avançados)
+- [x] API de Dashboard (estatísticas)
+- [ ] API de Upload de Imagens (S3)
+- [x] Geração de Descrições com IA
+
+## Fase 3: Frontend - Painel do Cliente (Dashboard/CRM)
+- [x] Layout do Dashboard com sidebar
+- [x] Página de Listagem de Imóveis
+- [x] Formulário de Cadastro/Edição de Imóvel
+- [x] Página de Leads/CRM
+- [x] Página de Agendamentos/Calendário
+- [x] Dashboard com métricas e gráficos
+- [x] Configurações do Site/Perfil
+
+## Fase 4: Frontend - Site Público do Corretor
+- [x] Landing Page pública do corretor/imobiliária
+- [x] Página de listagem de imóveis (com filtros)
+- [x] Página de detalhes do imóvel
+- [x] Formulário de contato/lead capture
+- [ ] Integração WhatsApp
+
+## Fase 5: Funcionalidades Avançadas
+- [ ] Integração com portais imobiliários (XML)
+- [ ] Geração automática de posts para redes sociais
+- [ ] Relatórios avançados
+- [ ] Multi-idioma
+
+## Testes
+- [x] Testes unitários das APIs (properties, leads, appointments, company, siteSettings)

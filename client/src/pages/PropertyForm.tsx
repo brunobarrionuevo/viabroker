@@ -1,0 +1,561 @@
+import AppLayout from "@/components/AppLayout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { trpc } from "@/lib/trpc";
+import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
+import { Link, useLocation, useParams } from "wouter";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+
+const propertyTypes = [
+  { value: "casa", label: "Casa" },
+  { value: "apartamento", label: "Apartamento" },
+  { value: "terreno", label: "Terreno" },
+  { value: "comercial", label: "Comercial" },
+  { value: "rural", label: "Rural" },
+  { value: "cobertura", label: "Cobertura" },
+  { value: "flat", label: "Flat" },
+  { value: "kitnet", label: "Kitnet" },
+  { value: "sobrado", label: "Sobrado" },
+  { value: "galpao", label: "Galpão" },
+  { value: "sala_comercial", label: "Sala Comercial" },
+  { value: "loja", label: "Loja" },
+  { value: "outro", label: "Outro" },
+];
+
+const purposeOptions = [
+  { value: "venda", label: "Venda" },
+  { value: "aluguel", label: "Aluguel" },
+  { value: "venda_aluguel", label: "Venda e Aluguel" },
+];
+
+const statusOptions = [
+  { value: "disponivel", label: "Disponível" },
+  { value: "reservado", label: "Reservado" },
+  { value: "vendido", label: "Vendido" },
+  { value: "alugado", label: "Alugado" },
+  { value: "inativo", label: "Inativo" },
+];
+
+const brazilianStates = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
+  "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+];
+
+export default function PropertyForm() {
+  const params = useParams<{ id?: string }>();
+  const [, navigate] = useLocation();
+  const isEditing = !!params.id;
+
+  const [formData, setFormData] = useState({
+    title: "",
+    code: "",
+    description: "",
+    type: "apartamento" as const,
+    purpose: "venda" as "venda" | "aluguel" | "venda_aluguel",
+    salePrice: "",
+    rentPrice: "",
+    condoFee: "",
+    iptuAnnual: "",
+    address: "",
+    number: "",
+    complement: "",
+    neighborhood: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    totalArea: "",
+    builtArea: "",
+    bedrooms: 0,
+    suites: 0,
+    bathrooms: 0,
+    parkingSpaces: 0,
+    status: "disponivel" as const,
+    isHighlight: false,
+    isPublished: true,
+    metaTitle: "",
+    metaDescription: "",
+  });
+
+  const { data: property, isLoading: loadingProperty } = trpc.properties.get.useQuery(
+    { id: Number(params.id) },
+    { enabled: isEditing }
+  );
+
+  const createMutation = trpc.properties.create.useMutation({
+    onSuccess: () => {
+      toast.success("Imóvel cadastrado com sucesso!");
+      navigate("/dashboard/properties");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao cadastrar imóvel");
+    },
+  });
+
+  const updateMutation = trpc.properties.update.useMutation({
+    onSuccess: () => {
+      toast.success("Imóvel atualizado com sucesso!");
+      navigate("/dashboard/properties");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao atualizar imóvel");
+    },
+  });
+
+  const generateDescriptionMutation = trpc.properties.generateDescription.useMutation({
+    onSuccess: (data) => {
+      setFormData(prev => ({ ...prev, description: typeof data.description === 'string' ? data.description : '' }));
+      toast.success("Descrição gerada com sucesso!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao gerar descrição");
+    },
+  });
+
+  useEffect(() => {
+    if (property) {
+      setFormData({
+        title: property.title,
+        code: property.code || "",
+        description: property.description || "",
+        type: property.type as any,
+        purpose: property.purpose as any,
+        salePrice: property.salePrice || "",
+        rentPrice: property.rentPrice || "",
+        condoFee: property.condoFee || "",
+        iptuAnnual: property.iptuAnnual || "",
+        address: property.address || "",
+        number: property.number || "",
+        complement: property.complement || "",
+        neighborhood: property.neighborhood || "",
+        city: property.city,
+        state: property.state,
+        zipCode: property.zipCode || "",
+        totalArea: property.totalArea || "",
+        builtArea: property.builtArea || "",
+        bedrooms: property.bedrooms || 0,
+        suites: property.suites || 0,
+        bathrooms: property.bathrooms || 0,
+        parkingSpaces: property.parkingSpaces || 0,
+        status: property.status as any,
+        isHighlight: property.isHighlight,
+        isPublished: property.isPublished,
+        metaTitle: property.metaTitle || "",
+        metaDescription: property.metaDescription || "",
+      });
+    }
+  }, [property]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (isEditing) {
+      updateMutation.mutate({ id: Number(params.id), ...formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleGenerateDescription = () => {
+    generateDescriptionMutation.mutate({
+      title: formData.title,
+      type: formData.type,
+      purpose: formData.purpose,
+      city: formData.city,
+      state: formData.state,
+      neighborhood: formData.neighborhood,
+      bedrooms: formData.bedrooms,
+      suites: formData.suites,
+      bathrooms: formData.bathrooms,
+      parkingSpaces: formData.parkingSpaces,
+      totalArea: formData.totalArea,
+      builtArea: formData.builtArea,
+    });
+  };
+
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
+
+  if (isEditing && loadingProperty) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  return (
+    <AppLayout>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button type="button" variant="ghost" size="icon" asChild>
+            <Link href="/dashboard/properties">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">
+              {isEditing ? "Editar Imóvel" : "Novo Imóvel"}
+            </h1>
+            <p className="text-muted-foreground">
+              {isEditing ? "Atualize as informações do imóvel" : "Preencha os dados do imóvel"}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Basic Info */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Informações Básicas</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="title">Título *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      placeholder="Ex: Apartamento 3 quartos no Centro"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="code">Código</Label>
+                    <Input
+                      id="code"
+                      value={formData.code}
+                      onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
+                      placeholder="Ex: APT-001"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="type">Tipo *</Label>
+                    <Select value={formData.type} onValueChange={(v) => setFormData(prev => ({ ...prev, type: v as any }))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {propertyTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="purpose">Finalidade *</Label>
+                    <Select value={formData.purpose} onValueChange={(v) => setFormData(prev => ({ ...prev, purpose: v as any }))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {purposeOptions.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="status">Status</Label>
+                    <Select value={formData.status} onValueChange={(v) => setFormData(prev => ({ ...prev, status: v as any }))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {statusOptions.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor="description">Descrição</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateDescription}
+                      disabled={generateDescriptionMutation.isPending || !formData.title || !formData.city}
+                    >
+                      {generateDescriptionMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Sparkles className="w-4 h-4 mr-2" />
+                      )}
+                      Gerar com IA
+                    </Button>
+                  </div>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Descreva o imóvel..."
+                    rows={5}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Location */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Localização</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="address">Endereço</Label>
+                    <Input
+                      id="address"
+                      value={formData.address}
+                      onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                      placeholder="Rua, Avenida..."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="number">Número</Label>
+                    <Input
+                      id="number"
+                      value={formData.number}
+                      onChange={(e) => setFormData(prev => ({ ...prev, number: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="complement">Complemento</Label>
+                    <Input
+                      id="complement"
+                      value={formData.complement}
+                      onChange={(e) => setFormData(prev => ({ ...prev, complement: e.target.value }))}
+                      placeholder="Apto, Bloco..."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="neighborhood">Bairro</Label>
+                    <Input
+                      id="neighborhood"
+                      value={formData.neighborhood}
+                      onChange={(e) => setFormData(prev => ({ ...prev, neighborhood: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="zipCode">CEP</Label>
+                    <Input
+                      id="zipCode"
+                      value={formData.zipCode}
+                      onChange={(e) => setFormData(prev => ({ ...prev, zipCode: e.target.value }))}
+                      placeholder="00000-000"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="city">Cidade *</Label>
+                    <Input
+                      id="city"
+                      value={formData.city}
+                      onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">Estado *</Label>
+                    <Select value={formData.state} onValueChange={(v) => setFormData(prev => ({ ...prev, state: v }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {brazilianStates.map((state) => (
+                          <SelectItem key={state} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Characteristics */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Características</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div>
+                    <Label htmlFor="bedrooms">Quartos</Label>
+                    <Input
+                      id="bedrooms"
+                      type="number"
+                      min="0"
+                      value={formData.bedrooms}
+                      onChange={(e) => setFormData(prev => ({ ...prev, bedrooms: parseInt(e.target.value) || 0 }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="suites">Suítes</Label>
+                    <Input
+                      id="suites"
+                      type="number"
+                      min="0"
+                      value={formData.suites}
+                      onChange={(e) => setFormData(prev => ({ ...prev, suites: parseInt(e.target.value) || 0 }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="bathrooms">Banheiros</Label>
+                    <Input
+                      id="bathrooms"
+                      type="number"
+                      min="0"
+                      value={formData.bathrooms}
+                      onChange={(e) => setFormData(prev => ({ ...prev, bathrooms: parseInt(e.target.value) || 0 }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="parkingSpaces">Vagas</Label>
+                    <Input
+                      id="parkingSpaces"
+                      type="number"
+                      min="0"
+                      value={formData.parkingSpaces}
+                      onChange={(e) => setFormData(prev => ({ ...prev, parkingSpaces: parseInt(e.target.value) || 0 }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="totalArea">Área Total (m²)</Label>
+                    <Input
+                      id="totalArea"
+                      value={formData.totalArea}
+                      onChange={(e) => setFormData(prev => ({ ...prev, totalArea: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="builtArea">Área Construída (m²)</Label>
+                    <Input
+                      id="builtArea"
+                      value={formData.builtArea}
+                      onChange={(e) => setFormData(prev => ({ ...prev, builtArea: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Pricing */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Valores</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {(formData.purpose === "venda" || formData.purpose === "venda_aluguel") && (
+                  <div>
+                    <Label htmlFor="salePrice">Preço de Venda (R$)</Label>
+                    <Input
+                      id="salePrice"
+                      value={formData.salePrice}
+                      onChange={(e) => setFormData(prev => ({ ...prev, salePrice: e.target.value }))}
+                      placeholder="0,00"
+                    />
+                  </div>
+                )}
+                {(formData.purpose === "aluguel" || formData.purpose === "venda_aluguel") && (
+                  <div>
+                    <Label htmlFor="rentPrice">Valor do Aluguel (R$)</Label>
+                    <Input
+                      id="rentPrice"
+                      value={formData.rentPrice}
+                      onChange={(e) => setFormData(prev => ({ ...prev, rentPrice: e.target.value }))}
+                      placeholder="0,00"
+                    />
+                  </div>
+                )}
+                <div>
+                  <Label htmlFor="condoFee">Condomínio (R$)</Label>
+                  <Input
+                    id="condoFee"
+                    value={formData.condoFee}
+                    onChange={(e) => setFormData(prev => ({ ...prev, condoFee: e.target.value }))}
+                    placeholder="0,00"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="iptuAnnual">IPTU Anual (R$)</Label>
+                  <Input
+                    id="iptuAnnual"
+                    value={formData.iptuAnnual}
+                    onChange={(e) => setFormData(prev => ({ ...prev, iptuAnnual: e.target.value }))}
+                    placeholder="0,00"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Configurações</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="isPublished">Publicado</Label>
+                    <p className="text-xs text-muted-foreground">Visível no site</p>
+                  </div>
+                  <Switch
+                    id="isPublished"
+                    checked={formData.isPublished}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isPublished: checked }))}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="isHighlight">Destaque</Label>
+                    <p className="text-xs text-muted-foreground">Exibir na home</p>
+                  </div>
+                  <Switch
+                    id="isHighlight"
+                    checked={formData.isHighlight}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isHighlight: checked }))}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Actions */}
+            <div className="flex flex-col gap-2">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {isEditing ? "Salvar Alterações" : "Cadastrar Imóvel"}
+              </Button>
+              <Button type="button" variant="outline" asChild>
+                <Link href="/dashboard/properties">Cancelar</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </AppLayout>
+  );
+}

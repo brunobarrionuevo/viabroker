@@ -5,31 +5,57 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
-
+import Dashboard from "./pages/Dashboard";
+import Properties from "./pages/Properties";
+import PropertyForm from "./pages/PropertyForm";
+import Leads from "./pages/Leads";
+import LeadForm from "./pages/LeadForm";
+import Appointments from "./pages/Appointments";
+import AppointmentForm from "./pages/AppointmentForm";
+import Settings from "./pages/Settings";
+import PublicProperties from "./pages/PublicProperties";
+import PublicPropertyDetail from "./pages/PublicPropertyDetail";
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
+      {/* Public Routes */}
+      <Route path="/" component={Home} />
+      <Route path="/imoveis" component={PublicProperties} />
+      <Route path="/imovel/:id" component={PublicPropertyDetail} />
+      
+      {/* Dashboard Routes */}
+      <Route path="/dashboard" component={Dashboard} />
+      
+      {/* Properties Routes */}
+      <Route path="/dashboard/properties" component={Properties} />
+      <Route path="/dashboard/properties/new" component={PropertyForm} />
+      <Route path="/dashboard/properties/:id" component={PropertyForm} />
+      
+      {/* Leads Routes */}
+      <Route path="/dashboard/leads" component={Leads} />
+      <Route path="/dashboard/leads/new" component={LeadForm} />
+      <Route path="/dashboard/leads/:id" component={LeadForm} />
+      
+      {/* Appointments Routes */}
+      <Route path="/dashboard/appointments" component={Appointments} />
+      <Route path="/dashboard/appointments/new" component={AppointmentForm} />
+      <Route path="/dashboard/appointments/:id" component={AppointmentForm} />
+      
+      {/* Settings Routes */}
+      <Route path="/dashboard/settings" component={Settings} />
+      
+      {/* Error Routes */}
+      <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
-
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
           <Router />

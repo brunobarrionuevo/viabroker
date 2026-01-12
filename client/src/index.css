@@ -193,32 +193,3 @@
     border-radius: var(--radius);
   }
 }
-
-@utility neu-flat {
-  background: var(--background);
-  box-shadow: 
-    5px 5px 10px oklch(0.90 0.01 260), 
-    -5px -5px 10px oklch(1 0 0);
-  border-radius: var(--radius);
-  border: 1px solid oklch(1 0 0 / 0.5);
-}
-
-@utility neu-pressed {
-  background: var(--background);
-  box-shadow: 
-    inset 5px 5px 10px oklch(0.90 0.01 260), 
-    inset -5px -5px 10px oklch(1 0 0);
-  border-radius: var(--radius);
-}
-
-@utility neu-btn {
-  @apply neu-flat transition-all duration-300 active:neu-pressed hover:-translate-y-0.5 hover:shadow-lg;
-}
-
-@utility neu-card {
-  @apply neu-flat p-6;
-}
-
-@utility text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
-}
