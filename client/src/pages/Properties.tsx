@@ -126,10 +126,18 @@ export default function Properties() {
             {properties.map((property) => (
               <Link key={property.id} href={`/dashboard/properties/${property.id}/edit`}>
                 <Card className="overflow-hidden hover:border-primary transition-colors cursor-pointer group">
-                  <div className="aspect-video bg-muted relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Home className="w-12 h-12 text-muted-foreground/50" />
-                    </div>
+                  <div className="aspect-video bg-muted relative overflow-hidden">
+                    {property.mainImageUrl ? (
+                      <img 
+                        src={property.mainImageUrl} 
+                        alt={property.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Home className="w-12 h-12 text-muted-foreground/50" />
+                      </div>
+                    )}
                     <div className="absolute top-2 right-2">
                       {getStatusBadge(property.status)}
                     </div>

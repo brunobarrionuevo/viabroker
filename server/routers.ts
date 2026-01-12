@@ -151,7 +151,17 @@ export const appRouter = router({
           companyId: ctx.user.companyId || undefined,
           ...input
         };
-        return db.getProperties(filters, input?.limit || 50, input?.offset || 0);
+        const propertiesList = await db.getProperties(filters, input?.limit || 50, input?.offset || 0);
+        
+        // Buscar imagens principais de todos os imóveis
+        const propertyIds = propertiesList.map(p => p.id);
+        const mainImages = await db.getPropertiesMainImages(propertyIds);
+        
+        // Adicionar a URL da imagem principal a cada imóvel
+        return propertiesList.map(property => ({
+          ...property,
+          mainImageUrl: mainImages.get(property.id) || null,
+        }));
       }),
     
     get: protectedProcedure

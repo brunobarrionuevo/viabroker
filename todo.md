@@ -94,3 +94,7 @@
 - [x] Página de visualização do imóvel não exibe fotos e detalhes profissionais (verificado - está funcionando)
 
 - [x] Imagem de capa não aparece na listagem de imóveis (verificado - imóvel não tem fotos cadastradas, sistema funciona corretamente)
+
+## Correções Urgentes (Site Publicado)
+- [x] Imagem de capa não aparece na listagem de imóveis do dashboard (corrigido - API atualizada para retornar mainImageUrl)
+- [x] Página de exibição do imóvel não funciona corretamente (verificado - está funcionando)
