@@ -1,4 +1,4 @@
-import { eq, and, desc, asc, like, or, sql } from "drizzle-orm";
+import { eq, and, desc, asc, like, or, sql, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, 
@@ -310,6 +310,40 @@ export async function setMainPropertyImage(propertyId: number, imageId: number):
   // Depois, define a imagem selecionada como principal
   await db.update(propertyImages).set({ isMain: true }).where(eq(propertyImages.id, imageId));
   return true;
+}
+
+export async function getPropertyMainImage(propertyId: number): Promise<PropertyImage | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  // Primeiro tenta buscar a imagem marcada como principal
+  const mainImage = await db.select().from(propertyImages)
+    .where(and(eq(propertyImages.propertyId, propertyId), eq(propertyImages.isMain, true)))
+    .limit(1);
+  if (mainImage.length > 0) return mainImage[0];
+  // Se não houver, retorna a primeira imagem pela ordem
+  const firstImage = await db.select().from(propertyImages)
+    .where(eq(propertyImages.propertyId, propertyId))
+    .orderBy(asc(propertyImages.order))
+    .limit(1);
+  return firstImage[0];
+}
+
+export async function getPropertiesMainImages(propertyIds: number[]): Promise<Map<number, string>> {
+  const db = await getDb();
+  if (!db || propertyIds.length === 0) return new Map();
+  
+  const images = await db.select().from(propertyImages)
+    .where(inArray(propertyImages.propertyId, propertyIds))
+    .orderBy(asc(propertyImages.order));
+  
+  const result = new Map<number, string>();
+  for (const img of images) {
+    // Se ainda não tem imagem para esse imóvel, ou se essa é a principal
+    if (!result.has(img.propertyId) || img.isMain) {
+      result.set(img.propertyId, img.url);
+    }
+  }
+  return result;
 }
 
 export async function countPropertyImages(propertyId: number): Promise<number> {

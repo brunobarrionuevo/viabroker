@@ -36,7 +36,7 @@
 - [ ] Integração WhatsApp
 
 ## Fase 5: Funcionalidades Avançadas
-- [ ] Integração com portais imobiliários (XML)
+- [x] Integração com portais imobiliários (XML)
 - [ ] Geração automática de posts para redes sociais
 - [ ] Relatórios avançados
 - [ ] Multi-idioma
@@ -82,3 +82,10 @@
 - [x] Formulário de contato/interesse
 - [x] Botão de WhatsApp
 - [x] Design responsivo e profissional
+## Melhorias de Listagem e Integração
+
+- [x] Exibir foto principal na listagem de imóveis (cards com imagem)
+- [x] Integração com portais imobiliários (geração de XML)
+- [x] Formato XML compatível com ZAP, Viva Real, OLX
+- [x] Endpoint para download do XML
+- [x] Página de Integrações no dashboard

@@ -209,10 +209,10 @@ export default function PublicProperties() {
               <Link key={property.id} href={`/imovel/${property.id}`}>
                 <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
                   {/* Image */}
-                  <div className="relative h-48 bg-muted">
-                    {false ? (
+                  <div className="relative h-48 bg-muted overflow-hidden">
+                    {property.mainImageUrl ? (
                       <img
-                        src=""
+                        src={property.mainImageUrl}
                         alt={property.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />

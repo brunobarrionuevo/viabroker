@@ -8,6 +8,7 @@ import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "./_core/llm";
 import { fetchAddressByCEP } from "./viaCep";
 import { validateCPF, validateCNPJ, cleanCPF, cleanCNPJ } from "../shared/validators";
+import { generateVivaRealXML, generateOLXXML, generateGenericXML } from "./xmlGenerator";
 
 // Schemas de validação
 const propertyTypeEnum = z.enum(["casa", "apartamento", "terreno", "comercial", "rural", "cobertura", "flat", "kitnet", "sobrado", "galpao", "sala_comercial", "loja", "outro"]);
@@ -343,7 +344,17 @@ export const appRouter = router({
           isPublished: true,
           status: "disponivel",
         };
-        return db.getProperties(filters, input?.limit || 50, input?.offset || 0);
+        const propertiesList = await db.getProperties(filters, input?.limit || 50, input?.offset || 0);
+        
+        // Buscar imagens principais de todos os imóveis
+        const propertyIds = propertiesList.map(p => p.id);
+        const mainImages = await db.getPropertiesMainImages(propertyIds);
+        
+        // Adicionar a URL da imagem principal a cada imóvel
+        return propertiesList.map(property => ({
+          ...property,
+          mainImageUrl: mainImages.get(property.id) || null,
+        }));
       }),
 
     getPublic: publicProcedure
@@ -684,6 +695,28 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
         }
         return db.upsertSiteSettings(ctx.user.companyId, input);
       }),
+  }),
+
+  // Geração de XML para portais imobiliários
+  xml: router({
+    vivareal: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+      }
+      return generateVivaRealXML(ctx.user.companyId);
+    }),
+    olx: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+      }
+      return generateOLXXML(ctx.user.companyId);
+    }),
+    generic: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+      }
+      return generateGenericXML(ctx.user.companyId);
+    }),
   }),
 });
 

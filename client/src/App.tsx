@@ -17,6 +17,7 @@ import Settings from "./pages/Settings";
 import PublicProperties from "./pages/PublicProperties";
 import PublicPropertyDetail from "./pages/PublicPropertyDetail";
 import Onboarding from "./pages/Onboarding";
+import Integrations from "./pages/Integrations";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
@@ -129,6 +130,11 @@ function Router() {
       {/* Settings Routes */}
       <Route path="/dashboard/settings">
         {() => <ProtectedRoute component={Settings} />}
+      </Route>
+      
+      {/* Integrations Routes */}
+      <Route path="/dashboard/integrations">
+        {() => <ProtectedRoute component={Integrations} />}
       </Route>
       
       {/* Error Routes */}
