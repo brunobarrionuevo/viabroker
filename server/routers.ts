@@ -193,16 +193,36 @@ export const appRouter = router({
         isPublished: z.boolean().default(true),
         metaTitle: z.string().optional(),
         metaDescription: z.string().optional(),
+        videoUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         if (!ctx.user.companyId) {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
         }
-        return db.createProperty({
+        
+        // Tratar valores vazios para evitar erros de banco de dados
+        const cleanedInput = {
           ...input,
+          salePrice: input.salePrice && input.salePrice !== "0" && input.salePrice !== "" ? input.salePrice : null,
+          rentPrice: input.rentPrice && input.rentPrice !== "0" && input.rentPrice !== "" ? input.rentPrice : null,
+          condoFee: input.condoFee && input.condoFee !== "0" && input.condoFee !== "" ? input.condoFee : null,
+          iptuAnnual: input.iptuAnnual && input.iptuAnnual !== "0" && input.iptuAnnual !== "" ? input.iptuAnnual : null,
+          totalArea: input.totalArea && input.totalArea !== "" ? input.totalArea : null,
+          builtArea: input.builtArea && input.builtArea !== "" ? input.builtArea : null,
+          code: input.code && input.code !== "" ? input.code : null,
+          address: input.address && input.address !== "" ? input.address : null,
+          number: input.number && input.number !== "" ? input.number : null,
+          complement: input.complement && input.complement !== "" ? input.complement : null,
+          neighborhood: input.neighborhood && input.neighborhood !== "" ? input.neighborhood : null,
+          zipCode: input.zipCode && input.zipCode !== "" ? input.zipCode : null,
+          metaTitle: input.metaTitle && input.metaTitle !== "" ? input.metaTitle : null,
+          metaDescription: input.metaDescription && input.metaDescription !== "" ? input.metaDescription : null,
+          videoUrl: input.videoUrl && input.videoUrl !== "" ? input.videoUrl : null,
           companyId: ctx.user.companyId,
           userId: ctx.user.id,
-        });
+        };
+        
+        return db.createProperty(cleanedInput);
       }),
     
     update: protectedProcedure

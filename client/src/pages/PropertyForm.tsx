@@ -10,6 +10,7 @@ import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Loader2, Wand2, Search, Image, Sparkles } from "lucide-react";
 import { Link, useLocation, useParams } from "wouter";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 // Funções de formatação
 const formatCurrency = (value: string): string => {
@@ -32,7 +33,6 @@ const formatCEP = (value: string): string => {
   const numbers = value.replace(/\D/g, "").slice(0, 8);
   return numbers.replace(/(\d{5})(\d)/, "$1-$2");
 };
-import { toast } from "sonner";
 
 const propertyTypes = [
   { value: "casa", label: "Casa" },

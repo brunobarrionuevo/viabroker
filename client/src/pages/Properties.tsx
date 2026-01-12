@@ -124,7 +124,7 @@ export default function Properties() {
         ) : properties && properties.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {properties.map((property) => (
-              <Link key={property.id} href={`/dashboard/properties/${property.id}`}>
+              <Link key={property.id} href={`/dashboard/properties/${property.id}/edit`}>
                 <Card className="overflow-hidden hover:border-primary transition-colors cursor-pointer group">
                   <div className="aspect-video bg-muted relative">
                     <div className="absolute inset-0 flex items-center justify-center">

@@ -68,3 +68,7 @@
 - [x] Carrossel de fotos com navegação e miniaturas
 - [x] Player de vídeo incorporado (YouTube/Vimeo)
 - [x] Exibição responsiva da galeria
+
+## Correções Urgentes
+- [x] Botão de incluir fotos não aparece no formulário de cadastro (corrigido - link para gerenciar fotos aparece na edição)
+- [x] Erro ao finalizar o cadastro de imóveis (corrigido - valores monetários e videoUrl)
