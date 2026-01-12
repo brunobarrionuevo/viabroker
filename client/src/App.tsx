@@ -21,6 +21,8 @@ import Integrations from "./pages/Integrations";
 import SiteCustomization from "./pages/SiteCustomization";
 import RealtorSite from "./pages/RealtorSite";
 import RealtorPropertyDetail from "./pages/RealtorPropertyDetail";
+import MasterLogin from "./pages/MasterLogin";
+import MasterDashboard from "./pages/MasterDashboard";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
@@ -148,6 +150,10 @@ function Router() {
       {/* Realtor Public Site Routes */}
       <Route path="/site/:slug" component={RealtorSite} />
       <Route path="/site/:slug/imovel/:id" component={RealtorPropertyDetail} />
+      
+      {/* Master Admin Routes - Independente */}
+      <Route path="/master" component={MasterLogin} />
+      <Route path="/master/dashboard" component={MasterDashboard} />
       
       {/* Error Routes */}
       <Route path="/404" component={NotFound} />

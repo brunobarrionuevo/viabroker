@@ -9,6 +9,8 @@ import { invokeLLM } from "./_core/llm";
 import { fetchAddressByCEP } from "./viaCep";
 import { validateCPF, validateCNPJ, cleanCPF, cleanCNPJ } from "../shared/validators";
 import { generateVivaRealXML, generateOLXXML, generateGenericXML } from "./xmlGenerator";
+import { masterAdminRouter } from "./masterAdmin";
+import { createCheckoutSession, createBillingPortalSession } from "./stripe";
 
 // Schemas de validação
 const propertyTypeEnum = z.enum(["casa", "apartamento", "terreno", "comercial", "rural", "cobertura", "flat", "kitnet", "sobrado", "galpao", "sala_comercial", "loja", "outro"]);
@@ -899,6 +901,41 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
         throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
       }
       return generateGenericXML(ctx.user.companyId);
+    }),
+  }),
+
+  // Administração Master
+  masterAdmin: masterAdminRouter,
+
+  // Stripe Checkout
+  stripe: router({
+    createCheckout: protectedProcedure
+      .input(z.object({
+        planId: z.string(),
+        billingCycle: z.enum(["monthly", "yearly"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        const origin = ctx.req.headers.origin || "http://localhost:3000";
+        const url = await createCheckoutSession(
+          ctx.user.companyId,
+          input.planId,
+          input.billingCycle,
+          ctx.user.email || "",
+          ctx.user.name || "",
+          origin
+        );
+        return { url };
+      }),
+    createBillingPortal: protectedProcedure.mutation(async ({ ctx }) => {
+      if (!ctx.user.companyId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+      }
+      const origin = ctx.req.headers.origin || "http://localhost:3000";
+      const url = await createBillingPortalSession(ctx.user.companyId, origin);
+      return { url };
     }),
   }),
 });

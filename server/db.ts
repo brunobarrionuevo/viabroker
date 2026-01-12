@@ -9,7 +9,11 @@ import {
   leads, InsertLead, Lead,
   interactions, InsertInteraction, Interaction,
   appointments, InsertAppointment, Appointment,
-  siteSettings, InsertSiteSettings, SiteSettings
+  siteSettings, InsertSiteSettings, SiteSettings,
+  masterAdmins, InsertMasterAdmin, MasterAdmin,
+  subscriptions, InsertSubscription, Subscription,
+  payments, InsertPayment, Payment,
+  activityLogs, InsertActivityLog, ActivityLog
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -174,6 +178,18 @@ export async function createPlan(data: InsertPlan): Promise<Plan> {
   const result = await db.insert(plans).values(data);
   const inserted = await db.select().from(plans).where(eq(plans.id, Number(result[0].insertId))).limit(1);
   return inserted[0];
+}
+
+export async function updatePlan(id: number, data: Partial<InsertPlan>): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(plans).set(data).where(eq(plans.id, id));
+}
+
+export async function deletePlan(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(plans).where(eq(plans.id, id));
 }
 
 // ==========================================
@@ -599,3 +615,231 @@ function generateSlug(text: string): string {
     .replace(/(^-|-$)/g, '')
     .substring(0, 100);
 }
+
+
+// ==========================================
+// ADMINISTRADORES MASTER
+// ==========================================
+
+export async function getMasterAdminByUsername(username: string): Promise<MasterAdmin | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(masterAdmins).where(eq(masterAdmins.username, username)).limit(1);
+  return result[0];
+}
+
+export async function getMasterAdminById(id: number): Promise<MasterAdmin | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(masterAdmins).where(eq(masterAdmins.id, id)).limit(1);
+  return result[0];
+}
+
+export async function createMasterAdmin(data: InsertMasterAdmin): Promise<MasterAdmin> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(masterAdmins).values(data);
+  const inserted = await db.select().from(masterAdmins).where(eq(masterAdmins.id, Number(result[0].insertId))).limit(1);
+  return inserted[0];
+}
+
+export async function updateMasterAdminLastLogin(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(masterAdmins).set({ lastLoginAt: new Date() }).where(eq(masterAdmins.id, id));
+}
+
+// ==========================================
+// ASSINATURAS
+// ==========================================
+
+export async function getSubscriptionByCompanyId(companyId: number): Promise<Subscription | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(subscriptions).where(eq(subscriptions.companyId, companyId)).limit(1);
+  return result[0];
+}
+
+export async function getSubscriptions(filters?: { status?: string; limit?: number; offset?: number }): Promise<Subscription[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const baseQuery = db.select().from(subscriptions).orderBy(desc(subscriptions.createdAt));
+  
+  if (filters?.status && filters?.limit && filters?.offset !== undefined) {
+    return baseQuery.where(eq(subscriptions.status, filters.status as any)).limit(filters.limit).offset(filters.offset);
+  } else if (filters?.status && filters?.limit) {
+    return baseQuery.where(eq(subscriptions.status, filters.status as any)).limit(filters.limit);
+  } else if (filters?.status) {
+    return baseQuery.where(eq(subscriptions.status, filters.status as any));
+  } else if (filters?.limit && filters?.offset !== undefined) {
+    return baseQuery.limit(filters.limit).offset(filters.offset);
+  } else if (filters?.limit) {
+    return baseQuery.limit(filters.limit);
+  }
+  
+  return baseQuery;
+}
+
+export async function createSubscription(data: InsertSubscription): Promise<Subscription> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(subscriptions).values(data);
+  const inserted = await db.select().from(subscriptions).where(eq(subscriptions.id, Number(result[0].insertId))).limit(1);
+  return inserted[0];
+}
+
+export async function updateSubscription(id: number, data: Partial<InsertSubscription>): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(subscriptions).set(data).where(eq(subscriptions.id, id));
+}
+
+// ==========================================
+// PAGAMENTOS
+// ==========================================
+
+export async function getPayments(filters?: { companyId?: number; status?: string; limit?: number; offset?: number }): Promise<Payment[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [];
+  if (filters?.companyId) {
+    conditions.push(eq(payments.companyId, filters.companyId));
+  }
+  if (filters?.status) {
+    conditions.push(eq(payments.status, filters.status as any));
+  }
+  
+  const baseQuery = db.select().from(payments).orderBy(desc(payments.createdAt));
+  
+  if (conditions.length > 0 && filters?.limit && filters?.offset !== undefined) {
+    return baseQuery.where(and(...conditions)).limit(filters.limit).offset(filters.offset);
+  } else if (conditions.length > 0 && filters?.limit) {
+    return baseQuery.where(and(...conditions)).limit(filters.limit);
+  } else if (conditions.length > 0) {
+    return baseQuery.where(and(...conditions));
+  } else if (filters?.limit && filters?.offset !== undefined) {
+    return baseQuery.limit(filters.limit).offset(filters.offset);
+  } else if (filters?.limit) {
+    return baseQuery.limit(filters.limit);
+  }
+  
+  return baseQuery;
+}
+
+export async function createPayment(data: InsertPayment): Promise<Payment> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(payments).values(data);
+  const inserted = await db.select().from(payments).where(eq(payments.id, Number(result[0].insertId))).limit(1);
+  return inserted[0];
+}
+
+export async function updatePayment(id: number, data: Partial<InsertPayment>): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(payments).set(data).where(eq(payments.id, id));
+}
+
+// ==========================================
+// LOGS DE ATIVIDADE
+// ==========================================
+
+export async function createActivityLog(data: InsertActivityLog): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(activityLogs).values(data);
+}
+
+export async function getActivityLogs(filters?: { actorType?: string; entityType?: string; limit?: number; offset?: number }): Promise<ActivityLog[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [];
+  if (filters?.actorType) {
+    conditions.push(eq(activityLogs.actorType, filters.actorType as any));
+  }
+  if (filters?.entityType) {
+    conditions.push(eq(activityLogs.entityType, filters.entityType));
+  }
+  
+  const baseQuery = db.select().from(activityLogs).orderBy(desc(activityLogs.createdAt));
+  
+  if (conditions.length > 0 && filters?.limit && filters?.offset !== undefined) {
+    return baseQuery.where(and(...conditions)).limit(filters.limit).offset(filters.offset);
+  } else if (conditions.length > 0 && filters?.limit) {
+    return baseQuery.where(and(...conditions)).limit(filters.limit);
+  } else if (conditions.length > 0) {
+    return baseQuery.where(and(...conditions));
+  } else if (filters?.limit && filters?.offset !== undefined) {
+    return baseQuery.limit(filters.limit).offset(filters.offset);
+  } else if (filters?.limit) {
+    return baseQuery.limit(filters.limit);
+  }
+  
+  return baseQuery;
+}
+
+// ==========================================
+// ESTATÍSTICAS MASTER
+// ==========================================
+
+export async function getMasterStats() {
+  const db = await getDb();
+  if (!db) return { totalCompanies: 0, activeSubscriptions: 0, totalRevenue: 0, totalUsers: 0 };
+  
+  const [companiesResult, subscriptionsResult, paymentsResult, usersResult] = await Promise.all([
+    db.select({ count: sql<number>`count(*)` }).from(companies),
+    db.select({ count: sql<number>`count(*)` }).from(subscriptions).where(eq(subscriptions.status, 'active')),
+    db.select({ total: sql<number>`COALESCE(SUM(amount), 0)` }).from(payments).where(eq(payments.status, 'succeeded')),
+    db.select({ count: sql<number>`count(*)` }).from(users)
+  ]);
+  
+  return {
+    totalCompanies: companiesResult[0]?.count || 0,
+    activeSubscriptions: subscriptionsResult[0]?.count || 0,
+    totalRevenue: paymentsResult[0]?.total || 0,
+    totalUsers: usersResult[0]?.count || 0
+  };
+}
+
+export async function getAllCompanies(filters?: { isActive?: boolean; search?: string; limit?: number; offset?: number }): Promise<Company[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [];
+  if (filters?.isActive !== undefined) {
+    conditions.push(eq(companies.isActive, filters.isActive));
+  }
+  if (filters?.search) {
+    conditions.push(or(
+      like(companies.name, `%${filters.search}%`),
+      like(companies.email, `%${filters.search}%`),
+      like(companies.slug, `%${filters.search}%`)
+    ));
+  }
+  
+  const baseQuery = db.select().from(companies).orderBy(desc(companies.createdAt));
+  
+  if (conditions.length > 0 && filters?.limit && filters?.offset !== undefined) {
+    return baseQuery.where(and(...conditions)).limit(filters.limit).offset(filters.offset);
+  } else if (conditions.length > 0 && filters?.limit) {
+    return baseQuery.where(and(...conditions)).limit(filters.limit);
+  } else if (conditions.length > 0) {
+    return baseQuery.where(and(...conditions));
+  } else if (filters?.limit && filters?.offset !== undefined) {
+    return baseQuery.limit(filters.limit).offset(filters.offset);
+  } else if (filters?.limit) {
+    return baseQuery.limit(filters.limit);
+  }
+  
+  return baseQuery;
+}
+
+export async function toggleCompanyStatus(companyId: number, isActive: boolean): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(companies).set({ isActive }).where(eq(companies.id, companyId));
+}
+

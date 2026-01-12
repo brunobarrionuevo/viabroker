@@ -36,6 +36,20 @@
       "when": 1768198388205,
       "tag": "0004_modern_lifeguard",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1768203242542,
+      "tag": "0005_easy_risque",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1768203885410,
+      "tag": "0006_short_war_machine",
+      "breakpoints": true
     }
   ]
 }

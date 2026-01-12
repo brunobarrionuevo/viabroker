@@ -134,3 +134,17 @@
 - [x] Substituir todas as referências de ImobiPro por Brokvia
 - [x] Atualizar logo em todos os componentes
 - [x] Atualizar título e metadados da aplicação
+
+
+## Painel Administrador Master
+- [x] Criar tabela de administradores master no banco de dados
+- [x] Criar tabela de assinaturas com status e histórico
+- [x] Implementar autenticação master independente (senha master)
+- [x] Dashboard master com métricas gerais (total clientes, assinaturas ativas, receita)
+- [x] Listagem de todos os clientes (corretores/imobiliárias)
+- [x] Ativar/desativar clientes
+- [x] Gerenciamento de planos e preços
+- [x] Visualização e controle de assinaturas
+- [x] Histórico de pagamentos
+- [x] Integração com Stripe para pagamentos recorrentes
+- [x] Logs de atividades do sistema

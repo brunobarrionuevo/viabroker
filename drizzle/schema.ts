@@ -45,6 +45,7 @@ export const companies = mysqlTable("companies", {
   description: text("description"),
   planId: int("planId"),
   planExpiresAt: timestamp("planExpiresAt"),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -285,3 +286,91 @@ export const siteSettings = mysqlTable("site_settings", {
 
 export type SiteSettings = typeof siteSettings.$inferSelect;
 export type InsertSiteSettings = typeof siteSettings.$inferInsert;
+
+// ==========================================
+// ADMINISTRADORES MASTER
+// ==========================================
+
+export const masterAdmins = mysqlTable("master_admins", {
+  id: int("id").autoincrement().primaryKey(),
+  username: varchar("username", { length: 50 }).notNull().unique(),
+  passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  email: varchar("email", { length: 320 }),
+  isActive: boolean("isActive").default(true).notNull(),
+  lastLoginAt: timestamp("lastLoginAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MasterAdmin = typeof masterAdmins.$inferSelect;
+export type InsertMasterAdmin = typeof masterAdmins.$inferInsert;
+
+// ==========================================
+// ASSINATURAS
+// ==========================================
+
+export const subscriptions = mysqlTable("subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  planId: int("planId").notNull(),
+  status: mysqlEnum("status", ["active", "canceled", "past_due", "trialing", "paused", "expired"]).default("trialing").notNull(),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 100 }),
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 100 }),
+  stripePriceId: varchar("stripePriceId", { length: 100 }),
+  currentPeriodStart: timestamp("currentPeriodStart"),
+  currentPeriodEnd: timestamp("currentPeriodEnd"),
+  cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false),
+  canceledAt: timestamp("canceledAt"),
+  trialStart: timestamp("trialStart"),
+  trialEnd: timestamp("trialEnd"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+
+// ==========================================
+// HISTÓRICO DE PAGAMENTOS
+// ==========================================
+
+export const payments = mysqlTable("payments", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  subscriptionId: int("subscriptionId"),
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 100 }),
+  stripeInvoiceId: varchar("stripeInvoiceId", { length: 100 }),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("BRL").notNull(),
+  status: mysqlEnum("status", ["pending", "succeeded", "failed", "refunded", "canceled"]).default("pending").notNull(),
+  paymentMethod: varchar("paymentMethod", { length: 50 }),
+  description: varchar("description", { length: 255 }),
+  invoiceUrl: text("invoiceUrl"),
+  receiptUrl: text("receiptUrl"),
+  paidAt: timestamp("paidAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;
+
+// ==========================================
+// LOGS DE ATIVIDADES DO SISTEMA
+// ==========================================
+
+export const activityLogs = mysqlTable("activity_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  actorType: mysqlEnum("actorType", ["master_admin", "user", "system"]).notNull(),
+  actorId: int("actorId"),
+  action: varchar("action", { length: 100 }).notNull(),
+  entityType: varchar("entityType", { length: 50 }),
+  entityId: int("entityId"),
+  details: json("details").$type<Record<string, any>>(),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ActivityLog = typeof activityLogs.$inferSelect;
+export type InsertActivityLog = typeof activityLogs.$inferInsert;
