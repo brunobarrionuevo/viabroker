@@ -312,15 +312,15 @@ export default function RealtorPropertyDetail() {
                       <>
                         <button
                           onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-white/30"
+                          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/50 backdrop-blur text-white flex items-center justify-center opacity-80 hover:opacity-100 transition-all hover:bg-black/70 z-10"
                         >
-                          <ChevronLeft className="w-7 h-7" />
+                          <ChevronLeft className="w-6 h-6 md:w-7 md:h-7" />
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-white/30"
+                          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/50 backdrop-blur text-white flex items-center justify-center opacity-80 hover:opacity-100 transition-all hover:bg-black/70 z-10"
                         >
-                          <ChevronRight className="w-7 h-7" />
+                          <ChevronRight className="w-6 h-6 md:w-7 md:h-7" />
                         </button>
                       </>
                     )}
@@ -353,18 +353,6 @@ export default function RealtorPropertyDetail() {
             {/* Thumbnails e Botões de Navegação */}
             {(hasImages || hasVideo) && (
               <div className="flex gap-2 p-4 overflow-x-auto bg-slate-800 items-center">
-                {/* Botão de Vídeo */}
-                {hasVideo && (
-                  <button
-                    onClick={() => setShowVideo(true)}
-                    className={`flex-shrink-0 w-20 h-14 rounded overflow-hidden border-2 transition-all flex items-center justify-center ${
-                      showVideo ? "border-red-500 bg-red-600" : "border-transparent bg-slate-700 opacity-60 hover:opacity-100"
-                    }`}
-                  >
-                    <Play className="w-8 h-8 text-white fill-current" />
-                  </button>
-                )}
-                
                 {/* Thumbnails das Fotos */}
                 {hasImages && images.map((img, idx) => (
                   <button
@@ -377,6 +365,18 @@ export default function RealtorPropertyDetail() {
                     <img src={img.url} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
+                
+                {/* Botão de Vídeo - Última posição */}
+                {hasVideo && (
+                  <button
+                    onClick={() => setShowVideo(true)}
+                    className={`flex-shrink-0 w-20 h-14 rounded overflow-hidden border-2 transition-all flex items-center justify-center ${
+                      showVideo ? "border-red-500 bg-red-600" : "border-transparent bg-slate-700 opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <Play className="w-8 h-8 text-white fill-current" />
+                  </button>
+                )}
               </div>
             )}
           </div>

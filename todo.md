@@ -231,3 +231,7 @@
 
 ## Correção Vídeo YouTube (13/01/2026)
 - [x] Corrigir exibição do vídeo do YouTube na página de detalhes do imóvel (só aparece galeria de fotos)
+
+## Ajustes Galeria de Imóveis (13/01/2026)
+- [x] Mover botão de vídeo para última posição na barra de thumbnails
+- [x] Corrigir navegação lateral das imagens com clique (setas sempre visíveis)
