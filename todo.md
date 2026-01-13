@@ -246,3 +246,10 @@
 - [x] Zoom com pinça nas imagens da galeria
 - [x] Formatação de telefone (xx) XXXXX-XXXX em todo o site
 - [x] Validação de CPF/CNPJ no cadastro inicial com mensagem de erro
+
+
+## Mapa, Filtros e Correções (13/01/2026)
+- [x] Adicionar campo para ocultar/mostrar endereço do imóvel no cadastro
+- [x] Implementar mapa do Google com localização do imóvel na página de exibição
+- [x] Adicionar filtros avançados: quartos, banheiros, vagas, bairro, cidade, estado, área
+- [x] Corrigir bug do filtro que não mostra imóveis ao voltar para "todos"

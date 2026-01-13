@@ -219,6 +219,7 @@ export const appRouter = router({
         metaTitle: z.string().optional(),
         metaDescription: z.string().optional(),
         videoUrl: z.string().optional(),
+        hideAddress: z.boolean().default(false),
       }))
       .mutation(async ({ ctx, input }) => {
         if (!ctx.user.companyId) {
@@ -282,6 +283,7 @@ export const appRouter = router({
         metaTitle: z.string().optional(),
         metaDescription: z.string().optional(),
         videoUrl: z.string().optional(),
+        hideAddress: z.boolean().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
@@ -385,6 +387,7 @@ export const appRouter = router({
         maxPrice: z.number().optional(),
         minBedrooms: z.number().optional(),
         maxBedrooms: z.number().optional(),
+        minBathrooms: z.number().optional(),
         minArea: z.number().optional(),
         maxArea: z.number().optional(),
         parkingSpaces: z.number().optional(),
@@ -437,6 +440,10 @@ export const appRouter = router({
         
         if (input?.maxBedrooms !== undefined) {
           propertiesList = propertiesList.filter(p => (p.bedrooms || 0) <= (input.maxBedrooms || 99));
+        }
+        
+        if (input?.minBathrooms !== undefined) {
+          propertiesList = propertiesList.filter(p => (p.bathrooms || 0) >= (input.minBathrooms || 0));
         }
         
         if (input?.minArea !== undefined) {

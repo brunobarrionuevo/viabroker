@@ -537,10 +537,10 @@ export default function RealtorPropertyDetail() {
                   <h1 className="text-2xl md:text-3xl font-bold mb-2">{property.title}</h1>
                   <p className="text-muted-foreground flex items-center gap-2">
                     <MapPin className="w-5 h-5" />
-                    {property.address && `${property.address}, ${property.number || ""} - `}
+                    {!property.hideAddress && property.address && `${property.address}, ${property.number || ""} - `}
                     {property.neighborhood && `${property.neighborhood}, `}
                     {property.city} - {property.state}
-                    {property.zipCode && ` | CEP: ${property.zipCode}`}
+                    {!property.hideAddress && property.zipCode && ` | CEP: ${property.zipCode}`}
                   </p>
                 </div>
 
@@ -659,6 +659,70 @@ export default function RealtorPropertyDetail() {
                     </CardContent>
                   </Card>
                 )}
+
+                {/* Map */}
+                <Card>
+                  <CardContent className="pt-6">
+                    <h2 className="font-semibold mb-4 flex items-center gap-2">
+                      <MapPin className="w-5 h-5" style={{ color: theme.primaryColor }} />
+                      Localização
+                    </h2>
+                    {property.hideAddress ? (
+                      <div className="bg-slate-100 rounded-lg p-6 text-center">
+                        <MapPin className="w-12 h-12 mx-auto mb-3 text-slate-400" />
+                        <p className="text-muted-foreground">
+                          Localização aproximada: {property.neighborhood && `${property.neighborhood}, `}{property.city} - {property.state}
+                        </p>
+                        <p className="text-sm text-slate-400 mt-2">
+                          Endereço completo disponível após contato com o corretor
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="aspect-video rounded-lg overflow-hidden border">
+                          <iframe
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0 }}
+                            loading="lazy"
+                            allowFullScreen
+                            referrerPolicy="no-referrer-when-downgrade"
+                            src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(
+                              `${property.address || ''} ${property.number || ''}, ${property.neighborhood || ''}, ${property.city}, ${property.state}, Brasil`
+                            )}&zoom=16`}
+                          />
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          <p className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4" />
+                            {property.address && `${property.address}, ${property.number || ""}`}
+                            {property.neighborhood && ` - ${property.neighborhood}`}
+                          </p>
+                          <p className="mt-1">
+                            {property.city} - {property.state}
+                            {property.zipCode && ` | CEP: ${property.zipCode}`}
+                          </p>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          className="w-full"
+                          asChild
+                        >
+                          <a 
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                              `${property.address || ''} ${property.number || ''}, ${property.neighborhood || ''}, ${property.city}, ${property.state}, Brasil`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <MapPin className="w-4 h-4 mr-2" />
+                            Abrir no Google Maps
+                          </a>
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Sidebar */}

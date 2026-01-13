@@ -69,6 +69,12 @@ const bedroomOptions = [
   { value: "5", label: "5+ quartos" },
 ];
 
+// Estados brasileiros
+const states = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
+  "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+];
+
 export default function RealtorSite() {
   const params = useParams<{ slug: string }>();
   const [showFilters, setShowFilters] = useState(false);
@@ -83,6 +89,10 @@ export default function RealtorSite() {
   const [minPriceFilter, setMinPriceFilter] = useState<number | undefined>();
   const [maxPriceFilter, setMaxPriceFilter] = useState<number | undefined>();
   const [parkingFilter, setParkingFilter] = useState("");
+  const [bathroomsFilter, setBathroomsFilter] = useState("");
+  const [stateFilter, setStateFilter] = useState("");
+  const [minAreaFilter, setMinAreaFilter] = useState<number | undefined>();
+  const [maxAreaFilter, setMaxAreaFilter] = useState<number | undefined>();
 
   // Formulário de Lead
   const [leadName, setLeadName] = useState("");
@@ -119,11 +129,15 @@ export default function RealtorSite() {
     type: typeFilter || undefined,
     purpose: purposeFilter || undefined,
     city: cityFilter || undefined,
+    state: stateFilter || undefined,
     neighborhood: neighborhoodFilter || undefined,
     minBedrooms: minBedroomsFilter ? parseInt(minBedroomsFilter) : undefined,
+    minBathrooms: bathroomsFilter ? parseInt(bathroomsFilter) : undefined,
     minPrice: minPriceFilter,
     maxPrice: maxPriceFilter,
     parkingSpaces: parkingFilter ? parseInt(parkingFilter) : undefined,
+    minArea: minAreaFilter,
+    maxArea: maxAreaFilter,
     search: search || undefined,
     limit: 50,
   }, { enabled: !!params.slug });
@@ -170,14 +184,18 @@ export default function RealtorSite() {
     setTypeFilter("");
     setPurposeFilter("");
     setCityFilter("");
+    setStateFilter("");
     setNeighborhoodFilter("");
     setMinBedroomsFilter("");
+    setBathroomsFilter("");
     setMinPriceFilter(undefined);
     setMaxPriceFilter(undefined);
     setParkingFilter("");
+    setMinAreaFilter(undefined);
+    setMaxAreaFilter(undefined);
   };
 
-  const hasActiveFilters = search || typeFilter || purposeFilter || cityFilter || neighborhoodFilter || minBedroomsFilter || minPriceFilter || maxPriceFilter || parkingFilter;
+  const hasActiveFilters = search || typeFilter || purposeFilter || cityFilter || stateFilter || neighborhoodFilter || minBedroomsFilter || bathroomsFilter || minPriceFilter || maxPriceFilter || parkingFilter || minAreaFilter || maxAreaFilter;
 
   // Aplicar tema personalizado
   const theme = {
@@ -571,6 +589,57 @@ export default function RealtorSite() {
                       placeholder="Sem limite"
                       value={maxPriceFilter || ""}
                       onChange={(e) => setMaxPriceFilter(e.target.value ? parseInt(e.target.value) : undefined)}
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm mb-2 block">Banheiros</Label>
+                    <Select value={bathroomsFilter} onValueChange={(v) => setBathroomsFilter(v === "all" ? "" : v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Banheiros" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="1">1+ banheiro</SelectItem>
+                        <SelectItem value="2">2+ banheiros</SelectItem>
+                        <SelectItem value="3">3+ banheiros</SelectItem>
+                        <SelectItem value="4">4+ banheiros</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm mb-2 block">Estado</Label>
+                    <Select value={stateFilter} onValueChange={(v) => setStateFilter(v === "all" ? "" : v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Todos os estados" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os estados</SelectItem>
+                        {states.map((s) => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm mb-2 block">Área Mínima (m²)</Label>
+                    <Input
+                      type="number"
+                      placeholder="0 m²"
+                      value={minAreaFilter || ""}
+                      onChange={(e) => setMinAreaFilter(e.target.value ? parseInt(e.target.value) : undefined)}
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm mb-2 block">Área Máxima (m²)</Label>
+                    <Input
+                      type="number"
+                      placeholder="Sem limite"
+                      value={maxAreaFilter || ""}
+                      onChange={(e) => setMaxAreaFilter(e.target.value ? parseInt(e.target.value) : undefined)}
                     />
                   </div>
                 </div>

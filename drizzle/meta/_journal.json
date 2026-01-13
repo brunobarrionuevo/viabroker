@@ -64,6 +64,13 @@
       "when": 1768236171150,
       "tag": "0008_skinny_maverick",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1768328008968,
+      "tag": "0009_fat_prowler",
+      "breakpoints": true
     }
   ]
 }

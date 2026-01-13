@@ -105,6 +105,7 @@ export default function PropertyForm() {
     metaTitle: "",
     metaDescription: "",
     videoUrl: "",
+    hideAddress: false,
   });
 
   const { data: property, isLoading: loadingProperty } = trpc.properties.get.useQuery(
@@ -173,6 +174,7 @@ export default function PropertyForm() {
         metaTitle: property.metaTitle || "",
         metaDescription: property.metaDescription || "",
         videoUrl: property.videoUrl || "",
+        hideAddress: property.hideAddress || false,
       });
     }
   }, [property]);
@@ -674,6 +676,17 @@ export default function PropertyForm() {
                     id="isHighlight"
                     checked={formData.isHighlight}
                     onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isHighlight: checked }))}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="hideAddress">Ocultar Endereço</Label>
+                    <p className="text-xs text-muted-foreground">Não mostrar endereço completo no site</p>
+                  </div>
+                  <Switch
+                    id="hideAddress"
+                    checked={formData.hideAddress}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hideAddress: checked }))}
                   />
                 </div>
               </CardContent>

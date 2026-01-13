@@ -137,6 +137,7 @@ export const properties = mysqlTable("properties", {
   metaTitle: varchar("metaTitle", { length: 70 }),
   metaDescription: varchar("metaDescription", { length: 160 }),
   videoUrl: text("videoUrl"),
+  hideAddress: boolean("hideAddress").default(false).notNull(),
   publishedAt: timestamp("publishedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

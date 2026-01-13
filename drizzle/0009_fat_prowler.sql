@@ -1,0 +1,1 @@
+ALTER TABLE `properties` ADD `hideAddress` boolean DEFAULT false NOT NULL;
