@@ -11,6 +11,7 @@ import { trpc } from "@/lib/trpc";
 import { Loader2, Building2, Globe, Palette, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { formatPhone } from "@/lib/formatters";
 
 export default function Settings() {
   const { data: company, isLoading: loadingCompany } = trpc.company.get.useQuery();
@@ -283,7 +284,8 @@ export default function Settings() {
                       <Input
                         id="phone"
                         value={companyData.phone}
-                        onChange={(e) => setCompanyData(prev => ({ ...prev, phone: e.target.value }))}
+                        onChange={(e) => setCompanyData(prev => ({ ...prev, phone: formatPhone(e.target.value) }))}
+                        placeholder="(00) 00000-0000"
                       />
                     </div>
                     <div>
@@ -291,7 +293,8 @@ export default function Settings() {
                       <Input
                         id="whatsapp"
                         value={companyData.whatsapp}
-                        onChange={(e) => setCompanyData(prev => ({ ...prev, whatsapp: e.target.value }))}
+                        onChange={(e) => setCompanyData(prev => ({ ...prev, whatsapp: formatPhone(e.target.value) }))}
+                        placeholder="(00) 00000-0000"
                       />
                     </div>
                   </div>

@@ -9,6 +9,7 @@ import { Users, Plus, Search, Phone, Mail, MessageSquare } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { displayPhone } from "@/lib/formatters";
 
 const stageOptions = [
   { value: "novo", label: "Novo", color: "bg-green-100 text-green-700" },
@@ -155,7 +156,7 @@ export default function Leads() {
                           {lead.phone && (
                             <span className="flex items-center gap-1">
                               <Phone className="w-3 h-3" />
-                              {lead.phone}
+                              {displayPhone(lead.phone)}
                             </span>
                           )}
                           {lead.whatsapp && (

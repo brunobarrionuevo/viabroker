@@ -10,6 +10,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { Link, useLocation, useParams } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { formatPhone } from "@/lib/formatters";
 
 const sourceOptions = [
   { value: "site", label: "Site" },
@@ -182,7 +183,7 @@ export default function LeadForm() {
                 <Input
                   id="phone"
                   value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: formatPhone(e.target.value) }))}
                   placeholder="(00) 00000-0000"
                 />
               </div>
@@ -191,7 +192,7 @@ export default function LeadForm() {
                 <Input
                   id="whatsapp"
                   value={formData.whatsapp}
-                  onChange={(e) => setFormData(prev => ({ ...prev, whatsapp: e.target.value }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, whatsapp: formatPhone(e.target.value) }))}
                   placeholder="(00) 00000-0000"
                 />
               </div>

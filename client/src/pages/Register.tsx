@@ -13,6 +13,7 @@ import {
   Loader2, AlertCircle, CheckCircle, Gift, Shield, Zap 
 } from "lucide-react";
 import { toast } from "sonner";
+import { isValidCPF, isValidCNPJ } from "@/lib/formatters";
 
 export default function Register() {
   const [, setLocation] = useLocation();
@@ -31,6 +32,7 @@ export default function Register() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [cpfCnpjError, setCpfCnpjError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const registerMutation = trpc.customAuth.register.useMutation({
@@ -100,6 +102,29 @@ export default function Register() {
       setError("Nome da empresa/corretor deve ter pelo menos 2 caracteres");
       return false;
     }
+    
+    // Validação obrigatória de CPF ou CNPJ
+    if (formData.personType === "fisica") {
+      if (!formData.cpf || formData.cpf.replace(/\D/g, "").length < 11) {
+        setCpfCnpjError("CPF é obrigatório. Digite os 11 dígitos.");
+        return false;
+      }
+      if (!isValidCPF(formData.cpf)) {
+        setCpfCnpjError("CPF inválido. Verifique os números digitados.");
+        return false;
+      }
+    } else {
+      if (!formData.cnpj || formData.cnpj.replace(/\D/g, "").length < 14) {
+        setCpfCnpjError("CNPJ é obrigatório. Digite os 14 dígitos.");
+        return false;
+      }
+      if (!isValidCNPJ(formData.cnpj)) {
+        setCpfCnpjError("CNPJ inválido. Verifique os números digitados.");
+        return false;
+      }
+    }
+    
+    setCpfCnpjError("");
     return true;
   };
 
@@ -344,27 +369,49 @@ export default function Register() {
 
                 {formData.personType === "fisica" ? (
                   <div className="space-y-2">
-                    <Label htmlFor="cpf">CPF (opcional)</Label>
+                    <Label htmlFor="cpf">CPF *</Label>
                     <Input
                       id="cpf"
                       name="cpf"
                       placeholder="000.000.000-00"
                       value={formData.cpf}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, cpf: formatCPF(e.target.value) }))}
+                      onChange={(e) => {
+                        setFormData((prev) => ({ ...prev, cpf: formatCPF(e.target.value) }));
+                        setCpfCnpjError("");
+                      }}
                       maxLength={14}
+                      className={cpfCnpjError ? "border-red-500" : ""}
+                      required
                     />
+                    {cpfCnpjError && formData.personType === "fisica" && (
+                      <p className="text-sm text-red-500 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {cpfCnpjError}
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <Label htmlFor="cnpj">CNPJ (opcional)</Label>
+                    <Label htmlFor="cnpj">CNPJ *</Label>
                     <Input
                       id="cnpj"
                       name="cnpj"
                       placeholder="00.000.000/0000-00"
                       value={formData.cnpj}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, cnpj: formatCNPJ(e.target.value) }))}
+                      onChange={(e) => {
+                        setFormData((prev) => ({ ...prev, cnpj: formatCNPJ(e.target.value) }));
+                        setCpfCnpjError("");
+                      }}
                       maxLength={18}
+                      className={cpfCnpjError ? "border-red-500" : ""}
+                      required
                     />
+                    {cpfCnpjError && formData.personType === "juridica" && (
+                      <p className="text-sm text-red-500 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {cpfCnpjError}
+                      </p>
+                    )}
                   </div>
                 )}
 

@@ -35,6 +35,7 @@ import {
 import { Link, useParams } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
+import { formatPhone, displayPhone } from "@/lib/formatters";
 
 // Função para extrair ID do vídeo do YouTube ou Vimeo
 function getVideoEmbedUrl(url: string | null): string | null {
@@ -644,7 +645,7 @@ export default function PublicPropertyDetail() {
                       <Button variant="outline" className="w-full h-12" asChild>
                         <a href={`tel:${property.company.phone}`}>
                           <Phone className="w-5 h-5 mr-2" />
-                          {property.company.phone}
+                          {displayPhone(property.company.phone)}
                         </a>
                       </Button>
                     )}
@@ -682,7 +683,7 @@ export default function PublicPropertyDetail() {
                         <Input
                           id="phone"
                           value={contactForm.phone}
-                          onChange={(e) => setContactForm(prev => ({ ...prev, phone: e.target.value }))}
+                          onChange={(e) => setContactForm(prev => ({ ...prev, phone: formatPhone(e.target.value) }))}
                           placeholder="(11) 99999-9999"
                           required
                         />

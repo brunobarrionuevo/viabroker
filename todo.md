@@ -238,3 +238,11 @@
 
 ## Gestos de Swipe na Galeria (13/01/2026)
 - [x] Implementar navegação por gestos de swipe na galeria de imóveis para dispositivos móveis
+
+## Melhorias Galeria e Validações (13/01/2026)
+- [x] Navegação por setas do teclado na galeria de imóveis
+- [x] Modal de imagem com swipe e setas do teclado
+- [x] Indicador visual de swipe na galeria
+- [x] Zoom com pinça nas imagens da galeria
+- [x] Formatação de telefone (xx) XXXXX-XXXX em todo o site
+- [x] Validação de CPF/CNPJ no cadastro inicial com mensagem de erro

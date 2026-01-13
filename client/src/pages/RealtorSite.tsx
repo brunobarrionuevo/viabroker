@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { displayPhone } from "@/lib/formatters";
 import { 
   Building2, 
   Search, 
@@ -800,7 +801,7 @@ export default function RealtorSite() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Telefone</p>
-                        <p className="font-medium">{settings?.contactPhone || company.phone}</p>
+                        <p className="font-medium">{displayPhone(settings?.contactPhone || company.phone)}</p>
                       </div>
                     </a>
                   )}

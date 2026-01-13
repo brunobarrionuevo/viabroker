@@ -24,11 +24,14 @@ import {
   Home,
   Check,
   X,
-  Play
+  Play,
+  ZoomIn,
+  Hand
 } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
+import { formatPhone, displayPhone } from "@/lib/formatters";
 
 // Mapeamento de tipos de imóvel
 const propertyTypeLabels: Record<string, string> = {
@@ -64,6 +67,15 @@ export default function RealtorPropertyDetail() {
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
   const minSwipeDistance = 50; // Mínimo de pixels para considerar um swipe
+  
+  // Estados para zoom
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const initialPinchDistance = useRef<number | null>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  
+  // Estado para mostrar indicador de swipe
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
 
   // Buscar configurações do site
   const { data: siteData, isLoading: loadingSite } = trpc.siteSettings.getPublic.useQuery(
@@ -171,7 +183,77 @@ export default function RealtorPropertyDetail() {
     // Reset
     touchStartX.current = null;
     touchEndX.current = null;
-  }, [showVideo, images]);
+    
+    // Esconder indicador de swipe após primeiro swipe
+    if (showSwipeHint) setShowSwipeHint(false);
+  }, [showVideo, images, showSwipeHint]);
+
+  // Handler para navegação por teclado
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!images || images.length <= 1) return;
+      
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        prevImage();
+        if (showSwipeHint) setShowSwipeHint(false);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        nextImage();
+        if (showSwipeHint) setShowSwipeHint(false);
+      } else if (e.key === "Escape" && showImageModal) {
+        setShowImageModal(false);
+        setZoomLevel(1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [images, showImageModal, showSwipeHint]);
+
+  // Handlers para zoom com pinça
+  const onPinchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const distance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      initialPinchDistance.current = distance;
+    }
+  }, []);
+
+  const onPinchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2 && initialPinchDistance.current) {
+      const distance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const scale = distance / initialPinchDistance.current;
+      setZoomLevel(prev => Math.min(Math.max(prev * scale, 1), 4));
+      initialPinchDistance.current = distance;
+    }
+  }, []);
+
+  const onPinchEnd = useCallback(() => {
+    initialPinchDistance.current = null;
+  }, []);
+
+  // Handler para duplo toque (zoom)
+  const lastTapTime = useRef<number>(0);
+  const onDoubleTap = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTapTime.current < 300) {
+      // Duplo toque detectado
+      setZoomLevel(prev => prev === 1 ? 2 : 1);
+    }
+    lastTapTime.current = now;
+  }, []);
+
+  // Reset zoom quando mudar de imagem
+  useEffect(() => {
+    setZoomLevel(1);
+    setZoomPosition({ x: 0, y: 0 });
+  }, [currentImageIndex]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -362,11 +444,25 @@ export default function RealtorPropertyDetail() {
                       </>
                     )}
 
-                    <div className="absolute bottom-4 left-4 text-white">
+                    <div className="absolute bottom-4 left-4 text-white flex items-center gap-2">
                       <span className="bg-black/50 px-3 py-1 rounded-full text-sm">
                         {currentImageIndex + 1} / {images.length} fotos
                       </span>
+                      <span className="bg-black/50 px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                        <ZoomIn className="w-4 h-4" /> Clique para ampliar
+                      </span>
                     </div>
+                    
+                    {/* Indicador de Swipe */}
+                    {showSwipeHint && images.length > 1 && (
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse">
+                        <div className="bg-black/70 backdrop-blur px-4 py-2 rounded-full text-white flex items-center gap-2">
+                          <Hand className="w-5 h-5" />
+                          <span className="text-sm">Deslize ou use as setas</span>
+                          <ChevronRight className="w-5 h-5" />
+                        </div>
+                      </div>
+                    )}
 
                     {/* Botão para assistir vídeo (se houver) */}
                     {hasVideo && (
@@ -630,7 +726,7 @@ export default function RealtorPropertyDetail() {
                           <Input
                             id="phone"
                             value={contactForm.phone}
-                            onChange={(e) => setContactForm(prev => ({ ...prev, phone: e.target.value }))}
+                            onChange={(e) => setContactForm(prev => ({ ...prev, phone: formatPhone(e.target.value) }))}
                             placeholder="(11) 99999-9999"
                             required
                           />
@@ -668,42 +764,95 @@ export default function RealtorPropertyDetail() {
         </section>
       </main>
 
-      {/* Image Modal */}
+      {/* Image Modal com Zoom e Swipe */}
       {showImageModal && hasImages && (
         <div 
           className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
-          onClick={() => setShowImageModal(false)}
+          onClick={() => { setShowImageModal(false); setZoomLevel(1); }}
         >
           <button
-            onClick={() => setShowImageModal(false)}
-            className="absolute top-4 right-4 text-white hover:bg-white/10 p-2 rounded-full"
+            onClick={() => { setShowImageModal(false); setZoomLevel(1); }}
+            className="absolute top-4 right-4 text-white hover:bg-white/10 p-2 rounded-full z-10"
           >
             <X className="w-6 h-6" />
           </button>
           
-          <button
-            onClick={(e) => { e.stopPropagation(); prevImage(); }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20"
-          >
-            <ChevronLeft className="w-7 h-7" />
-          </button>
+          {/* Botões de navegação */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 z-10"
+              >
+                <ChevronLeft className="w-7 h-7" />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 z-10"
+              >
+                <ChevronRight className="w-7 h-7" />
+              </button>
+            </>
+          )}
           
-          <img
-            src={images[currentImageIndex].url}
-            alt=""
-            className="max-h-[90vh] max-w-[90vw] object-contain"
+          {/* Container da imagem com zoom */}
+          <div 
+            className="relative max-h-[90vh] max-w-[90vw] overflow-hidden touch-none"
             onClick={(e) => e.stopPropagation()}
-          />
-          
-          <button
-            onClick={(e) => { e.stopPropagation(); nextImage(); }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20"
+            onTouchStart={(e) => {
+              onTouchStart(e);
+              onPinchStart(e);
+              onDoubleTap();
+            }}
+            onTouchMove={(e) => {
+              if (e.touches.length === 2) {
+                onPinchMove(e);
+              } else if (zoomLevel === 1) {
+                onTouchMove(e);
+              }
+            }}
+            onTouchEnd={(e) => {
+              if (zoomLevel === 1) {
+                onTouchEnd();
+              }
+              onPinchEnd();
+            }}
           >
-            <ChevronRight className="w-7 h-7" />
-          </button>
+            <img
+              ref={imageRef}
+              src={images[currentImageIndex].url}
+              alt=""
+              className="max-h-[90vh] max-w-[90vw] object-contain transition-transform duration-200"
+              style={{ 
+                transform: `scale(${zoomLevel}) translate(${zoomPosition.x}px, ${zoomPosition.y}px)`,
+                cursor: zoomLevel > 1 ? 'grab' : 'default'
+              }}
+              draggable={false}
+            />
+          </div>
           
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white">
-            {currentImageIndex + 1} / {images.length}
+          {/* Indicadores na parte inferior */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 text-white">
+            <span className="bg-black/50 px-3 py-1 rounded-full text-sm">
+              {currentImageIndex + 1} / {images.length}
+            </span>
+            {zoomLevel > 1 && (
+              <span className="bg-black/50 px-3 py-1 rounded-full text-sm">
+                Zoom: {Math.round(zoomLevel * 100)}%
+              </span>
+            )}
+            <button
+              onClick={(e) => { e.stopPropagation(); setZoomLevel(prev => prev === 1 ? 2 : 1); }}
+              className="bg-black/50 px-3 py-1 rounded-full text-sm flex items-center gap-1 hover:bg-black/70"
+            >
+              <ZoomIn className="w-4 h-4" />
+              {zoomLevel === 1 ? 'Ampliar' : 'Reduzir'}
+            </button>
+          </div>
+          
+          {/* Dica de navegação no modal */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 text-white/70 text-sm">
+            Use as setas do teclado ou deslize para navegar
           </div>
         </div>
       )}
