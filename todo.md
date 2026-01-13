@@ -253,3 +253,7 @@
 - [x] Implementar mapa do Google com localização do imóvel na página de exibição
 - [x] Adicionar filtros avançados: quartos, banheiros, vagas, bairro, cidade, estado, área
 - [x] Corrigir bug do filtro que não mostra imóveis ao voltar para "todos"
+
+
+## Correção Urgente - Listagem Dashboard (13/01/2026)
+- [x] Corrigir erro na listagem de imóveis do dashboard quando retorna para exibir todos

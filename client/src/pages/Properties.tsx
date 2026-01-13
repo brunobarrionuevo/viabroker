@@ -34,8 +34,8 @@ export default function Properties() {
 
   const { data: properties, isLoading } = trpc.properties.list.useQuery({
     search: search || undefined,
-    type: typeFilter || undefined,
-    status: statusFilter || undefined,
+    type: typeFilter && typeFilter !== "all" ? typeFilter : undefined,
+    status: statusFilter && statusFilter !== "all" ? statusFilter : undefined,
   });
 
   const getStatusBadge = (status: string) => {
