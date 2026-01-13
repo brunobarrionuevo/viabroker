@@ -227,3 +227,7 @@
 - [x] Corrigir erro ao salvar descrição gerada com IA no formulário de imóveis (campo estado não carregava corretamente)
 - [x] Corrigir exibição de finalidade no painel master (mostra "aluguel" ao invés de "venda")
 - [x] Criar plano de cortesia no painel admin master (funcionalidades completas, tempo indeterminado, controlável pelo admin)
+
+
+## Correção Vídeo YouTube (13/01/2026)
+- [x] Corrigir exibição do vídeo do YouTube na página de detalhes do imóvel (só aparece galeria de fotos)

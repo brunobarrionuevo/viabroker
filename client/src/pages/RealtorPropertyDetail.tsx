@@ -23,7 +23,8 @@ import {
   ChevronRight,
   Home,
   Check,
-  X
+  X,
+  Play
 } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { useState, useEffect } from "react";
@@ -57,6 +58,7 @@ export default function RealtorPropertyDetail() {
     phone: "",
     message: "",
   });
+  const [showVideo, setShowVideo] = useState(false);
 
   // Buscar configurações do site
   const { data: siteData, isLoading: loadingSite } = trpc.siteSettings.getPublic.useQuery(
@@ -210,6 +212,28 @@ export default function RealtorPropertyDetail() {
   const defaultMessage = siteData?.settings?.whatsappDefaultMessage || 
     `Olá! Tenho interesse no imóvel "${property.title}". Gostaria de mais informações.`;
 
+  // Função para extrair ID do vídeo do YouTube ou Vimeo
+  const getVideoEmbedUrl = (url: string | null): string | null => {
+    if (!url) return null;
+    
+    // YouTube
+    const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (youtubeMatch) {
+      return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1`;
+    }
+    
+    // Vimeo
+    const vimeoMatch = url.match(/(?:vimeo\.com\/)([0-9]+)/);
+    if (vimeoMatch) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+    }
+    
+    return null;
+  };
+
+  const videoEmbedUrl = getVideoEmbedUrl(property.videoUrl);
+  const hasVideo = !!videoEmbedUrl;
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgroundColor, color: theme.textColor, fontFamily: theme.fontFamily }}>
       {/* Header */}
@@ -254,61 +278,100 @@ export default function RealtorPropertyDetail() {
       </header>
 
       <main>
-        {/* Gallery */}
+        {/* Gallery / Video Section */}
         <section className="bg-slate-900">
           <div className="container mx-auto">
-            <div 
-              className="relative aspect-[16/9] md:aspect-[21/9] cursor-pointer group"
-              onClick={() => hasImages && setShowImageModal(true)}
-            >
-              {hasImages && currentImage ? (
-                <>
-                  <img
-                    src={currentImage.url}
-                    alt={currentImage.caption || property.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  
-                  {images.length > 1 && (
-                    <>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-white/30"
-                      >
-                        <ChevronLeft className="w-7 h-7" />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-white/30"
-                      >
-                        <ChevronRight className="w-7 h-7" />
-                      </button>
-                    </>
-                  )}
+            {/* Vídeo ou Galeria */}
+            {showVideo && hasVideo ? (
+              // Exibição do Vídeo
+              <div className="relative aspect-[16/9] md:aspect-[21/9]">
+                <iframe
+                  src={videoEmbedUrl}
+                  title="Vídeo do Imóvel"
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              // Exibição da Galeria de Fotos
+              <div 
+                className="relative aspect-[16/9] md:aspect-[21/9] cursor-pointer group"
+                onClick={() => hasImages && setShowImageModal(true)}
+              >
+                {hasImages && currentImage ? (
+                  <>
+                    <img
+                      src={currentImage.url}
+                      alt={currentImage.caption || property.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    
+                    {images.length > 1 && (
+                      <>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-white/30"
+                        >
+                          <ChevronLeft className="w-7 h-7" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-white/30"
+                        >
+                          <ChevronRight className="w-7 h-7" />
+                        </button>
+                      </>
+                    )}
 
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <span className="bg-black/50 px-3 py-1 rounded-full text-sm">
-                      {currentImageIndex + 1} / {images.length} fotos
-                    </span>
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <span className="bg-black/50 px-3 py-1 rounded-full text-sm">
+                        {currentImageIndex + 1} / {images.length} fotos
+                      </span>
+                    </div>
+
+                    {/* Botão para assistir vídeo (se houver) */}
+                    {hasVideo && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setShowVideo(true); }}
+                        className="absolute bottom-4 right-4 flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full transition-all shadow-lg"
+                      >
+                        <Play className="w-5 h-5 fill-current" />
+                        <span className="font-medium">Assistir Vídeo</span>
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-slate-800">
+                    <Home className="w-20 h-20 text-slate-600" />
                   </div>
-                </>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-slate-800">
-                  <Home className="w-20 h-20 text-slate-600" />
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
-            {/* Thumbnails */}
-            {hasImages && images.length > 1 && (
-              <div className="flex gap-2 p-4 overflow-x-auto bg-slate-800">
-                {images.map((img, idx) => (
+            {/* Thumbnails e Botões de Navegação */}
+            {(hasImages || hasVideo) && (
+              <div className="flex gap-2 p-4 overflow-x-auto bg-slate-800 items-center">
+                {/* Botão de Vídeo */}
+                {hasVideo && (
+                  <button
+                    onClick={() => setShowVideo(true)}
+                    className={`flex-shrink-0 w-20 h-14 rounded overflow-hidden border-2 transition-all flex items-center justify-center ${
+                      showVideo ? "border-red-500 bg-red-600" : "border-transparent bg-slate-700 opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <Play className="w-8 h-8 text-white fill-current" />
+                  </button>
+                )}
+                
+                {/* Thumbnails das Fotos */}
+                {hasImages && images.map((img, idx) => (
                   <button
                     key={img.id}
-                    onClick={() => setCurrentImageIndex(idx)}
+                    onClick={() => { setShowVideo(false); setCurrentImageIndex(idx); }}
                     className={`flex-shrink-0 w-20 h-14 rounded overflow-hidden border-2 transition-all ${
-                      idx === currentImageIndex ? "border-white" : "border-transparent opacity-60 hover:opacity-100"
+                      !showVideo && idx === currentImageIndex ? "border-white" : "border-transparent opacity-60 hover:opacity-100"
                     }`}
                   >
                     <img src={img.url} alt="" className="w-full h-full object-cover" />
