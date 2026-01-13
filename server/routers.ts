@@ -226,6 +226,15 @@ export const appRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
         }
         
+        // Gerar código de referência automático se não fornecido
+        let autoCode = input.code;
+        if (!autoCode || autoCode === "") {
+          const propertyCount = await db.getPropertyCountByCompany(ctx.user.companyId);
+          const companyPrefix = ctx.user.companyId.toString().padStart(3, '0');
+          const propertyNumber = (propertyCount + 1).toString().padStart(4, '0');
+          autoCode = `IMV${companyPrefix}${propertyNumber}`;
+        }
+        
         // Tratar valores vazios para evitar erros de banco de dados
         const cleanedInput = {
           ...input,
@@ -235,7 +244,7 @@ export const appRouter = router({
           iptuAnnual: input.iptuAnnual && input.iptuAnnual !== "0" && input.iptuAnnual !== "" ? input.iptuAnnual : null,
           totalArea: input.totalArea && input.totalArea !== "" ? input.totalArea : null,
           builtArea: input.builtArea && input.builtArea !== "" ? input.builtArea : null,
-          code: input.code && input.code !== "" ? input.code : null,
+          code: autoCode,
           address: input.address && input.address !== "" ? input.address : null,
           number: input.number && input.number !== "" ? input.number : null,
           complement: input.complement && input.complement !== "" ? input.complement : null,

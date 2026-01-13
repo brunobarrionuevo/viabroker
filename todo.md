@@ -257,3 +257,10 @@
 
 ## Correção Urgente - Listagem Dashboard (13/01/2026)
 - [x] Corrigir erro na listagem de imóveis do dashboard quando retorna para exibir todos
+
+
+## Correções Urgentes e Código de Referência (13/01/2026)
+- [x] Corrigir bug do filtro na versão publicada (não mostra imóveis ao voltar para "todos")
+- [x] Exibir imagens dos anúncios no dashboard principal
+- [x] Implementar código de referência automático nos anúncios
+- [x] Exibir código de referência na página do anúncio

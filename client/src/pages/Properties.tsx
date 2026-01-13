@@ -148,10 +148,17 @@ export default function Properties() {
                     )}
                   </div>
                   <CardContent className="pt-4">
-                    <h3 className="font-semibold line-clamp-1 group-hover:text-primary transition-colors">
-                      {property.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <h3 className="font-semibold line-clamp-1 group-hover:text-primary transition-colors">
+                        {property.title}
+                      </h3>
+                      {property.code && (
+                        <Badge variant="outline" className="text-xs shrink-0">
+                          {property.code}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
                       {property.neighborhood ? `${property.neighborhood}, ` : ""}{property.city} - {property.state}
                     </p>

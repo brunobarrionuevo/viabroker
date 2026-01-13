@@ -963,6 +963,13 @@ export async function getPropertiesByCompanyId(companyId: number): Promise<Prope
   return db.select().from(properties).where(eq(properties.companyId, companyId)).orderBy(desc(properties.createdAt));
 }
 
+export async function getPropertyCountByCompany(companyId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.select({ count: sql<number>`count(*)` }).from(properties).where(eq(properties.companyId, companyId));
+  return result[0]?.count || 0;
+}
+
 export async function getLeadsByCompanyId(companyId: number): Promise<Lead[]> {
   const db = await getDb();
   if (!db) return [];

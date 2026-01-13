@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, code, title FROM properties LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, code, title FROM properties LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "code": "IMV0010001",
+      "title": "Apartamento Teste 3 Quartos"
+    },
+    {
+      "id": "2",
+      "code": "IMV0010002",
+      "title": "soafjsokfjs flaskmflsa"
+    },
+    {
+      "id": "30001",
+      "code": "IMV0020001",
+      "title": "Teste mobile"
+    },
+    {
+      "id": "60001",
+      "code": "IMV0010003",
+      "title": "Jdjdnr"
+    },
+    {
+      "id": "90001",
+      "code": "1001",
+      "title": "Apt 3 quartos"
+    },
+    {
+      "id": "120001",
+      "code": "IMV0010004",
+      "title": "Casa - Centro"
+    },
+    {
+      "id": "120002",
+      "code": "IMV0010005",
+      "title": "Apto Pajuçara "
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcode\ttitle\n1\tIMV0010001\tApartamento Teste 3 Quartos\n2\tIMV0010002\tsoafjsokfjs flaskmflsa\n30001\tIMV0020001\tTeste mobile\n60001\tIMV0010003\tJdjdnr\n90001\t1001\tApt 3 quartos\n120001\tIMV0010004\tCasa - Centro\n120002\tIMV0010005\tApto Pajuçara \n",
+  "stderr": "",
+  "execution_time_ms": 606
+}

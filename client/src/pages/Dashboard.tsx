@@ -225,8 +225,18 @@ function RecentPropertiesCard() {
             {properties.map((property) => (
               <Link key={property.id} href={`/dashboard/properties/${property.id}`}>
                 <a className="block p-4 rounded-lg border hover:border-primary transition-colors">
-                  <div className="aspect-video bg-muted rounded-md mb-3 flex items-center justify-center">
-                    <Home className="w-8 h-8 text-muted-foreground" />
+                  <div className="aspect-video bg-muted rounded-md mb-3 overflow-hidden">
+                    {property.mainImageUrl ? (
+                      <img 
+                        src={property.mainImageUrl} 
+                        alt={property.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Home className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                    )}
                   </div>
                   <h3 className="font-medium text-sm line-clamp-1">{property.title}</h3>
                   <p className="text-xs text-muted-foreground">{property.city} - {property.state}</p>
