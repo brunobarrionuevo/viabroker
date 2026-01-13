@@ -27,7 +27,7 @@ import {
   Play
 } from "lucide-react";
 import { Link, useParams } from "wouter";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 
 // Mapeamento de tipos de imóvel
@@ -59,6 +59,11 @@ export default function RealtorPropertyDetail() {
     message: "",
   });
   const [showVideo, setShowVideo] = useState(false);
+  
+  // Estados para controle de swipe
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const minSwipeDistance = 50; // Mínimo de pixels para considerar um swipe
 
   // Buscar configurações do site
   const { data: siteData, isLoading: loadingSite } = trpc.siteSettings.getPublic.useQuery(
@@ -138,6 +143,35 @@ export default function RealtorPropertyDetail() {
       setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
     }
   };
+
+  // Handlers para gestos de swipe
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = null;
+    touchStartX.current = e.targetTouches[0].clientX;
+  }, []);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  }, []);
+
+  const onTouchEnd = useCallback(() => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe && !showVideo) {
+      nextImage();
+    }
+    if (isRightSwipe && !showVideo) {
+      prevImage();
+    }
+    
+    // Reset
+    touchStartX.current = null;
+    touchEndX.current = null;
+  }, [showVideo, images]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -296,8 +330,11 @@ export default function RealtorPropertyDetail() {
             ) : (
               // Exibição da Galeria de Fotos
               <div 
-                className="relative aspect-[16/9] md:aspect-[21/9] cursor-pointer group"
+                className="relative aspect-[16/9] md:aspect-[21/9] cursor-pointer group select-none touch-pan-y"
                 onClick={() => hasImages && setShowImageModal(true)}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
               >
                 {hasImages && currentImage ? (
                   <>
