@@ -571,61 +571,82 @@ export const masterAdminRouter = router({
       }
       
       // Excluir em cascata (inline para evitar problemas de cache)
-      // 1. Buscar IDs dos imóveis da empresa
-      const companyProperties = await database.select({ id: properties.id })
-        .from(properties)
-        .where(eq(properties.companyId, input.companyId));
-      const propertyIds = companyProperties.map(p => p.id);
-      
-      // 2. Excluir property_images
-      if (propertyIds.length > 0) {
-        await database.delete(propertyImages)
-          .where(inArray(propertyImages.propertyId, propertyIds));
+      try {
+        console.log(`[deleteCompany] Iniciando exclusão da empresa ${input.companyId}`);
+        
+        // 1. Buscar IDs dos imóveis da empresa
+        const companyProperties = await database.select({ id: properties.id })
+          .from(properties)
+          .where(eq(properties.companyId, input.companyId));
+        const propertyIds = companyProperties.map(p => p.id);
+        console.log(`[deleteCompany] Encontrados ${propertyIds.length} imóveis`);
+        
+        // 2. Excluir property_images
+        if (propertyIds.length > 0) {
+          const deletedImages = await database.delete(propertyImages)
+            .where(inArray(propertyImages.propertyId, propertyIds));
+          console.log(`[deleteCompany] Fotos de imóveis excluídas`);
+        }
+        
+        // 3. Buscar IDs dos leads da empresa para excluir interactions
+        const companyLeads = await database.select({ id: leads.id })
+          .from(leads)
+          .where(eq(leads.companyId, input.companyId));
+        const leadIds = companyLeads.map(l => l.id);
+        console.log(`[deleteCompany] Encontrados ${leadIds.length} leads`);
+        
+        // 4. Excluir interactions (dependem de leads)
+        if (leadIds.length > 0) {
+          const deletedInteractions = await database.delete(interactions)
+            .where(inArray(interactions.leadId, leadIds));
+          console.log(`[deleteCompany] Interações excluídas`);
+        }
+        
+        // 5. Excluir appointments
+        const deletedAppointments = await database.delete(appointments)
+          .where(eq(appointments.companyId, input.companyId));
+        console.log(`[deleteCompany] Agendamentos excluídos`);
+        
+        // 6. Excluir leads
+        const deletedLeads = await database.delete(leads)
+          .where(eq(leads.companyId, input.companyId));
+        console.log(`[deleteCompany] Leads excluídos`);
+        
+        // 7. Excluir properties
+        const deletedProperties = await database.delete(properties)
+          .where(eq(properties.companyId, input.companyId));
+        console.log(`[deleteCompany] Imóveis excluídos`);
+        
+        // 8. Excluir users
+        console.log(`[deleteCompany] Tentando excluir usuários da empresa ${input.companyId}`);
+        const deletedUsers = await database.delete(users)
+          .where(eq(users.companyId, input.companyId));
+        console.log(`[deleteCompany] Usuários excluídos`);
+        
+        // 9. Excluir subscriptions
+        const deletedSubscriptions = await database.delete(subscriptions)
+          .where(eq(subscriptions.companyId, input.companyId));
+        console.log(`[deleteCompany] Assinaturas excluídas`);
+        
+        // 10. Excluir payments
+        const deletedPayments = await database.delete(payments)
+          .where(eq(payments.companyId, input.companyId));
+        console.log(`[deleteCompany] Pagamentos excluídos`);
+        
+        // 11. Excluir site_settings
+        const deletedSettings = await database.delete(siteSettings)
+          .where(eq(siteSettings.companyId, input.companyId));
+        console.log(`[deleteCompany] Configurações excluídas`);
+        
+        // 12. Finalmente, excluir a empresa
+        const deletedCompany = await database.delete(companies)
+          .where(eq(companies.id, input.companyId));
+        console.log(`[deleteCompany] Empresa excluída com sucesso`);
+        
+      } catch (error) {
+        console.error(`[deleteCompany] Erro durante exclusão:`, error);
+        throw error;
       }
-      
-      // 3. Buscar IDs dos leads da empresa para excluir interactions
-      const companyLeads = await database.select({ id: leads.id })
-        .from(leads)
-        .where(eq(leads.companyId, input.companyId));
-      const leadIds = companyLeads.map(l => l.id);
-      
-      // 4. Excluir interactions (dependem de leads)
-      if (leadIds.length > 0) {
-        await database.delete(interactions)
-          .where(inArray(interactions.leadId, leadIds));
-      }
-      
-      // 5. Excluir appointments
-      await database.delete(appointments)
-        .where(eq(appointments.companyId, input.companyId));
-      
-      // 6. Excluir leads
-      await database.delete(leads)
-        .where(eq(leads.companyId, input.companyId));
-      
-      // 7. Excluir properties
-      await database.delete(properties)
-        .where(eq(properties.companyId, input.companyId));
-      
-      // 8. Excluir users
-      await database.delete(users)
-        .where(eq(users.companyId, input.companyId));
-      
-      // 9. Excluir subscriptions
-      await database.delete(subscriptions)
-        .where(eq(subscriptions.companyId, input.companyId));
-      
-      // 10. Excluir payments
-      await database.delete(payments)
-        .where(eq(payments.companyId, input.companyId));
-      
-      // 11. Excluir site_settings
-      await database.delete(siteSettings)
-        .where(eq(siteSettings.companyId, input.companyId));
-      
-      // 12. Finalmente, excluir a empresa
-      await database.delete(companies)
-        .where(eq(companies.id, input.companyId));
       
       // Log de atividade (criar depois da exclusão para não ser excluído)
       await db.createActivityLog({

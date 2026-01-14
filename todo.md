@@ -373,3 +373,10 @@
 - [x] Implementar endpoint deleteCompany no backend para admin master
 - [x] Excluir todos os dados relacionados (imóveis, leads, usuários, etc.)
 - [x] Testar funcionalidade de exclusão de empresa
+
+
+## Bug Crítico - Exclusão de Empresa (14/01/2026)
+- [x] Corrigir exclusão de empresa que não remove usuários corretamente
+- [x] Corrigir erro de email duplicado ao tentar cadastrar empresa excluída novamente
+- [x] Verificar se todos os dados relacionados estão sendo excluídos em cascata
+- [x] Testar novo cadastro com email de empresa excluída

@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, email, companyId FROM users WHERE email = 'brunobarrionuevo@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, email, companyId FROM users WHERE email = 'brunobarrionuevo@gmail.com';",
+  "rows": [
+    {
+      "id": "630079",
+      "email": "brunobarrionuevo@gmail.com",
+      "companyId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tcompanyId\n630079\tbrunobarrionuevo@gmail.com\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 763
+}
