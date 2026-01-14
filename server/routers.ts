@@ -1062,7 +1062,7 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
     // Solicitar parceria
     request: protectedProcedure
       .input(z.object({
-        partnerSlug: z.string(),
+        partnerCode: z.string(),
         shareAllProperties: z.boolean().default(false),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -1070,10 +1070,10 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
           throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
         }
         
-        // Buscar empresa parceira pelo slug
-        const partner = await db.getCompanyBySlug(input.partnerSlug);
+        // Buscar empresa parceira pelo código de parceiro
+        const partner = await db.getCompanyByPartnerCode(input.partnerCode);
         if (!partner) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Corretor não encontrado" });
+          throw new TRPCError({ code: "NOT_FOUND", message: "Código de parceiro não encontrado" });
         }
         
         if (partner.id === ctx.user.companyId) {

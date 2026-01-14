@@ -62,6 +62,7 @@ export const companies = mysqlTable("companies", {
   planId: int("planId"),
   planExpiresAt: timestamp("planExpiresAt"),
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  partnerCode: varchar("partnerCode", { length: 20 }).unique(),
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

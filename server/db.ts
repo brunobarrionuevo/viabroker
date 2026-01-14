@@ -225,6 +225,16 @@ export async function updateUser(userId: number, data: Partial<InsertUser>): Pro
 // EMPRESAS / IMOBILIÁRIAS
 // ==========================================
 
+// Gerar código de parceiro único
+function generatePartnerCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'BRK';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
 export async function createCompany(data: InsertCompany): Promise<Company> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -232,6 +242,18 @@ export async function createCompany(data: InsertCompany): Promise<Company> {
   // Se não foi fornecido slug, gerar a partir do nome
   if (!data.slug && data.name) {
     data.slug = generateSlug(data.name);
+  }
+  
+  // Gerar código de parceiro único
+  if (!data.partnerCode) {
+    let partnerCode = generatePartnerCode();
+    // Verificar se o código já existe
+    let exists = await db.select().from(companies).where(eq(companies.partnerCode, partnerCode)).limit(1);
+    while (exists.length > 0) {
+      partnerCode = generatePartnerCode();
+      exists = await db.select().from(companies).where(eq(companies.partnerCode, partnerCode)).limit(1);
+    }
+    data.partnerCode = partnerCode;
   }
   
   const result = await db.insert(companies).values(data);
@@ -250,6 +272,13 @@ export async function getCompanyBySlug(slug: string): Promise<Company | undefine
   const db = await getDb();
   if (!db) return undefined;
   const result = await db.select().from(companies).where(eq(companies.slug, slug)).limit(1);
+  return result[0];
+}
+
+export async function getCompanyByPartnerCode(partnerCode: string): Promise<Company | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(companies).where(eq(companies.partnerCode, partnerCode)).limit(1);
   return result[0];
 }
 
@@ -998,31 +1027,70 @@ export async function getPartnershipById(id: number): Promise<Partnership | unde
   return result[0];
 }
 
-export async function getPartnershipsByCompany(companyId: number): Promise<Partnership[]> {
+export async function getPartnershipsByCompany(companyId: number): Promise<any[]> {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(partnerships)
+  const results = await db.select().from(partnerships)
     .where(or(eq(partnerships.requesterId, companyId), eq(partnerships.partnerId, companyId)))
     .orderBy(desc(partnerships.createdAt));
+  
+  // Enriquecer com nomes das empresas
+  const enriched = await Promise.all(results.map(async (p) => {
+    const requester = await getCompanyById(p.requesterId);
+    const partner = await getCompanyById(p.partnerId);
+    return {
+      ...p,
+      requesterName: requester?.name || 'Desconhecido',
+      requesterCode: requester?.partnerCode || '',
+      partnerName: partner?.name || 'Desconhecido',
+      partnerCode: partner?.partnerCode || '',
+    };
+  }));
+  return enriched;
 }
 
-export async function getPendingPartnerships(companyId: number): Promise<Partnership[]> {
+export async function getPendingPartnerships(companyId: number): Promise<any[]> {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(partnerships)
+  const results = await db.select().from(partnerships)
     .where(and(eq(partnerships.partnerId, companyId), eq(partnerships.status, 'pending')))
     .orderBy(desc(partnerships.createdAt));
+  
+  // Enriquecer com nomes das empresas
+  const enriched = await Promise.all(results.map(async (p) => {
+    const requester = await getCompanyById(p.requesterId);
+    return {
+      ...p,
+      requesterName: requester?.name || 'Desconhecido',
+      requesterCode: requester?.partnerCode || '',
+    };
+  }));
+  return enriched;
 }
 
-export async function getAcceptedPartnerships(companyId: number): Promise<Partnership[]> {
+export async function getAcceptedPartnerships(companyId: number): Promise<any[]> {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(partnerships)
+  const results = await db.select().from(partnerships)
     .where(and(
       or(eq(partnerships.requesterId, companyId), eq(partnerships.partnerId, companyId)),
       eq(partnerships.status, 'accepted')
     ))
     .orderBy(desc(partnerships.createdAt));
+  
+  // Enriquecer com nomes das empresas
+  const enriched = await Promise.all(results.map(async (p) => {
+    const requester = await getCompanyById(p.requesterId);
+    const partner = await getCompanyById(p.partnerId);
+    return {
+      ...p,
+      requesterName: requester?.name || 'Desconhecido',
+      requesterCode: requester?.partnerCode || '',
+      partnerName: partner?.name || 'Desconhecido',
+      partnerCode: partner?.partnerCode || '',
+    };
+  }));
+  return enriched;
 }
 
 export async function updatePartnership(id: number, data: Partial<InsertPartnership>): Promise<void> {
@@ -1062,36 +1130,92 @@ export async function getPropertyShareById(id: number): Promise<PropertyShare | 
   return result[0];
 }
 
-export async function getPropertySharesByOwner(ownerCompanyId: number): Promise<PropertyShare[]> {
+export async function getPropertySharesByOwner(ownerCompanyId: number): Promise<any[]> {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(propertyShares)
+  const results = await db.select().from(propertyShares)
     .where(eq(propertyShares.ownerCompanyId, ownerCompanyId))
     .orderBy(desc(propertyShares.createdAt));
+  
+  // Enriquecer com dados do imóvel e parceiro
+  const enriched = await Promise.all(results.map(async (s) => {
+    const property = await getPropertyById(s.propertyId);
+    const partner = await getCompanyById(s.partnerCompanyId);
+    return {
+      ...s,
+      propertyTitle: property?.title || 'Imóvel não encontrado',
+      propertyCode: property?.code || '',
+      partnerName: partner?.name || 'Desconhecido',
+      partnerCode: partner?.partnerCode || '',
+    };
+  }));
+  return enriched;
 }
 
-export async function getPropertySharesByPartner(partnerCompanyId: number): Promise<PropertyShare[]> {
+export async function getPropertySharesByPartner(partnerCompanyId: number): Promise<any[]> {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(propertyShares)
+  const results = await db.select().from(propertyShares)
     .where(eq(propertyShares.partnerCompanyId, partnerCompanyId))
     .orderBy(desc(propertyShares.createdAt));
+  
+  // Enriquecer com dados do imóvel e proprietário
+  const enriched = await Promise.all(results.map(async (s) => {
+    const property = await getPropertyById(s.propertyId);
+    const owner = await getCompanyById(s.ownerCompanyId);
+    return {
+      ...s,
+      propertyTitle: property?.title || 'Imóvel não encontrado',
+      propertyCode: property?.code || '',
+      ownerName: owner?.name || 'Desconhecido',
+      ownerCode: owner?.partnerCode || '',
+    };
+  }));
+  return enriched;
 }
 
-export async function getPendingPropertyShares(partnerCompanyId: number): Promise<PropertyShare[]> {
+export async function getPendingPropertyShares(partnerCompanyId: number): Promise<any[]> {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(propertyShares)
+  const results = await db.select().from(propertyShares)
     .where(and(eq(propertyShares.partnerCompanyId, partnerCompanyId), eq(propertyShares.status, 'pending')))
     .orderBy(desc(propertyShares.createdAt));
+  
+  // Enriquecer com dados do imóvel e proprietário
+  const enriched = await Promise.all(results.map(async (s) => {
+    const property = await getPropertyById(s.propertyId);
+    const owner = await getCompanyById(s.ownerCompanyId);
+    return {
+      ...s,
+      propertyTitle: property?.title || 'Imóvel não encontrado',
+      propertyCode: property?.code || '',
+      ownerName: owner?.name || 'Desconhecido',
+      ownerCode: owner?.partnerCode || '',
+    };
+  }));
+  return enriched;
 }
 
-export async function getAcceptedPropertyShares(partnerCompanyId: number): Promise<PropertyShare[]> {
+export async function getAcceptedPropertyShares(partnerCompanyId: number): Promise<any[]> {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(propertyShares)
+  const results = await db.select().from(propertyShares)
     .where(and(eq(propertyShares.partnerCompanyId, partnerCompanyId), eq(propertyShares.status, 'accepted')))
     .orderBy(desc(propertyShares.createdAt));
+  
+  // Enriquecer com dados do imóvel e proprietário
+  const enriched = await Promise.all(results.map(async (s) => {
+    const property = await getPropertyById(s.propertyId);
+    const owner = await getCompanyById(s.ownerCompanyId);
+    return {
+      ...s,
+      propertyTitle: property?.title || 'Imóvel não encontrado',
+      propertyCode: property?.code || '',
+      ownerName: owner?.name || 'Desconhecido',
+      ownerCode: owner?.partnerCode || '',
+    };
+  }));
+  return enriched;
 }
 
 export async function updatePropertyShare(id: number, data: Partial<InsertPropertyShare>): Promise<void> {

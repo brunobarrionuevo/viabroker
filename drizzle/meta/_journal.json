@@ -85,6 +85,13 @@
       "when": 1768353843070,
       "tag": "0011_thin_timeslip",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1768356488866,
+      "tag": "0012_sparkling_hellion",
+      "breakpoints": true
     }
   ]
 }

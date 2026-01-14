@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { trpc } from "../lib/trpc";
+import AppLayout from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,20 +12,22 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Users, UserPlus, Check, X, Share2, Building2, Home, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Users, UserPlus, Check, X, Share2, Building2, Home, Clock, CheckCircle, XCircle, AlertCircle, Copy, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 
 export default function Partnerships() {
   const queryClient = useQueryClient();
-  const [partnerSlug, setPartnerSlug] = useState("");
+  const [partnerCode, setPartnerCode] = useState("");
   const [shareAll, setShareAll] = useState(false);
   const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState<number | null>(null);
   const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
 
+  // Query para obter dados da empresa (incluindo partnerCode)
+  const { data: company } = trpc.company.get.useQuery();
+
   // Queries
   const { data: partnerships = [], isLoading: loadingPartnerships } = trpc.partnerships.list.useQuery();
-
   const { data: pendingPartnerships = [] } = trpc.partnerships.pending.useQuery();
   const { data: acceptedPartnerships = [] } = trpc.partnerships.accepted.useQuery();
   const { data: sentShares = [] } = trpc.propertyShares.sentList.useQuery();
@@ -38,7 +41,7 @@ export default function Partnerships() {
       toast.success("Solicitação enviada - Aguardando aprovação do parceiro");
       queryClient.invalidateQueries({ queryKey: ["partnerships"] });
       setShowRequestDialog(false);
-      setPartnerSlug("");
+      setPartnerCode("");
       setShareAll(false);
     },
     onError: (error: any) => {
@@ -119,6 +122,13 @@ export default function Partnerships() {
     },
   });
 
+  const copyPartnerCode = () => {
+    if (company?.partnerCode) {
+      navigator.clipboard.writeText(company.partnerCode);
+      toast.success("Código copiado para a área de transferência");
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
@@ -137,7 +147,8 @@ export default function Partnerships() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <AppLayout>
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Parcerias</h1>
@@ -182,10 +193,12 @@ export default function Partnerships() {
                     </SelectTrigger>
                     <SelectContent>
                       {acceptedPartnerships.map((p: any) => {
-                        const partnerId = p.requesterId === properties[0]?.companyId ? p.partnerId : p.requesterId;
+                        const isRequester = p.requesterId === company?.id;
+                        const partnerId = isRequester ? p.partnerId : p.requesterId;
+                        const partnerName = isRequester ? p.partnerName : p.requesterName;
                         return (
                           <SelectItem key={p.id} value={partnerId.toString()}>
-                            Parceiro #{partnerId}
+                            {partnerName}
                           </SelectItem>
                         );
                       })}
@@ -222,19 +235,20 @@ export default function Partnerships() {
               <DialogHeader>
                 <DialogTitle>Solicitar Parceria</DialogTitle>
                 <DialogDescription>
-                  Digite o slug do corretor para enviar uma solicitação de parceria
+                  Digite o código de parceiro do corretor para enviar uma solicitação
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label>Slug do Corretor</Label>
+                  <Label>Código do Parceiro</Label>
                   <Input
-                    placeholder="ex: joao-silva"
-                    value={partnerSlug}
-                    onChange={(e) => setPartnerSlug(e.target.value)}
+                    placeholder="ex: BRK123ABC"
+                    value={partnerCode}
+                    onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                    className="font-mono"
                   />
                   <p className="text-xs text-gray-500">
-                    O slug é a parte final da URL do site do corretor (ex: /site/joao-silva)
+                    Solicite o código de parceiro ao corretor que deseja adicionar
                   </p>
                 </div>
                 <div className="flex items-center justify-between">
@@ -252,8 +266,8 @@ export default function Partnerships() {
                   Cancelar
                 </Button>
                 <Button 
-                  onClick={() => requestPartnership.mutate({ partnerSlug, shareAllProperties: shareAll })}
-                  disabled={!partnerSlug || requestPartnership.isPending}
+                  onClick={() => requestPartnership.mutate({ partnerCode, shareAllProperties: shareAll })}
+                  disabled={!partnerCode || requestPartnership.isPending}
                 >
                   Enviar Solicitação
                 </Button>
@@ -262,6 +276,30 @@ export default function Partnerships() {
           </Dialog>
         </div>
       </div>
+
+      {/* Meu código de parceiro */}
+      <Card className="border-blue-200 bg-blue-50">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <Users className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-blue-700 font-medium">Meu Código de Parceiro</p>
+                <p className="text-2xl font-mono font-bold text-blue-900">{company?.partnerCode || "Carregando..."}</p>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" onClick={copyPartnerCode} className="border-blue-300 text-blue-700 hover:bg-blue-100">
+              <Copy className="w-4 h-4 mr-2" />
+              Copiar
+            </Button>
+          </div>
+          <p className="text-xs text-blue-600 mt-2">
+            Compartilhe este código com outros corretores para que eles possam solicitar parceria com você
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Notificações de pendências */}
       {(pendingPartnerships.length > 0 || pendingShares.length > 0) && (
@@ -286,9 +324,13 @@ export default function Partnerships() {
               <Badge variant="destructive" className="ml-1">{pendingPartnerships.length}</Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="shared" className="flex items-center gap-2">
-            <Share2 className="w-4 h-4" />
+          <TabsTrigger value="sent" className="flex items-center gap-2">
+            <ArrowUpRight className="w-4 h-4" />
             Imóveis Compartilhados
+          </TabsTrigger>
+          <TabsTrigger value="received" className="flex items-center gap-2">
+            <ArrowDownLeft className="w-4 h-4" />
+            Imóveis Recebidos
             {pendingShares.length > 0 && (
               <Badge variant="destructive" className="ml-1">{pendingShares.length}</Badge>
             )}
@@ -312,9 +354,9 @@ export default function Partnerships() {
                           <Building2 className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <p className="font-medium">Corretor #{p.requesterId}</p>
+                          <p className="font-medium">{p.requesterName}</p>
                           <p className="text-sm text-gray-500">
-                            Solicitou parceria em {new Date(p.createdAt).toLocaleDateString('pt-BR')}
+                            Código: {p.requesterCode} • Solicitou em {new Date(p.createdAt).toLocaleDateString('pt-BR')}
                           </p>
                         </div>
                       </div>
@@ -322,7 +364,7 @@ export default function Partnerships() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => rejectPartnership.mutate(p.id)}
+                          onClick={() => rejectPartnership.mutate({ id: p.id })}
                           disabled={rejectPartnership.isPending}
                         >
                           <X className="w-4 h-4 mr-1" />
@@ -330,7 +372,7 @@ export default function Partnerships() {
                         </Button>
                         <Button
                           size="sm"
-                          onClick={() => acceptPartnership.mutate(p.id)}
+                          onClick={() => acceptPartnership.mutate({ id: p.id })}
                           disabled={acceptPartnership.isPending}
                         >
                           <Check className="w-4 h-4 mr-1" />
@@ -361,91 +403,46 @@ export default function Partnerships() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {partnerships.map((p: any) => (
-                    <div key={p.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                          <Building2 className="w-5 h-5 text-gray-600" />
+                  {partnerships.map((p: any) => {
+                    const isRequester = p.requesterId === company?.id;
+                    const partnerName = isRequester ? p.partnerName : p.requesterName;
+                    const partnerCodeDisplay = isRequester ? p.partnerCode : p.requesterCode;
+                    return (
+                      <div key={p.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                            <Building2 className="w-5 h-5 text-gray-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{partnerName}</p>
+                            <p className="text-sm text-gray-500">
+                              Código: {partnerCodeDisplay} • {p.shareAllProperties ? "Compartilhamento automático" : "Compartilhamento manual"}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium">
-                            Corretor #{p.requesterId === properties[0]?.companyId ? p.partnerId : p.requesterId}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {p.shareAllProperties ? "Compartilhamento automático" : "Compartilhamento manual"}
-                          </p>
+                        <div className="flex items-center gap-3">
+                          {getStatusBadge(p.status)}
+                          {p.status === "accepted" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => cancelPartnership.mutate({ id: p.id })}
+                              disabled={cancelPartnership.isPending}
+                            >
+                              Cancelar
+                            </Button>
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {getStatusBadge(p.status)}
-                        {p.status === "accepted" && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => cancelPartnership.mutate(p.id)}
-                            disabled={cancelPartnership.isPending}
-                          >
-                            Cancelar
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="shared" className="space-y-4">
-          {/* Compartilhamentos Pendentes */}
-          {pendingShares.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Imóveis Aguardando Aceitação</CardTitle>
-                <CardDescription>Imóveis compartilhados com você que precisam de aprovação</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {pendingShares.map((s: any) => (
-                    <div key={s.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                          <Home className="w-5 h-5 text-green-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium">Imóvel #{s.propertyId}</p>
-                          <p className="text-sm text-gray-500">
-                            Compartilhado por Corretor #{s.ownerCompanyId}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => rejectShare.mutate(s.id)}
-                          disabled={rejectShare.isPending}
-                        >
-                          <X className="w-4 h-4 mr-1" />
-                          Rejeitar
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => acceptShare.mutate(s.id)}
-                          disabled={acceptShare.isPending}
-                        >
-                          <Check className="w-4 h-4 mr-1" />
-                          Aceitar
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
+        <TabsContent value="sent" className="space-y-4">
           {/* Imóveis que eu compartilhei */}
           <Card>
             <CardHeader>
@@ -468,9 +465,9 @@ export default function Partnerships() {
                           <Home className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <p className="font-medium">Imóvel #{s.propertyId}</p>
+                          <p className="font-medium">{s.propertyCode} - {s.propertyTitle}</p>
                           <p className="text-sm text-gray-500">
-                            Compartilhado com Corretor #{s.partnerCompanyId}
+                            Compartilhado com: <span className="font-medium">{s.partnerName}</span>
                           </p>
                         </div>
                       </div>
@@ -480,7 +477,7 @@ export default function Partnerships() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => revokeShare.mutate(s.id)}
+                            onClick={() => revokeShare.mutate({ id: s.id })}
                             disabled={revokeShare.isPending}
                           >
                             Revogar
@@ -493,12 +490,62 @@ export default function Partnerships() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="received" className="space-y-4">
+          {/* Compartilhamentos Pendentes */}
+          {pendingShares.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Imóveis Aguardando Aceitação</CardTitle>
+                <CardDescription>Imóveis compartilhados com você que precisam de aprovação</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {pendingShares.map((s: any) => (
+                    <div key={s.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                          <Home className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{s.propertyCode} - {s.propertyTitle}</p>
+                          <p className="text-sm text-gray-500">
+                            Compartilhado por: <span className="font-medium">{s.ownerName}</span>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => rejectShare.mutate({ id: s.id })}
+                          disabled={rejectShare.isPending}
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          Rejeitar
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => acceptShare.mutate({ id: s.id })}
+                          disabled={acceptShare.isPending}
+                        >
+                          <Check className="w-4 h-4 mr-1" />
+                          Aceitar
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Imóveis recebidos */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Imóveis Recebidos de Parceiros</CardTitle>
-              <CardDescription>Imóveis que parceiros compartilharam com você</CardDescription>
+              <CardDescription>Imóveis que parceiros compartilharam com você e estão ativos no seu site</CardDescription>
             </CardHeader>
             <CardContent>
               {receivedShares.filter((s: any) => s.status === 'accepted').length === 0 ? (
@@ -517,10 +564,10 @@ export default function Partnerships() {
                         </div>
                         <div>
                           <p className="font-medium">
-                            {s.partnerPropertyCode || `Imóvel #${s.propertyId}`}
+                            {s.partnerPropertyCode || s.propertyCode} - {s.propertyTitle}
                           </p>
                           <p className="text-sm text-gray-500">
-                            De Corretor #{s.ownerCompanyId}
+                            De: <span className="font-medium">{s.ownerName}</span>
                           </p>
                         </div>
                       </div>
@@ -536,5 +583,6 @@ export default function Partnerships() {
         </TabsContent>
       </Tabs>
     </div>
+    </AppLayout>
   );
 }

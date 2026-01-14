@@ -274,3 +274,11 @@
 - [x] Criar mecanismo de autorização/aceitação de parceria
 - [x] Personalizar códigos de imóveis por corretor (evitar duplicatas)
 - [x] Exibir imóveis compartilhados na página do corretor parceiro
+
+
+## Correções Sistema de Compartilhamento (13/01/2026)
+- [x] Criar código interno personalizado para cada corretor (partnerCode gerado automaticamente no cadastro)
+- [x] Mostrar nome de ambos os corretores no compartilhamento (requesterName, partnerName)
+- [x] Separar abas entre "Imóveis que compartilhei" e "Imóveis que recebi" (3 abas: Parcerias, Imóveis Compartilhados, Imóveis Recebidos)
+- [x] Fixar menu lateral do dashboard (AppLayout adicionado à página de parcerias)
+- [x] Corrigir página de parcerias (reescrita completa com todas as funcionalidades)

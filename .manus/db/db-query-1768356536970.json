@@ -1,0 +1,25 @@
+{
+  "query": "SELECT id, name, partnerCode FROM companies;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, name, partnerCode FROM companies;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Bruno Barrionuevo",
+      "partnerCode": "BRK23B6DA"
+    },
+    {
+      "id": "2",
+      "name": "Bruno Uzeda",
+      "partnerCode": "BRKCB70D8"
+    },
+    {
+      "id": "30001",
+      "name": "Tiago B",
+      "partnerCode": "BRK77F80A"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tpartnerCode\n1\tBruno Barrionuevo\tBRK23B6DA\n2\tBruno Uzeda\tBRKCB70D8\n30001\tTiago B\tBRK77F80A\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}
