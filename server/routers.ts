@@ -1470,6 +1470,68 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
         
         return { success: true, isHighlight: newHighlight };
       }),
+
+    // Toggle status (ativar/inativar) de imóvel compartilhado (pelo parceiro)
+    toggleStatus: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const newStatus = await db.toggleShareStatus(input.id, ctx.user.companyId);
+        
+        // Registrar log de atividade
+        await db.createActivityLog({
+          actorType: 'user',
+          actorId: ctx.user.id,
+          action: newStatus === 'inactive' ? 'share_inactivated' : 'share_activated',
+          entityType: 'property_share',
+          entityId: input.id,
+          details: { message: `Imóvel compartilhado ${newStatus === 'inactive' ? 'inativado' : 'ativado'}`, companyId: ctx.user.companyId },
+        });
+        
+        return { success: true, status: newStatus };
+      }),
+
+    // Excluir compartilhamento de imóvel (pelo parceiro)
+    deleteShare: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        // Buscar dados do compartilhamento antes de excluir para o log
+        const share = await db.getPropertyShareById(input.id);
+        if (!share || share.partnerCompanyId !== ctx.user.companyId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Compartilhamento não encontrado" });
+        }
+        
+        await db.deletePropertyShare(input.id, ctx.user.companyId);
+        
+        // Registrar log de atividade
+        await db.createActivityLog({
+          actorType: 'user',
+          actorId: ctx.user.id,
+          action: 'share_deleted',
+          entityType: 'property_share',
+          entityId: input.id,
+          details: { message: 'Compartilhamento de imóvel excluído', companyId: ctx.user.companyId },
+        });
+        
+        return { success: true };
+      }),
+
+    // Listar imóveis recebidos (aceitos e inativos)
+    listReceived: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        return db.getReceivedPropertyShares(ctx.user.companyId);
+      }),
   }),
 });
 

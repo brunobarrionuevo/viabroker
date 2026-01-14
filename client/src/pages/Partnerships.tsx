@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Users, UserPlus, Check, X, Share2, Building2, Home, Clock, CheckCircle, XCircle, AlertCircle, Copy, ArrowUpRight, ArrowDownLeft, Eye, MapPin, BedDouble, Bath, Car, Star } from "lucide-react";
+import { Users, UserPlus, Check, X, Share2, Building2, Home, Clock, CheckCircle, XCircle, AlertCircle, Copy, ArrowUpRight, ArrowDownLeft, Eye, MapPin, BedDouble, Bath, Car, Star, Power, Trash2 } from "lucide-react";
 
 export default function Partnerships() {
   const queryClient = useQueryClient();
@@ -157,6 +157,33 @@ export default function Partnerships() {
       toast.success(data.isHighlight ? "Imóvel marcado como destaque" : "Destaque removido");
       queryClient.invalidateQueries({ queryKey: ["propertyShares"] });
       queryClient.invalidateQueries({ queryKey: [["propertyShares", "receivedList"]] });
+      queryClient.invalidateQueries({ queryKey: [["propertyShares", "listReceived"]] });
+      queryClient.invalidateQueries({ queryKey: [["properties", "list"]] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    },
+  });
+
+  const toggleStatus = trpc.propertyShares.toggleStatus.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.status === 'inactive' ? "Imóvel inativado - Não aparecerá mais no seu site" : "Imóvel ativado - Voltará a aparecer no seu site");
+      queryClient.invalidateQueries({ queryKey: ["propertyShares"] });
+      queryClient.invalidateQueries({ queryKey: [["propertyShares", "receivedList"]] });
+      queryClient.invalidateQueries({ queryKey: [["propertyShares", "listReceived"]] });
+      queryClient.invalidateQueries({ queryKey: [["properties", "list"]] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    },
+  });
+
+  const deleteShare = trpc.propertyShares.deleteShare.useMutation({
+    onSuccess: () => {
+      toast.success("Compartilhamento excluído - O imóvel foi removido da sua lista");
+      queryClient.invalidateQueries({ queryKey: ["propertyShares"] });
+      queryClient.invalidateQueries({ queryKey: [["propertyShares", "receivedList"]] });
+      queryClient.invalidateQueries({ queryKey: [["propertyShares", "listReceived"]] });
       queryClient.invalidateQueries({ queryKey: [["properties", "list"]] });
     },
     onError: (error: any) => {
@@ -610,10 +637,10 @@ export default function Partnerships() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg">Imóveis Recebidos de Parceiros</CardTitle>
-                <CardDescription>Imóveis que parceiros compartilharam com você e estão ativos no seu site</CardDescription>
+                <CardDescription>Imóveis que parceiros compartilharam com você</CardDescription>
               </CardHeader>
               <CardContent>
-                {receivedShares.filter((s: any) => s.status === 'accepted').length === 0 ? (
+                {receivedShares.filter((s: any) => s.status === 'accepted' || s.status === 'inactive').length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <Home className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                     <p>Nenhum imóvel recebido</p>
@@ -621,14 +648,14 @@ export default function Partnerships() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {receivedShares.filter((s: any) => s.status === 'accepted').map((s: any) => (
-                      <div key={s.id} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-white gap-3 ${s.isHighlight ? 'border-yellow-400 bg-yellow-50' : ''}`}>
+                    {receivedShares.filter((s: any) => s.status === 'accepted' || s.status === 'inactive').map((s: any) => (
+                      <div key={s.id} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-3 ${s.status === 'inactive' ? 'bg-gray-50 border-gray-300 opacity-70' : s.isHighlight ? 'border-yellow-400 bg-yellow-50' : 'bg-white'}`}>
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${s.isHighlight ? 'bg-yellow-100' : 'bg-purple-100'}`}>
-                            {s.isHighlight ? <Star className="w-5 h-5 text-yellow-600 fill-yellow-600" /> : <Home className="w-5 h-5 text-purple-600" />}
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${s.status === 'inactive' ? 'bg-gray-200' : s.isHighlight ? 'bg-yellow-100' : 'bg-purple-100'}`}>
+                            {s.status === 'inactive' ? <Power className="w-5 h-5 text-gray-500" /> : s.isHighlight ? <Star className="w-5 h-5 text-yellow-600 fill-yellow-600" /> : <Home className="w-5 h-5 text-purple-600" />}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-medium truncate">
+                            <p className={`font-medium truncate ${s.status === 'inactive' ? 'text-gray-500' : ''}`}>
                               {s.partnerPropertyCode || s.propertyCode} - {s.propertyTitle}
                             </p>
                             <p className="text-sm text-gray-500 truncate">
@@ -636,19 +663,45 @@ export default function Partnerships() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {s.status === 'accepted' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => toggleHighlight.mutate({ id: s.id })}
+                              className={s.isHighlight ? 'border-yellow-400 text-yellow-700 hover:bg-yellow-100' : ''}
+                              title={s.isHighlight ? 'Remover destaque' : 'Marcar como destaque'}
+                            >
+                              <Star className={`w-4 h-4 ${s.isHighlight ? 'fill-yellow-500' : ''}`} />
+                              <span className="ml-1 hidden sm:inline">{s.isHighlight ? 'Destaque' : 'Destacar'}</span>
+                            </Button>
+                          )}
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => toggleHighlight.mutate({ id: s.id })}
-                            className={s.isHighlight ? 'border-yellow-400 text-yellow-700 hover:bg-yellow-100' : ''}
-                            title={s.isHighlight ? 'Remover destaque' : 'Marcar como destaque'}
+                            onClick={() => toggleStatus.mutate({ id: s.id })}
+                            className={s.status === 'inactive' ? 'border-green-400 text-green-700 hover:bg-green-100' : 'border-orange-400 text-orange-700 hover:bg-orange-100'}
+                            title={s.status === 'inactive' ? 'Ativar imóvel' : 'Inativar imóvel'}
                           >
-                            <Star className={`w-4 h-4 ${s.isHighlight ? 'fill-yellow-500' : ''}`} />
-                            <span className="ml-1 hidden sm:inline">{s.isHighlight ? 'Destaque' : 'Destacar'}</span>
+                            <Power className="w-4 h-4" />
+                            <span className="ml-1 hidden sm:inline">{s.status === 'inactive' ? 'Ativar' : 'Inativar'}</span>
                           </Button>
-                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 whitespace-nowrap shrink-0">
-                            <CheckCircle className="w-3 h-3 mr-1" /> Ativo
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (confirm('Tem certeza que deseja excluir este compartilhamento? Esta ação não pode ser desfeita.')) {
+                                deleteShare.mutate({ id: s.id });
+                              }
+                            }}
+                            className="border-red-400 text-red-700 hover:bg-red-100"
+                            title="Excluir compartilhamento"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span className="ml-1 hidden sm:inline">Excluir</span>
+                          </Button>
+                          <Badge variant="outline" className={`whitespace-nowrap shrink-0 ${s.status === 'inactive' ? 'bg-gray-50 text-gray-600 border-gray-300' : 'bg-green-50 text-green-700 border-green-200'}`}>
+                            {s.status === 'inactive' ? <><Power className="w-3 h-3 mr-1" /> Inativo</> : <><CheckCircle className="w-3 h-3 mr-1" /> Ativo</>}
                           </Badge>
                         </div>
                       </div>

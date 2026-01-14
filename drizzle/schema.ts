@@ -450,7 +450,7 @@ export const propertyShares = mysqlTable("propertyShares", {
   ownerCompanyId: int("ownerCompanyId").notNull(), // Empresa dona do imóvel
   partnerCompanyId: int("partnerCompanyId").notNull(), // Empresa parceira que recebe o compartilhamento
   partnershipId: int("partnershipId").notNull(), // Referência à parceria
-  status: mysqlEnum("status", ["pending", "accepted", "rejected", "revoked"]).default("pending").notNull(),
+  status: mysqlEnum("status", ["pending", "accepted", "rejected", "revoked", "inactive"]).default("pending").notNull(),
   partnerPropertyCode: varchar("partnerPropertyCode", { length: 50 }), // Código único do imóvel para o parceiro
   isHighlight: boolean("isHighlight").default(false).notNull(), // Se o parceiro marcou como destaque
   createdAt: timestamp("createdAt").defaultNow().notNull(),

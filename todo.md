@@ -308,3 +308,8 @@
 ## Bug Destaque de Imóveis de Parceiros (14/01/2026)
 - [x] Corrigir: Imóvel de parceiro continua aparecendo como destaque no site mesmo após remover destaque na aba de parcerias (isHighlight do compartilhamento agora sobrescreve o do imóvel original)
 - [x] Bug persistente: Imóvel de parceiro ainda aparece em destaque no site público mesmo após correção anterior (corrigido filtro na API listPublic para verificar isHighlight do compartilhamento)
+
+
+## Gestão de Imóveis de Parceiros (14/01/2026)
+- [x] Adicionar opção de inativar imóvel de parceiro na aba Recebidos (botão Inativar/Ativar com toggle)
+- [x] Adicionar opção de excluir/rejeitar imóvel de parceiro na aba Recebidos (botão Excluir com confirmação)

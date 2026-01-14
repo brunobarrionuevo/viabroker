@@ -1321,3 +1321,63 @@ export async function toggleShareHighlight(shareId: number, partnerCompanyId: nu
   
   return newHighlight;
 }
+
+
+export async function toggleShareStatus(shareId: number, partnerCompanyId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se o compartilhamento pertence ao parceiro
+  const share = await db.select().from(propertyShares)
+    .where(and(eq(propertyShares.id, shareId), eq(propertyShares.partnerCompanyId, partnerCompanyId)))
+    .limit(1);
+  
+  if (!share[0]) throw new Error("Compartilhamento não encontrado");
+  
+  // Alternar entre 'accepted' e 'inactive'
+  const newStatus = share[0].status === 'accepted' ? 'inactive' : 'accepted';
+  await db.update(propertyShares).set({ status: newStatus as any }).where(eq(propertyShares.id, shareId));
+  
+  return newStatus;
+}
+
+export async function deletePropertyShare(shareId: number, partnerCompanyId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se o compartilhamento pertence ao parceiro
+  const share = await db.select().from(propertyShares)
+    .where(and(eq(propertyShares.id, shareId), eq(propertyShares.partnerCompanyId, partnerCompanyId)))
+    .limit(1);
+  
+  if (!share[0]) throw new Error("Compartilhamento não encontrado");
+  
+  // Deletar o compartilhamento
+  await db.delete(propertyShares).where(eq(propertyShares.id, shareId));
+}
+
+export async function getReceivedPropertyShares(partnerCompanyId: number): Promise<any[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Buscar compartilhamentos aceitos OU inativos (para mostrar na aba Recebidos)
+  const results = await db.select().from(propertyShares)
+    .where(and(
+      eq(propertyShares.partnerCompanyId, partnerCompanyId),
+      or(eq(propertyShares.status, 'accepted'), eq(propertyShares.status, 'inactive'))
+    ))
+    .orderBy(desc(propertyShares.createdAt));
+  
+  // Enriquecer com dados do imóvel e proprietário
+  const enriched = await Promise.all(results.map(async (s) => {
+    const property = await getPropertyById(s.propertyId);
+    const owner = await getCompanyById(s.ownerCompanyId);
+    return {
+      ...s,
+      propertyTitle: property?.title || 'Imóvel não encontrado',
+      propertyCode: property?.code || '',
+      ownerName: owner?.name || 'Desconhecido',
+    };
+  }));
+  return enriched;
+}

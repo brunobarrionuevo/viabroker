@@ -1,0 +1,1 @@
+ALTER TABLE `propertyShares` MODIFY COLUMN `status` enum('pending','accepted','rejected','revoked','inactive') NOT NULL DEFAULT 'pending';
