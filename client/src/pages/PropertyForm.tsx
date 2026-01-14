@@ -29,6 +29,17 @@ const parseCurrencyToNumber = (value: string): number => {
   return parseFloat(cleaned) || 0;
 };
 
+// Função para formatar número (do banco) para exibição em moeda brasileira
+const formatNumberToCurrency = (value: string | number | null | undefined): string => {
+  if (!value) return "";
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num)) return "";
+  return new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(num);
+};
+
 const formatCEP = (value: string): string => {
   const numbers = value.replace(/\D/g, "").slice(0, 8);
   return numbers.replace(/(\d{5})(\d)/, "$1-$2");
@@ -182,10 +193,10 @@ export default function PropertyForm() {
         description: property.description || "",
         type: property.type as any,
         purpose: property.purpose as any,
-        salePrice: property.salePrice || "",
-        rentPrice: property.rentPrice || "",
-        condoFee: property.condoFee || "",
-        iptuAnnual: property.iptuAnnual || "",
+        salePrice: formatNumberToCurrency(property.salePrice),
+        rentPrice: formatNumberToCurrency(property.rentPrice),
+        condoFee: formatNumberToCurrency(property.condoFee),
+        iptuAnnual: formatNumberToCurrency(property.iptuAnnual),
         address: property.address || "",
         number: property.number || "",
         complement: property.complement || "",

@@ -1,0 +1,19 @@
+{
+  "query": "SELECT id, code, title, type, purpose, status, companyId FROM properties WHERE code = 'IMV0020003';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, code, title, type, purpose, status, companyId FROM properties WHERE code = 'IMV0020003';",
+  "rows": [
+    {
+      "id": "150002",
+      "code": "IMV0020003",
+      "title": "dasdad",
+      "type": "apartamento",
+      "purpose": "venda",
+      "status": "vendido",
+      "companyId": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcode\ttitle\ttype\tpurpose\tstatus\tcompanyId\n150002\tIMV0020003\tdasdad\tapartamento\tvenda\tvendido\t2\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

@@ -1,0 +1,19 @@
+{
+  "query": "SELECT p.id, p.code, p.title, p.type, p.status, p.companyId, c.name as companyName FROM properties p JOIN companies c ON p.companyId = c.id WHERE p.code = 'IMV0020003' OR p.code LIKE '%0020003%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT p.id, p.code, p.title, p.type, p.status, p.companyId, c.name as companyName FROM properties p JOIN companies c ON p.companyId = c.id WHERE p.code = 'IMV0020003' OR p.code LIKE '%0020003%';",
+  "rows": [
+    {
+      "id": "150002",
+      "code": "IMV0020003",
+      "title": "dasdad",
+      "type": "apartamento",
+      "status": "vendido",
+      "companyId": "2",
+      "companyName": "Bruno Uzeda"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcode\ttitle\ttype\tstatus\tcompanyId\tcompanyName\n150002\tIMV0020003\tdasdad\tapartamento\tvendido\t2\tBruno Uzeda\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

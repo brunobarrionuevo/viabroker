@@ -329,3 +329,5 @@
 - [x] Bug: Imóveis de parceiros permitem acesso à página de edição (corrigido - agora redireciona para página de parcerias)
 
 - [x] Bug persistente: Erro de SQL ao salvar imóvel 150001 (imóvel de parceiro) - adicionado redirecionamento automático quando imóvel não é encontrado
+
+- [x] Bug intermitente: Alteração de status funciona nas primeiras vezes mas depois de 3 mudanças começa a dar erro (corrigido: preços agora são formatados corretamente ao carregar imóvel para edição)

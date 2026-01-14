@@ -1,0 +1,91 @@
+{
+  "query": "SELECT p.id, p.code, p.title, p.type, p.status, p.companyId, c.name as companyName FROM properties p JOIN companies c ON p.companyId = c.id ORDER BY p.id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT p.id, p.code, p.title, p.type, p.status, p.companyId, c.name as companyName FROM properties p JOIN companies c ON p.companyId = c.id ORDER BY p.id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "150002",
+      "code": "IMV0020003",
+      "title": "dasdad",
+      "type": "apartamento",
+      "status": "vendido",
+      "companyId": "2",
+      "companyName": "Bruno Uzeda"
+    },
+    {
+      "id": "150001",
+      "code": "IMV0020002",
+      "title": "casa Aldebaran",
+      "type": "casa",
+      "status": "reservado",
+      "companyId": "2",
+      "companyName": "Bruno Uzeda"
+    },
+    {
+      "id": "120002",
+      "code": "IMV0010005",
+      "title": "Apto Pajuçara ",
+      "type": "apartamento",
+      "status": "disponivel",
+      "companyId": "1",
+      "companyName": "Bruno Barrionuevo"
+    },
+    {
+      "id": "120001",
+      "code": "IMV0010004",
+      "title": "Casa - Centro",
+      "type": "casa",
+      "status": "disponivel",
+      "companyId": "1",
+      "companyName": "Bruno Barrionuevo"
+    },
+    {
+      "id": "90001",
+      "code": "1001",
+      "title": "Apt 3 quartos",
+      "type": "apartamento",
+      "status": "disponivel",
+      "companyId": "30001",
+      "companyName": "Tiago B"
+    },
+    {
+      "id": "60001",
+      "code": "IMV0010003",
+      "title": "Jdjdnr",
+      "type": "apartamento",
+      "status": "reservado",
+      "companyId": "1",
+      "companyName": "Bruno Barrionuevo"
+    },
+    {
+      "id": "30001",
+      "code": "IMV0020001",
+      "title": "Teste mobile",
+      "type": "apartamento",
+      "status": "vendido",
+      "companyId": "2",
+      "companyName": "Bruno Uzeda"
+    },
+    {
+      "id": "2",
+      "code": "IMV0010002",
+      "title": "soafjsokfjs flaskmflsa",
+      "type": "apartamento",
+      "status": "disponivel",
+      "companyId": "1",
+      "companyName": "Bruno Barrionuevo"
+    },
+    {
+      "id": "1",
+      "code": "IMV0010001",
+      "title": "Apartamento Teste 3 Quartos",
+      "type": "apartamento",
+      "status": "disponivel",
+      "companyId": "1",
+      "companyName": "Bruno Barrionuevo"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcode\ttitle\ttype\tstatus\tcompanyId\tcompanyName\n150002\tIMV0020003\tdasdad\tapartamento\tvendido\t2\tBruno Uzeda\n150001\tIMV0020002\tcasa Aldebaran\tcasa\treservado\t2\tBruno Uzeda\n120002\tIMV0010005\tApto Pajuçara \tapartamento\tdisponivel\t1\tBruno Barrionuevo\n120001\tIMV0010004\tCasa - Centro\tcasa\tdisponivel\t1\tBruno Barrionuevo\n90001\t1001\tApt 3 quartos\tapartamento\tdisponivel\t30001\tTiago B\n60001\tIMV0010003\tJdjdnr\tapartamento\treservado\t1\tBruno Barrionuevo\n30001\tIMV0020001\tTeste mobile\tapartamento\tvendido\t2\tBruno Uzeda\n2\tIMV0010002\tsoafjsokfjs flaskmflsa\tapartamento\tdisponivel\t1\tBruno Barrionuevo\n1\tIMV0010001\tApartamento Teste 3 Quartos\tapartamento\tdisponivel\t1\tBruno Barrionuevo\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}
