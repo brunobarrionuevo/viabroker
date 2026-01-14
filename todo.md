@@ -321,3 +321,7 @@
 - [x] Imóvel Alugado: exibir badge "Alugado" no site do proprietário e parceiros (overlay azul)
 - [x] Imóvel Vendido: exibir badge "Vendido" no site do proprietário e parceiros (overlay vermelho)
 - [x] Imóvel Excluído: remover compartilhamentos de todos os parceiros (cascata no deleteProperty)
+
+
+## Bug - Erro ao Alterar Status (14/01/2026)
+- [x] Corrigir erro ao alterar status de imóveis no dashboard (adicionado placeholder aos SelectValue para garantir exibição correta dos valores)

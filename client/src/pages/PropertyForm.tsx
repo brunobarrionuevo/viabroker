@@ -366,7 +366,7 @@ export default function PropertyForm() {
                     <Label htmlFor="type">Tipo *</Label>
                     <Select value={formData.type} onValueChange={(v) => setFormData(prev => ({ ...prev, type: v as any }))}>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder="Selecione o tipo" />
                       </SelectTrigger>
                       <SelectContent>
                         {propertyTypes.map((type) => (
@@ -381,7 +381,7 @@ export default function PropertyForm() {
                     <Label htmlFor="purpose">Finalidade *</Label>
                     <Select value={formData.purpose} onValueChange={(v) => setFormData(prev => ({ ...prev, purpose: v as any }))}>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder="Selecione a finalidade" />
                       </SelectTrigger>
                       <SelectContent>
                         {purposeOptions.map((opt) => (
@@ -396,7 +396,7 @@ export default function PropertyForm() {
                     <Label htmlFor="status">Status</Label>
                     <Select value={formData.status} onValueChange={(v) => setFormData(prev => ({ ...prev, status: v as any }))}>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder="Selecione o status" />
                       </SelectTrigger>
                       <SelectContent>
                         {statusOptions.map((opt) => (
