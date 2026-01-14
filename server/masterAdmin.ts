@@ -4,6 +4,8 @@ import { router, publicProcedure } from "./_core/trpc";
 import * as db from "./db";
 import * as bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { eq, inArray } from "drizzle-orm";
+import { companies, users, properties, propertyImages, leads, interactions, appointments, subscriptions, payments, siteSettings, activityLogs } from "../drizzle/schema";
 
 const MASTER_JWT_SECRET = process.env.JWT_SECRET || "master-secret-key-change-in-production";
 
@@ -545,6 +547,97 @@ export const masterAdminRouter = router({
       });
       
       return { success: true, message: "Senha alterada com sucesso" };
+    }),
+
+  // Deletar empresa
+  deleteCompany: publicProcedure
+    .input(z.object({
+      token: z.string(),
+      companyId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const admin = await masterAuthMiddleware(input.token);
+      
+      // Buscar empresa
+      const company = await db.getCompanyById(input.companyId);
+      if (!company) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Empresa não encontrada" });
+      }
+      
+      // Obter database connection
+      const database = await db.getDb();
+      if (!database) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Erro ao conectar ao banco de dados" });
+      }
+      
+      // Excluir em cascata (inline para evitar problemas de cache)
+      // 1. Buscar IDs dos imóveis da empresa
+      const companyProperties = await database.select({ id: properties.id })
+        .from(properties)
+        .where(eq(properties.companyId, input.companyId));
+      const propertyIds = companyProperties.map(p => p.id);
+      
+      // 2. Excluir property_images
+      if (propertyIds.length > 0) {
+        await database.delete(propertyImages)
+          .where(inArray(propertyImages.propertyId, propertyIds));
+      }
+      
+      // 3. Buscar IDs dos leads da empresa para excluir interactions
+      const companyLeads = await database.select({ id: leads.id })
+        .from(leads)
+        .where(eq(leads.companyId, input.companyId));
+      const leadIds = companyLeads.map(l => l.id);
+      
+      // 4. Excluir interactions (dependem de leads)
+      if (leadIds.length > 0) {
+        await database.delete(interactions)
+          .where(inArray(interactions.leadId, leadIds));
+      }
+      
+      // 5. Excluir appointments
+      await database.delete(appointments)
+        .where(eq(appointments.companyId, input.companyId));
+      
+      // 6. Excluir leads
+      await database.delete(leads)
+        .where(eq(leads.companyId, input.companyId));
+      
+      // 7. Excluir properties
+      await database.delete(properties)
+        .where(eq(properties.companyId, input.companyId));
+      
+      // 8. Excluir users
+      await database.delete(users)
+        .where(eq(users.companyId, input.companyId));
+      
+      // 9. Excluir subscriptions
+      await database.delete(subscriptions)
+        .where(eq(subscriptions.companyId, input.companyId));
+      
+      // 10. Excluir payments
+      await database.delete(payments)
+        .where(eq(payments.companyId, input.companyId));
+      
+      // 11. Excluir site_settings
+      await database.delete(siteSettings)
+        .where(eq(siteSettings.companyId, input.companyId));
+      
+      // 12. Finalmente, excluir a empresa
+      await database.delete(companies)
+        .where(eq(companies.id, input.companyId));
+      
+      // Log de atividade (criar depois da exclusão para não ser excluído)
+      await db.createActivityLog({
+        actorType: "master_admin",
+        actorId: admin.id,
+        action: "delete_company",
+        entityType: "company",
+        entityId: input.companyId,
+        details: { name: company.name, email: company.email },
+      });
+      
+      return { success: true, message: "Empresa e todos os seus dados foram excluídos" };
     }),
 
   // Deletar usuario
