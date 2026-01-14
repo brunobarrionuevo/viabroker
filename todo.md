@@ -422,3 +422,8 @@
 ## Ajuste Botão Gerenciar Fotos (14/01/2026)
 - [x] Adicionar botão "Gerenciar Fotos" visível na página de cadastro inicial do imóvel
 - [x] Posicionar botão acima do botão "Salvar" no formulário
+
+
+## Melhorias no Formulário de Cadastro (14/01/2026)
+- [x] Adicionar texto informativo sobre geração de descrição com IA (recomendar preencher todos os campos antes)
+- [x] Corrigir item "Portaria" para "Portaria 24h" na seção de detalhes do imóvel

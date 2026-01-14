@@ -682,6 +682,9 @@ export default function PropertyForm() {
                     placeholder="Descreva o imóvel..."
                     rows={5}
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    💡 Para gerar uma descrição mais completa com IA, recomendamos preencher todos os campos do cadastro antes.
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -873,7 +876,7 @@ export default function PropertyForm() {
                       checked={formData.hasLobby}
                       onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasLobby: checked }))}
                     />
-                    <Label htmlFor="hasLobby" className="cursor-pointer">Portaria</Label>
+                    <Label htmlFor="hasLobby" className="cursor-pointer">Portaria 24h</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Switch
