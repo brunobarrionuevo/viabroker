@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Home, Plus, Search, MapPin, Bed, Car, Maximize } from "lucide-react";
+import { Home, Plus, Search, MapPin, Bed, Car, Maximize, Users } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -124,8 +124,8 @@ export default function Properties() {
         ) : properties && properties.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {properties.map((property) => (
-              <Link key={property.id} href={`/dashboard/properties/${property.id}/edit`}>
-                <Card className="overflow-hidden hover:border-primary transition-colors cursor-pointer group">
+              <Link key={property.id} href={(property as any).isShared ? "#" : `/dashboard/properties/${property.id}/edit`}>
+                <Card className={`overflow-hidden hover:border-primary transition-colors cursor-pointer group ${(property as any).isShared ? 'border-purple-300 bg-purple-50/30' : ''}`}>
                   <div className="aspect-video bg-muted relative overflow-hidden">
                     {property.mainImageUrl ? (
                       <img 
@@ -138,12 +138,19 @@ export default function Properties() {
                         <Home className="w-12 h-12 text-muted-foreground/50" />
                       </div>
                     )}
-                    <div className="absolute top-2 right-2">
+                    <div className="absolute top-2 right-2 flex flex-col gap-1">
                       {getStatusBadge(property.status)}
                     </div>
-                    {property.isHighlight && (
+                    {property.isHighlight && !(property as any).isShared && (
                       <Badge className="absolute top-2 left-2 bg-primary">
                         Destaque
+                      </Badge>
+                    )}
+                    {/* Badge de imóvel de parceiro */}
+                    {(property as any).isShared && (
+                      <Badge className="absolute top-2 left-2 bg-purple-600 text-white">
+                        <Users className="w-3 h-3 mr-1" />
+                        Parceiro
                       </Badge>
                     )}
                   </div>
@@ -154,7 +161,7 @@ export default function Properties() {
                       </h3>
                       {property.code && (
                         <Badge variant="outline" className="text-xs shrink-0">
-                          {property.code}
+                          {(property as any).isShared && (property as any).partnerPropertyCode ? (property as any).partnerPropertyCode : property.code}
                         </Badge>
                       )}
                     </div>
@@ -162,6 +169,21 @@ export default function Properties() {
                       <MapPin className="w-3 h-3" />
                       {property.neighborhood ? `${property.neighborhood}, ` : ""}{property.city} - {property.state}
                     </p>
+                    
+                    {/* Informação do parceiro proprietário */}
+                    {(property as any).isShared && (property as any).sharedFromCompanyName && (
+                      <div className="mt-2 p-2 bg-purple-100 rounded-md">
+                        <p className="text-xs text-purple-700 font-medium flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          De: {(property as any).sharedFromCompanyName}
+                        </p>
+                        {(property as any).sharedFromPartnerCode && (
+                          <p className="text-xs text-purple-600">
+                            Código: {(property as any).sharedFromPartnerCode}
+                          </p>
+                        )}
+                      </div>
+                    )}
                     
                     <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
                       {property.bedrooms ? (

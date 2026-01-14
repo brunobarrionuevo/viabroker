@@ -530,11 +530,18 @@ export const appRouter = router({
         const mainImages = await db.getPropertiesMainImages(propertyIds);
         
         // Adicionar a URL da imagem principal a cada imóvel
-        return propertiesList.map(property => ({
-          ...property,
-          mainImageUrl: mainImages.get(property.id) || null,
-          isShared: property.companyId !== companyId, // Indicar se é imóvel compartilhado
-        }));
+        return propertiesList.map(property => {
+          const isShared = property.companyId !== companyId;
+          return {
+            ...property,
+            mainImageUrl: mainImages.get(property.id) || null,
+            isShared,
+            // Campos de compartilhamento já vêm do getSharedPropertiesForPartner
+            sharedFromCompanyName: (property as any).sharedFromCompanyName || null,
+            sharedFromPartnerCode: (property as any).sharedFromPartnerCode || null,
+            partnerPropertyCode: (property as any).partnerPropertyCode || null,
+          };
+        });
       }),
 
     getPublic: publicProcedure

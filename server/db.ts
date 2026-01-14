@@ -1233,7 +1233,7 @@ export async function getPropertyShareByPropertyAndPartner(propertyId: number, p
   return result[0];
 }
 
-export async function getSharedPropertiesForPartner(partnerCompanyId: number): Promise<Property[]> {
+export async function getSharedPropertiesForPartner(partnerCompanyId: number): Promise<(Property & { sharedFromCompanyId?: number; sharedFromCompanyName?: string; sharedFromPartnerCode?: string; partnerPropertyCode?: string | null })[]> {
   const db = await getDb();
   if (!db) return [];
   
@@ -1251,7 +1251,27 @@ export async function getSharedPropertiesForPartner(partnerCompanyId: number): P
       eq(properties.isPublished, true)
     ));
   
-  return sharedProperties;
+  // Criar mapa de compartilhamentos para adicionar informações do parceiro
+  const shareMap = new Map(shares.map(s => [s.propertyId, s]));
+  
+  // Buscar informações das empresas proprietárias
+  const ownerCompanyIds = Array.from(new Set(sharedProperties.map(p => p.companyId)));
+  const ownerCompanies = await db.select().from(companies)
+    .where(sql`${companies.id} IN (${sql.join(ownerCompanyIds.map(id => sql`${id}`), sql`, `)})`);
+  const companyMap = new Map(ownerCompanies.map(c => [c.id, c]));
+  
+  // Adicionar informações do parceiro proprietário a cada imóvel
+  return sharedProperties.map(property => {
+    const share = shareMap.get(property.id);
+    const ownerCompany = companyMap.get(property.companyId);
+    return {
+      ...property,
+      sharedFromCompanyId: property.companyId,
+      sharedFromCompanyName: ownerCompany?.name || 'Parceiro',
+      sharedFromPartnerCode: ownerCompany?.partnerCode || '',
+      partnerPropertyCode: share?.partnerPropertyCode || property.code,
+    };
+  });
 }
 
 export async function generatePartnerPropertyCode(partnerCompanyId: number): Promise<string> {

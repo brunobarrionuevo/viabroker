@@ -282,3 +282,11 @@
 - [x] Separar abas entre "Imóveis que compartilhei" e "Imóveis que recebi" (3 abas: Parcerias, Imóveis Compartilhados, Imóveis Recebidos)
 - [x] Fixar menu lateral do dashboard (AppLayout adicionado à página de parcerias)
 - [x] Corrigir página de parcerias (reescrita completa com todas as funcionalidades)
+
+
+## Melhorias Sistema de Compartilhamento (13/01/2026)
+- [x] Atualização automática da página após aceitar parceria (invalidateQueries implementado)
+- [x] Visualização prévia do imóvel antes de aceitar compartilhamento (dialog de preview com imagem, preço, características)
+- [x] Corrigir layout das abas (flex-wrap, min-width, text-xs sm:text-sm)
+- [x] Destaque de imóveis de parceiros na listagem de imóveis (badge roxo "Parceiro", borda roxa)
+- [x] Exibir código e nome do parceiro proprietário nos imóveis compartilhados (info box com nome e código do parceiro)
