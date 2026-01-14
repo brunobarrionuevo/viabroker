@@ -14,7 +14,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { sdk } from "./_core/sdk";
 
-const JWT_SECRET = process.env.JWT_SECRET || "brokvia-secret-key-change-in-production";
+const JWT_SECRET = process.env.JWT_SECRET || "viabroker-secret-key-change-in-production";
 const TRIAL_DAYS = 7;
 
 // Gerar token aleatório
@@ -24,7 +24,7 @@ function generateToken(): string {
 
 // Gerar OpenID único para usuários próprios
 function generateOpenId(): string {
-  return `brokvia_${crypto.randomBytes(16).toString("hex")}`;
+  return `viabroker_${crypto.randomBytes(16).toString("hex")}`;
 }
 
 // Calcular data de fim do trial

@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { notifyOwner } from "./_core/notification";
 
-const APP_NAME = "Brokvia";
+const APP_NAME = "Viabroker";
 // Usar a URL do ambiente ou fallback para a URL publicada
 const APP_URL = process.env.VITE_APP_URL || process.env.APP_URL || "https://imobpitch-2bvimoer.manus.space";
 
@@ -81,7 +81,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
     if (process.env.SMTP_HOST) {
       const transporter = getTransporter();
       await transporter.sendMail({
-        from: `"${APP_NAME}" <${process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@brokvia.com"}>`,
+        from: `"${APP_NAME}" <${process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@viabroker.app"}>`,
         to,
         subject,
         html,

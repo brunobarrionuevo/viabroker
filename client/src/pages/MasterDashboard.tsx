@@ -191,7 +191,7 @@ export default function MasterDashboard() {
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-gray-900">Brokvia Admin</h1>
+              <h1 className="font-bold text-gray-900">Viabroker Admin</h1>
               <p className="text-xs text-gray-500">Painel Master</p>
             </div>
           </div>

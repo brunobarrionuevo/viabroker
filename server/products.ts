@@ -1,7 +1,7 @@
-// Definição dos planos de assinatura da Brokvia
+// Definição dos planos de assinatura da Viabroker
 // Os preços são em centavos (BRL)
 
-export interface BrokviaProduct {
+export interface ViabrokerProduct {
   id: string;
   name: string;
   description: string;
@@ -20,7 +20,7 @@ export interface BrokviaProduct {
   hasPrioritySupport: boolean;
 }
 
-export const BROKVIA_PLANS: BrokviaProduct[] = [
+export const BROKVIA_PLANS: ViabrokerProduct[] = [
   {
     id: "basic",
     name: "Basic",
@@ -103,7 +103,7 @@ export const BROKVIA_PLANS: BrokviaProduct[] = [
   },
 ];
 
-export function getPlanById(planId: string): BrokviaProduct | undefined {
+export function getPlanById(planId: string): ViabrokerProduct | undefined {
   return BROKVIA_PLANS.find(plan => plan.id === planId);
 }
 

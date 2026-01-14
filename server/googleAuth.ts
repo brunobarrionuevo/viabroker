@@ -14,7 +14,7 @@ const TRIAL_DAYS = 7;
 
 // Gerar OpenID único para usuários próprios
 function generateOpenId(): string {
-  return `brokvia_${crypto.randomBytes(16).toString("hex")}`;
+  return `viabroker_${crypto.randomBytes(16).toString("hex")}`;
 }
 
 // Calcular data de fim do trial

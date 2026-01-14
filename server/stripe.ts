@@ -136,7 +136,7 @@ export async function createCheckoutSession(
         price_data: {
           currency: "brl",
           product_data: {
-            name: `Brokvia ${plan.name}`,
+            name: `Viabroker ${plan.name}`,
             description: plan.description,
             metadata: {
               plan_id: planId,

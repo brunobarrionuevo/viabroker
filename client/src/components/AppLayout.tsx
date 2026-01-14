@@ -76,8 +76,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
       )}>
         <div className="flex items-center justify-between h-16 px-4 border-b">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <img src="/brokvia-logo.png" alt="Brokvia" className="w-8 h-8 object-contain" />
-            <span className="font-bold text-lg">Brokvia</span>
+            <img src="/viabroker-logo.png" alt="Viabroker" className="w-8 h-8 object-contain" />
+            <span className="font-bold text-lg">Viabroker</span>
           </Link>
           <Button 
             variant="ghost" 

@@ -41,8 +41,8 @@ export default function VerifyEmail() {
         <div className="text-center mb-8">
           <Link href="/">
             <div className="inline-flex items-center gap-2">
-              <img src="/brokvia-logo.png" alt="Brokvia" className="h-10 w-10" />
-              <span className="text-2xl font-bold text-blue-900">Brokvia</span>
+              <img src="/viabroker-logo.png" alt="Viabroker" className="h-10 w-10" />
+              <span className="text-2xl font-bold text-blue-900">Viabroker</span>
             </div>
           </Link>
         </div>

@@ -20,8 +20,8 @@ export default function Login() {
   const loginMutation = trpc.customAuth.login.useMutation({
     onSuccess: (data) => {
       // Salvar token no localStorage
-      localStorage.setItem("brokvia_token", data.token);
-      localStorage.setItem("brokvia_user", JSON.stringify(data.user));
+      localStorage.setItem("viabroker_token", data.token);
+      localStorage.setItem("viabroker_user", JSON.stringify(data.user));
       
       toast.success("Login realizado com sucesso!");
       
@@ -56,8 +56,8 @@ export default function Login() {
         <div className="text-center mb-8">
           <Link href="/">
             <div className="inline-flex items-center gap-2">
-              <img src="/brokvia-logo.png" alt="Brokvia" className="h-10 w-10" />
-              <span className="text-2xl font-bold text-blue-900">Brokvia</span>
+              <img src="/viabroker-logo.png" alt="Viabroker" className="h-10 w-10" />
+              <span className="text-2xl font-bold text-blue-900">Viabroker</span>
             </div>
           </Link>
           <p className="text-gray-600 mt-2">Plataforma de Sites para Corretores</p>

@@ -331,3 +331,10 @@
 - [x] Bug persistente: Erro de SQL ao salvar imóvel 150001 (imóvel de parceiro) - adicionado redirecionamento automático quando imóvel não é encontrado
 
 - [x] Bug intermitente: Alteração de status funciona nas primeiras vezes mas depois de 3 mudanças começa a dar erro (corrigido: preços agora são formatados corretamente ao carregar imóvel para edição)
+
+
+## Rebranding: Brokvia → Viabroker (14/01/2026)
+- [x] Alterar nome de Brokvia para Viabroker em todos os componentes (sed realizado em todos os arquivos)
+- [x] Atualizar VITE_APP_TITLE para Viabroker (alterar em Settings → General da interface Manus)
+- [x] Preparar configurações para domínio viabroker.app (URLs atualizadas no código)
+- [x] Atualizar textos e referências no código (brokvia_token → viabroker_token, etc)

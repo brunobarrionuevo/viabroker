@@ -79,8 +79,8 @@ export default function ResendVerification() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 text-2xl font-bold text-primary">
-            <img src="/brokvia-logo.png" alt="Brokvia" className="h-8 w-8" />
-            Brokvia
+            <img src="/viabroker-logo.png" alt="Viabroker" className="h-8 w-8" />
+            Viabroker
           </Link>
         </div>
 
