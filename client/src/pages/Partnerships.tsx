@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Users, UserPlus, Check, X, Share2, Building2, Home, Clock, CheckCircle, XCircle, AlertCircle, Copy, ArrowUpRight, ArrowDownLeft, Eye, MapPin, BedDouble, Bath, Car } from "lucide-react";
+import { Users, UserPlus, Check, X, Share2, Building2, Home, Clock, CheckCircle, XCircle, AlertCircle, Copy, ArrowUpRight, ArrowDownLeft, Eye, MapPin, BedDouble, Bath, Car, Star } from "lucide-react";
 
 export default function Partnerships() {
   const queryClient = useQueryClient();
@@ -36,6 +36,7 @@ export default function Partnerships() {
   const { data: receivedShares = [] } = trpc.propertyShares.receivedList.useQuery();
   const { data: pendingShares = [] } = trpc.propertyShares.pending.useQuery();
   const { data: properties = [] } = trpc.properties.list.useQuery({});
+  const { data: activityLogs = [] } = trpc.partnershipActivity.list.useQuery();
 
   // Query para preview do imóvel
   const { data: previewProperty } = trpc.properties.getPublic.useQuery(
@@ -145,6 +146,18 @@ export default function Partnerships() {
       toast.success("Compartilhamento revogado");
       queryClient.invalidateQueries({ queryKey: ["propertyShares"] });
       queryClient.invalidateQueries({ queryKey: [["propertyShares", "sentList"]] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    },
+  });
+
+  const toggleHighlight = trpc.propertyShares.toggleHighlight.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.isHighlight ? "Imóvel marcado como destaque" : "Destaque removido");
+      queryClient.invalidateQueries({ queryKey: ["propertyShares"] });
+      queryClient.invalidateQueries({ queryKey: [["propertyShares", "receivedList"]] });
+      queryClient.invalidateQueries({ queryKey: [["properties", "list"]] });
     },
     onError: (error: any) => {
       toast.error(error.message);
@@ -372,6 +385,10 @@ export default function Partnerships() {
               {pendingShares.length > 0 && (
                 <Badge variant="destructive" className="ml-1 text-xs px-1.5">{pendingShares.length}</Badge>
               )}
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex-1 min-w-[120px] text-xs sm:text-sm px-2 py-2">
+              <Clock className="w-4 h-4 mr-1 shrink-0" />
+              <span className="truncate">Histórico</span>
             </TabsTrigger>
           </TabsList>
 
@@ -605,10 +622,10 @@ export default function Partnerships() {
                 ) : (
                   <div className="space-y-3">
                     {receivedShares.filter((s: any) => s.status === 'accepted').map((s: any) => (
-                      <div key={s.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-white gap-3">
+                      <div key={s.id} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-white gap-3 ${s.isHighlight ? 'border-yellow-400 bg-yellow-50' : ''}`}>
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                            <Home className="w-5 h-5 text-purple-600" />
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${s.isHighlight ? 'bg-yellow-100' : 'bg-purple-100'}`}>
+                            {s.isHighlight ? <Star className="w-5 h-5 text-yellow-600 fill-yellow-600" /> : <Home className="w-5 h-5 text-purple-600" />}
                           </div>
                           <div className="min-w-0">
                             <p className="font-medium truncate">
@@ -619,9 +636,75 @@ export default function Partnerships() {
                             </p>
                           </div>
                         </div>
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 whitespace-nowrap shrink-0">
-                          <CheckCircle className="w-3 h-3 mr-1" /> Ativo no seu site
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => toggleHighlight.mutate({ id: s.id })}
+                            className={s.isHighlight ? 'border-yellow-400 text-yellow-700 hover:bg-yellow-100' : ''}
+                            title={s.isHighlight ? 'Remover destaque' : 'Marcar como destaque'}
+                          >
+                            <Star className={`w-4 h-4 ${s.isHighlight ? 'fill-yellow-500' : ''}`} />
+                            <span className="ml-1 hidden sm:inline">{s.isHighlight ? 'Destaque' : 'Destacar'}</span>
+                          </Button>
+                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 whitespace-nowrap shrink-0">
+                            <CheckCircle className="w-3 h-3 mr-1" /> Ativo
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Histórico de Atividades */}
+          <TabsContent value="history" className="space-y-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Histórico de Atividades</CardTitle>
+                <CardDescription>Registro de ações relacionadas às suas parcerias</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {activityLogs.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p>Nenhuma atividade registrada</p>
+                    <p className="text-sm">As ações de parcerias aparecerão aqui</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {activityLogs.map((log: any) => (
+                      <div key={log.id} className="flex items-start gap-3 p-3 border rounded-lg bg-gray-50">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                          log.action === 'partnership_requested' ? 'bg-blue-100' :
+                          log.action === 'partnership_accepted' ? 'bg-green-100' :
+                          log.action === 'property_shared' ? 'bg-purple-100' :
+                          log.action === 'property_share_accepted' ? 'bg-emerald-100' :
+                          'bg-gray-100'
+                        }`}>
+                          {log.action === 'partnership_requested' && <UserPlus className="w-4 h-4 text-blue-600" />}
+                          {log.action === 'partnership_accepted' && <Check className="w-4 h-4 text-green-600" />}
+                          {log.action === 'property_shared' && <Share2 className="w-4 h-4 text-purple-600" />}
+                          {log.action === 'property_share_accepted' && <CheckCircle className="w-4 h-4 text-emerald-600" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm">
+                            {log.action === 'partnership_requested' && 'Solicitação de parceria enviada'}
+                            {log.action === 'partnership_accepted' && 'Parceria aceita'}
+                            {log.action === 'property_shared' && 'Imóvel compartilhado'}
+                            {log.action === 'property_share_accepted' && 'Compartilhamento aceito'}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {log.details?.partnerName && `Parceiro: ${log.details.partnerName}`}
+                            {log.details?.propertyTitle && ` | Imóvel: ${log.details.propertyTitle}`}
+                            {log.details?.partnerPropertyCode && ` | Código: ${log.details.partnerPropertyCode}`}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {new Date(log.createdAt).toLocaleString('pt-BR')}
+                          </p>
+                        </div>
                       </div>
                     ))}
                   </div>

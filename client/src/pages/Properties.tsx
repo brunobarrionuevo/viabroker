@@ -27,15 +27,23 @@ const statusOptions = [
   { value: "inativo", label: "Inativo", color: "bg-gray-100 text-gray-700" },
 ];
 
+const originOptions = [
+  { value: "all", label: "Todos os imóveis" },
+  { value: "own", label: "Meus imóveis" },
+  { value: "shared", label: "Imóveis de parceiros" },
+];
+
 export default function Properties() {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [originFilter, setOriginFilter] = useState<string>("all");
 
   const { data: properties, isLoading } = trpc.properties.list.useQuery({
     search: search || undefined,
     type: typeFilter && typeFilter !== "all" ? typeFilter : undefined,
     status: statusFilter && statusFilter !== "all" ? statusFilter : undefined,
+    origin: originFilter as 'all' | 'own' | 'shared' || 'all',
   });
 
   const getStatusBadge = (status: string) => {
@@ -99,6 +107,18 @@ export default function Properties() {
                   {statusOptions.map((status) => (
                     <SelectItem key={status.value} value={status.value}>
                       {status.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={originFilter} onValueChange={setOriginFilter}>
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Origem" />
+                </SelectTrigger>
+                <SelectContent>
+                  {originOptions.map((origin) => (
+                    <SelectItem key={origin.value} value={origin.value}>
+                      {origin.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -1,0 +1,17 @@
+{
+  "query": "SELECT p.id, p.title, p.companyId, c.name as companyName, c.slug as companySlug \nFROM properties p \nJOIN companies c ON p.companyId = c.id \nWHERE p.id = 150001;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT p.id, p.title, p.companyId, c.name as companyName, c.slug as companySlug \nFROM properties p \nJOIN companies c ON p.companyId = c.id \nWHERE p.id = 150001;",
+  "rows": [
+    {
+      "id": "150001",
+      "title": "casa Aldebaran",
+      "companyId": "2",
+      "companyName": "Bruno Uzeda",
+      "companySlug": "bruno-uzeda"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tcompanyId\tcompanyName\tcompanySlug\n150001\tcasa Aldebaran\t2\tBruno Uzeda\tbruno-uzeda\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

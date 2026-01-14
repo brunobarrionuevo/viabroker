@@ -12,6 +12,7 @@ import { generateVivaRealXML, generateOLXXML, generateGenericXML } from "./xmlGe
 import { masterAdminRouter } from "./masterAdmin";
 import { createCheckoutSession, createBillingPortalSession } from "./stripe";
 import { authRouter } from "./auth";
+import { sendPartnershipRequestEmail, sendPartnershipAcceptedEmail, sendPropertyShareEmail, sendPropertyShareAcceptedEmail } from "./email";
 
 // Schemas de validação
 const propertyTypeEnum = z.enum(["casa", "apartamento", "terreno", "comercial", "rural", "cobertura", "flat", "kitnet", "sobrado", "galpao", "sala_comercial", "loja", "outro"]);
@@ -157,15 +158,45 @@ export const appRouter = router({
         state: z.string().optional(),
         status: z.string().optional(),
         search: z.string().optional(),
+        origin: z.enum(['all', 'own', 'shared']).optional(), // Filtro de origem
         limit: z.number().min(1).max(100).default(50),
         offset: z.number().min(0).default(0),
       }).optional())
       .query(async ({ ctx, input }) => {
-        const filters: db.PropertyFilters = {
-          companyId: ctx.user.companyId || undefined,
-          ...input
-        };
-        const propertiesList = await db.getProperties(filters, input?.limit || 50, input?.offset || 0);
+        const companyId = ctx.user.companyId;
+        if (!companyId) return [];
+        
+        let propertiesList: any[] = [];
+        
+        // Buscar imóveis próprios (se não for filtro "shared")
+        if (input?.origin !== 'shared') {
+          const filters: db.PropertyFilters = {
+            companyId,
+            type: input?.type,
+            purpose: input?.purpose,
+            city: input?.city,
+            state: input?.state,
+            status: input?.status,
+            search: input?.search,
+          };
+          const ownProperties = await db.getProperties(filters, input?.limit || 50, input?.offset || 0);
+          propertiesList = ownProperties.map(p => ({ ...p, isShared: false }));
+        }
+        
+        // Buscar imóveis compartilhados (se não for filtro "own")
+        if (input?.origin !== 'own') {
+          const sharedProperties = await db.getSharedPropertiesForPartner(companyId);
+          // Adicionar imóveis compartilhados à lista (evitando duplicatas)
+          const existingIds = new Set(propertiesList.map(p => p.id));
+          for (const shared of sharedProperties) {
+            if (!existingIds.has(shared.id)) {
+              propertiesList.push({
+                ...shared,
+                isShared: true,
+              });
+            }
+          }
+        }
         
         // Buscar imagens principais de todos os imóveis
         const propertyIds = propertiesList.map(p => p.id);
@@ -1093,11 +1124,41 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
           throw new TRPCError({ code: "CONFLICT", message: "Já existe uma parceria com este corretor" });
         }
         
-        return db.createPartnership({
+        const partnership = await db.createPartnership({
           requesterId: ctx.user.companyId,
           partnerId: partner.id,
           shareAllProperties: input.shareAllProperties,
         });
+        
+        // Registrar log de atividade
+        await db.createActivityLog({
+          actorType: 'user',
+          actorId: ctx.user.id,
+          action: 'partnership_requested',
+          entityType: 'partnership',
+          entityId: partnership.id,
+          details: {
+            companyId: ctx.user.companyId,
+            partnerCompanyId: partner.id,
+            partnerName: partner.name,
+            partnerCode: partner.partnerCode,
+          },
+        });
+        
+        // Enviar email de notificação para o parceiro
+        const requester = await db.getCompanyById(ctx.user.companyId);
+        const partnerUsers = await db.getUsersByCompanyId(partner.id);
+        const partnerUser = partnerUsers[0];
+        if (partnerUser?.email && requester) {
+          sendPartnershipRequestEmail(
+            partnerUser.email,
+            partner.name,
+            requester.name,
+            requester.partnerCode || ''
+          ).catch(err => console.error('[Email] Erro ao enviar notificação de parceria:', err));
+        }
+        
+        return partnership;
       }),
 
     // Aceitar parceria
@@ -1121,6 +1182,33 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
           status: 'accepted',
           acceptedAt: new Date(),
         });
+        
+        // Registrar log de atividade
+        await db.createActivityLog({
+          actorType: 'user',
+          actorId: ctx.user.id,
+          action: 'partnership_accepted',
+          entityType: 'partnership',
+          entityId: partnership.id,
+          details: {
+            companyId: ctx.user.companyId,
+            partnerCompanyId: partnership.requesterId,
+          },
+        });
+        
+        // Enviar email de notificação para quem solicitou
+        const requester = await db.getCompanyById(partnership.requesterId);
+        const partner = await db.getCompanyById(ctx.user.companyId);
+        const requesterUsers = await db.getUsersByCompanyId(partnership.requesterId);
+        const requesterUser = requesterUsers[0];
+        if (requesterUser?.email && requester && partner) {
+          sendPartnershipAcceptedEmail(
+            requesterUser.email,
+            requester.name,
+            partner.name,
+            partner.partnerCode || ''
+          ).catch(err => console.error('[Email] Erro ao enviar notificação de aceite:', err));
+        }
         
         return { success: true };
       }),
@@ -1163,6 +1251,14 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
         
         return { success: true };
       }),
+  }),
+
+  // Histórico de atividades de parcerias
+  partnershipActivity: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) return [];
+      return db.getPartnershipActivityLogs(ctx.user.companyId, 50);
+    }),
   }),
 
   // Compartilhamento de imóveis
@@ -1220,12 +1316,45 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
           throw new TRPCError({ code: "CONFLICT", message: "Este imóvel já foi compartilhado com este parceiro" });
         }
         
-        return db.createPropertyShare({
+        const share = await db.createPropertyShare({
           propertyId: input.propertyId,
           ownerCompanyId: ctx.user.companyId,
           partnerCompanyId: input.partnerCompanyId,
           partnershipId: partnership.id,
         });
+        
+        // Registrar log de atividade
+        await db.createActivityLog({
+          actorType: 'user',
+          actorId: ctx.user.id,
+          action: 'property_shared',
+          entityType: 'partnership',
+          entityId: share.id,
+          details: {
+            companyId: ctx.user.companyId,
+            partnerCompanyId: input.partnerCompanyId,
+            propertyId: input.propertyId,
+            propertyTitle: property.title,
+            propertyCode: property.code,
+          },
+        });
+        
+        // Enviar email de notificação para o parceiro
+        const owner = await db.getCompanyById(ctx.user.companyId);
+        const partnerCompany = await db.getCompanyById(input.partnerCompanyId);
+        const partnerUsers = await db.getUsersByCompanyId(input.partnerCompanyId);
+        const partnerUser = partnerUsers[0];
+        if (partnerUser?.email && owner && partnerCompany) {
+          sendPropertyShareEmail(
+            partnerUser.email,
+            partnerCompany.name,
+            owner.name,
+            property.title,
+            property.code || ''
+          ).catch(err => console.error('[Email] Erro ao enviar notificação de compartilhamento:', err));
+        }
+        
+        return share;
       }),
 
     // Aceitar compartilhamento
@@ -1253,6 +1382,37 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
           acceptedAt: new Date(),
           partnerPropertyCode: partnerCode,
         });
+        
+        // Registrar log de atividade
+        const property = await db.getPropertyById(share.propertyId);
+        await db.createActivityLog({
+          actorType: 'user',
+          actorId: ctx.user.id,
+          action: 'property_share_accepted',
+          entityType: 'partnership',
+          entityId: share.id,
+          details: {
+            companyId: ctx.user.companyId,
+            partnerCompanyId: share.ownerCompanyId,
+            propertyId: share.propertyId,
+            propertyTitle: property?.title,
+            partnerPropertyCode: partnerCode,
+          },
+        });
+        
+        // Enviar email de notificação para o dono do imóvel
+        const owner = await db.getCompanyById(share.ownerCompanyId);
+        const partner = await db.getCompanyById(ctx.user.companyId);
+        const ownerUsers = await db.getUsersByCompanyId(share.ownerCompanyId);
+        const ownerUser = ownerUsers[0];
+        if (ownerUser?.email && owner && partner && property) {
+          sendPropertyShareAcceptedEmail(
+            ownerUser.email,
+            owner.name,
+            partner.name,
+            property.title
+          ).catch(err => console.error('[Email] Erro ao enviar notificação de aceite de compartilhamento:', err));
+        }
         
         return { success: true, partnerCode };
       }),
@@ -1291,6 +1451,19 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
         await db.updatePropertyShare(input.id, { status: 'revoked' });
         
         return { success: true };
+      }),
+
+    // Toggle destaque de imóvel compartilhado (pelo parceiro)
+    toggleHighlight: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const newHighlight = await db.toggleShareHighlight(input.id, ctx.user.companyId);
+        
+        return { success: true, isHighlight: newHighlight };
       }),
   }),
 });

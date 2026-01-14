@@ -452,6 +452,7 @@ export const propertyShares = mysqlTable("propertyShares", {
   partnershipId: int("partnershipId").notNull(), // Referência à parceria
   status: mysqlEnum("status", ["pending", "accepted", "rejected", "revoked"]).default("pending").notNull(),
   partnerPropertyCode: varchar("partnerPropertyCode", { length: 50 }), // Código único do imóvel para o parceiro
+  isHighlight: boolean("isHighlight").default(false).notNull(), // Se o parceiro marcou como destaque
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   acceptedAt: timestamp("acceptedAt"),

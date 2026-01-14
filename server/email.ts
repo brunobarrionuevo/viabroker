@@ -263,3 +263,133 @@ export async function sendPasswordResetEmail(
     getEmailTemplate(content, `Redefinir senha - ${APP_NAME}`)
   );
 }
+
+
+// ==========================================
+// NOTIFICAÇÕES DE PARCERIAS
+// ==========================================
+
+// Email de solicitação de parceria recebida
+export async function sendPartnershipRequestEmail(
+  email: string,
+  recipientName: string,
+  requesterName: string,
+  requesterCode: string
+): Promise<boolean> {
+  const content = `
+    <h2>Olá, ${recipientName}! 🤝</h2>
+    <p>Você recebeu uma nova solicitação de parceria no <strong>${APP_NAME}</strong>!</p>
+    <div class="highlight">
+      <strong>📋 Detalhes da solicitação</strong><br>
+      <strong>Corretor:</strong> ${requesterName}<br>
+      <strong>Código:</strong> ${requesterCode}
+    </div>
+    <p>Ao aceitar esta parceria, vocês poderão compartilhar imóveis entre si, ampliando o portfólio de ambos.</p>
+    <div style="text-align: center;">
+      <a href="${APP_URL}/dashboard/partnerships" class="button">Ver Solicitação</a>
+    </div>
+    <p style="color: #6b7280; font-size: 13px;">
+      Você pode aceitar ou recusar esta solicitação a qualquer momento no seu dashboard.
+    </p>
+  `;
+
+  return sendEmail(
+    email,
+    `Nova solicitação de parceria - ${APP_NAME}`,
+    getEmailTemplate(content, `Nova solicitação de parceria - ${APP_NAME}`)
+  );
+}
+
+// Email de parceria aceita
+export async function sendPartnershipAcceptedEmail(
+  email: string,
+  recipientName: string,
+  partnerName: string,
+  partnerCode: string
+): Promise<boolean> {
+  const content = `
+    <h2>Parabéns, ${recipientName}! 🎉</h2>
+    <p>Sua solicitação de parceria foi aceita!</p>
+    <div class="highlight">
+      <strong>✅ Parceria confirmada</strong><br>
+      <strong>Parceiro:</strong> ${partnerName}<br>
+      <strong>Código:</strong> ${partnerCode}
+    </div>
+    <h3>O que vocês podem fazer agora:</h3>
+    <ul>
+      <li>✅ Compartilhar imóveis entre vocês</li>
+      <li>✅ Ampliar o portfólio de ambos</li>
+      <li>✅ Aumentar as chances de venda/locação</li>
+    </ul>
+    <div style="text-align: center;">
+      <a href="${APP_URL}/dashboard/partnerships" class="button">Gerenciar Parcerias</a>
+    </div>
+  `;
+
+  return sendEmail(
+    email,
+    `Parceria aceita - ${APP_NAME}`,
+    getEmailTemplate(content, `Parceria aceita - ${APP_NAME}`)
+  );
+}
+
+// Email de compartilhamento de imóvel recebido
+export async function sendPropertyShareEmail(
+  email: string,
+  recipientName: string,
+  ownerName: string,
+  propertyTitle: string,
+  propertyCode: string
+): Promise<boolean> {
+  const content = `
+    <h2>Olá, ${recipientName}! 🏠</h2>
+    <p>Seu parceiro compartilhou um imóvel com você no <strong>${APP_NAME}</strong>!</p>
+    <div class="highlight">
+      <strong>📋 Detalhes do imóvel</strong><br>
+      <strong>Imóvel:</strong> ${propertyTitle}<br>
+      <strong>Código:</strong> ${propertyCode}<br>
+      <strong>Compartilhado por:</strong> ${ownerName}
+    </div>
+    <p>Ao aceitar, este imóvel aparecerá na sua listagem e no seu site, permitindo que você também o divulgue e negocie.</p>
+    <div style="text-align: center;">
+      <a href="${APP_URL}/dashboard/partnerships" class="button">Ver Imóvel</a>
+    </div>
+    <p style="color: #6b7280; font-size: 13px;">
+      Você pode aceitar ou recusar este compartilhamento a qualquer momento.
+    </p>
+  `;
+
+  return sendEmail(
+    email,
+    `Novo imóvel compartilhado - ${APP_NAME}`,
+    getEmailTemplate(content, `Novo imóvel compartilhado - ${APP_NAME}`)
+  );
+}
+
+// Email de compartilhamento aceito (para o dono)
+export async function sendPropertyShareAcceptedEmail(
+  email: string,
+  ownerName: string,
+  partnerName: string,
+  propertyTitle: string
+): Promise<boolean> {
+  const content = `
+    <h2>Ótimas notícias, ${ownerName}! 🎉</h2>
+    <p>Seu imóvel foi aceito pelo parceiro e agora está disponível no site dele!</p>
+    <div class="highlight">
+      <strong>✅ Compartilhamento aceito</strong><br>
+      <strong>Imóvel:</strong> ${propertyTitle}<br>
+      <strong>Parceiro:</strong> ${partnerName}
+    </div>
+    <p>Agora seu imóvel tem mais visibilidade e chances de ser negociado!</p>
+    <div style="text-align: center;">
+      <a href="${APP_URL}/dashboard/partnerships" class="button">Ver Compartilhamentos</a>
+    </div>
+  `;
+
+  return sendEmail(
+    email,
+    `Compartilhamento aceito - ${APP_NAME}`,
+    getEmailTemplate(content, `Compartilhamento aceito - ${APP_NAME}`)
+  );
+}

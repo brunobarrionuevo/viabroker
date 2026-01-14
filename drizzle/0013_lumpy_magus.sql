@@ -1,0 +1,1 @@
+ALTER TABLE `propertyShares` ADD `isHighlight` boolean DEFAULT false NOT NULL;

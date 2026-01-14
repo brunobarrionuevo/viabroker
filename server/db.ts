@@ -915,6 +915,19 @@ export async function getActivityLogs(filters?: { actorType?: string; entityType
   return baseQuery;
 }
 
+export async function getPartnershipActivityLogs(companyId: number, limit: number = 50): Promise<ActivityLog[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(activityLogs)
+    .where(and(
+      eq(activityLogs.entityType, 'partnership'),
+      sql`JSON_EXTRACT(${activityLogs.details}, '$.companyId') = ${companyId} OR JSON_EXTRACT(${activityLogs.details}, '$.partnerCompanyId') = ${companyId}`
+    ))
+    .orderBy(desc(activityLogs.createdAt))
+    .limit(limit);
+}
+
 // ==========================================
 // ESTATÍSTICAS MASTER
 // ==========================================
@@ -1288,4 +1301,21 @@ export async function generatePartnerPropertyCode(partnerCompanyId: number): Pro
   const shareNumber = (count + 1).toString().padStart(4, '0');
   
   return `PRC${companyPrefix}${shareNumber}`;
+}
+
+export async function toggleShareHighlight(shareId: number, partnerCompanyId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se o compartilhamento pertence ao parceiro
+  const share = await db.select().from(propertyShares)
+    .where(and(eq(propertyShares.id, shareId), eq(propertyShares.partnerCompanyId, partnerCompanyId)))
+    .limit(1);
+  
+  if (!share[0]) throw new Error("Compartilhamento não encontrado");
+  
+  const newHighlight = !share[0].isHighlight;
+  await db.update(propertyShares).set({ isHighlight: newHighlight }).where(eq(propertyShares.id, shareId));
+  
+  return newHighlight;
 }

@@ -290,3 +290,16 @@
 - [x] Corrigir layout das abas (flex-wrap, min-width, text-xs sm:text-sm)
 - [x] Destaque de imóveis de parceiros na listagem de imóveis (badge roxo "Parceiro", borda roxa)
 - [x] Exibir código e nome do parceiro proprietário nos imóveis compartilhados (info box com nome e código do parceiro)
+
+
+## Correções e Novas Funcionalidades de Parcerias (13/01/2026)
+- [ ] Corrigir imagem do imóvel compartilhado não aparece no site público do parceiro
+- [x] Corrigir listagem de imóveis de parceiros não aparece no dashboard (implementado com badge roxo e info do parceiro)
+- [x] Remover destaque automático de imóveis compartilhados (imóveis compartilhados não têm destaque por padrão)
+- [x] Implementar opção para parceiro marcar imóvel compartilhado como destaque (botão estrela na aba Imóveis Recebidos)
+- [x] Notificações por email: enviar email quando receber solicitação de parceria
+- [x] Notificações por email: enviar email quando receber compartilhamento de imóvel
+- [x] Notificações por email: enviar email quando parceria for aceita
+- [x] Notificações por email: enviar email quando compartilhamento for aceito
+- [x] Filtro de origem na listagem: "Meus imóveis" / "Imóveis de parceiros" (seletor "Todos os imóveis" adicionado)
+- [x] Histórico de atividades de parcerias (log de ações) - aba Histórico na página de parcerias

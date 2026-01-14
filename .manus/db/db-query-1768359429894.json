@@ -1,0 +1,28 @@
+{
+  "query": "SELECT pi.id, pi.propertyId, LEFT(pi.url, 150) as url_truncated, pi.fileKey, pi.isMain, p.title, p.companyId \nFROM property_images pi \nJOIN properties p ON pi.propertyId = p.id \nWHERE p.id = 150001;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT pi.id, pi.propertyId, LEFT(pi.url, 150) as url_truncated, pi.fileKey, pi.isMain, p.title, p.companyId \nFROM property_images pi \nJOIN properties p ON pi.propertyId = p.id \nWHERE p.id = 150001;",
+  "rows": [
+    {
+      "id": "90002",
+      "propertyId": "150001",
+      "url_truncated": "https://d2xsxph8kpxj0f.cloudfront.net/310419663029731755/2BVimoerGJ5AEbhy4VpTbU/properties/t8tD7hY69gaqTiG-W5JNr.HEIC",
+      "fileKey": "properties/t8tD7hY69gaqTiG-W5JNr.HEIC",
+      "isMain": "0",
+      "title": "casa Aldebaran",
+      "companyId": "2"
+    },
+    {
+      "id": "90001",
+      "propertyId": "150001",
+      "url_truncated": "https://d2xsxph8kpxj0f.cloudfront.net/310419663029731755/2BVimoerGJ5AEbhy4VpTbU/properties/q53qWyBMB8B7_N-DrZ1Vf.JPG",
+      "fileKey": "properties/q53qWyBMB8B7_N-DrZ1Vf.JPG",
+      "isMain": "1",
+      "title": "casa Aldebaran",
+      "companyId": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tpropertyId\turl_truncated\tfileKey\tisMain\ttitle\tcompanyId\n90002\t150001\thttps://d2xsxph8kpxj0f.cloudfront.net/310419663029731755/2BVimoerGJ5AEbhy4VpTbU/properties/t8tD7hY69gaqTiG-W5JNr.HEIC\tproperties/t8tD7hY69gaqTiG-W5JNr.HEIC\t0\tcasa Aldebaran\t2\n90001\t150001\thttps://d2xsxph8kpxj0f.cloudfront.net/310419663029731755/2BVimoerGJ5AEbhy4VpTbU/properties/q53qWyBMB8B7_N-DrZ1Vf.JPG\tproperties/q53qWyBMB8B7_N-DrZ1Vf.JPG\t1\tcasa Aldebaran\t2\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, title, companyId, isPublished, status FROM properties WHERE id = 150001;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, title, companyId, isPublished, status FROM properties WHERE id = 150001;",
+  "rows": [
+    {
+      "id": "150001",
+      "title": "casa Aldebaran",
+      "companyId": "2",
+      "isPublished": "1",
+      "status": "disponivel"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tcompanyId\tisPublished\tstatus\n150001\tcasa Aldebaran\t2\t1\tdisponivel\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

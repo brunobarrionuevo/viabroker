@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, propertyId, url, isMain FROM property_images WHERE propertyId = 150001;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, propertyId, url, isMain FROM property_images WHERE propertyId = 150001;",
+  "rows": [
+    {
+      "id": "90001",
+      "propertyId": "150001",
+      "url": "https://d2xsxph8kpxj0f.cloudfront.net/310419663029731755/2BVimoerGJ5AEbhy4VpTbU/properties/q53qWyBMB8B7_N-DrZ1Vf.JPG",
+      "isMain": "1"
+    },
+    {
+      "id": "90002",
+      "propertyId": "150001",
+      "url": "https://d2xsxph8kpxj0f.cloudfront.net/310419663029731755/2BVimoerGJ5AEbhy4VpTbU/properties/t8tD7hY69gaqTiG-W5JNr.HEIC",
+      "isMain": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tpropertyId\turl\tisMain\n90001\t150001\thttps://d2xsxph8kpxj0f.cloudfront.net/310419663029731755/2BVimoerGJ5AEbhy4VpTbU/properties/q53qWyBMB8B7_N-DrZ1Vf.JPG\t1\n90002\t150001\thttps://d2xsxph8kpxj0f.cloudfront.net/310419663029731755/2BVimoerGJ5AEbhy4VpTbU/properties/t8tD7hY69gaqTiG-W5JNr.HEIC\t0\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}
