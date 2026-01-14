@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, email, name, companyId, createdAt FROM users ORDER BY createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, email, name, companyId, createdAt FROM users ORDER BY createdAt DESC;",
+  "rows": [
+    {
+      "id": "630098",
+      "email": "brunobarrionuevo@gmail.com",
+      "name": "Bruno Barrionuevo",
+      "companyId": "NULL",
+      "createdAt": "2026-01-14 08:34:30"
+    },
+    {
+      "id": "360017",
+      "email": "tiagobarrionuevo@gmail.com",
+      "name": "Tiago",
+      "companyId": "30001",
+      "createdAt": "2026-01-13 15:55:38"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tcompanyId\tcreatedAt\n630098\tbrunobarrionuevo@gmail.com\tBruno Barrionuevo\tNULL\t2026-01-14 08:34:30\n360017\ttiagobarrionuevo@gmail.com\tTiago\t30001\t2026-01-13 15:55:38\n",
+  "stderr": "",
+  "execution_time_ms": 93
+}

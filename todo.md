@@ -388,3 +388,10 @@
 - [x] Alterar validação de senha para mínimo 8 caracteres com pelo menos 1 caractere especial
 - [x] Adicionar botão de mostrar/ocultar senha nos campos de senha e confirmação
 - [x] Adicionar indicador visual de correspondência de senhas (verde se igual, vermelho se diferente)
+
+
+## Bug Persistente - Email Duplicado e Contagem de Usuários (14/01/2026)
+- [x] Investigar por que brunobarrionuevo@gmail.com ainda aparece como cadastrado
+- [x] Corrigir contagem de usuários no dashboard master (contagem inclui admin master)
+- [x] Verificar se há cache ou problema de sincronização no banco de dados
+- [x] Testar cadastro completo após correção definitiva
