@@ -380,3 +380,11 @@
 - [x] Corrigir erro de email duplicado ao tentar cadastrar empresa excluída novamente
 - [x] Verificar se todos os dados relacionados estão sendo excluídos em cascata
 - [x] Testar novo cadastro com email de empresa excluída
+
+
+## Correções e Melhorias de Cadastro (14/01/2026)
+- [x] Corrigir erro de email duplicado no cadastro (brunobarrionuevo@gmail.com ainda aparece como cadastrado)
+- [x] Remover botão "Cadastrar com Google" da página de cadastro
+- [x] Alterar validação de senha para mínimo 8 caracteres com pelo menos 1 caractere especial
+- [x] Adicionar botão de mostrar/ocultar senha nos campos de senha e confirmação
+- [x] Adicionar indicador visual de correspondência de senhas (verde se igual, vermelho se diferente)
