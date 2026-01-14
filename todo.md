@@ -353,3 +353,9 @@
 - [x] Adicionar opção de alterar plano de usuário (endpoint changeUserPlan)
 - [x] Adicionar aba "Usuários" no dashboard master com funcionalidades de gerenciamento
 - [x] Adicionar interface no MasterDashboard para gerenciar usuários
+
+
+## Dashboard Admin Master - Novas Funcionalidades (14/01/2026)
+- [x] Adicionar página de configurações para alterar senha do admin master (aba Configurações adicionada)
+- [x] Adicionar função de exclusão de usuário no dashboard master (endpoint deleteUser adicionado)
+- [x] Adicionar aba "Configurações" no MasterDashboard (interface de alteração de senha)

@@ -273,6 +273,10 @@ export default function MasterDashboard() {
               <Users className="w-4 h-4 mr-2" />
               Usuários
             </TabsTrigger>
+            <TabsTrigger value="settings" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700">
+              <Edit className="w-4 h-4 mr-2" />
+              Configurações
+            </TabsTrigger>
           </TabsList>
 
           {/* Companies Tab */}
@@ -808,3 +812,42 @@ export default function MasterDashboard() {
     </div>
   );
 }
+
+          {/* Settings Tab */}
+          <TabsContent value="settings">
+            <Card className="bg-white border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-gray-900 text-xl">Configuracoes do Admin Master</CardTitle>
+                <CardDescription className="text-gray-500">
+                  Gerencie sua conta de administrador
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Alterar Senha */}
+                <div className="border rounded-lg p-4 bg-gray-50">
+                  <h3 className="font-semibold text-gray-900 mb-4">Alterar Senha</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="currentPassword" className="text-gray-700">Senha Atual</Label>
+                      <Input
+                        id="currentPassword"
+                        type="password"
+                        placeholder="Digite sua senha atual"
+                        className="border-gray-300 text-gray-900"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="newPassword" className="text-gray-700">Nova Senha</Label>
+                      <Input
+                        id="newPassword"
+                        type="password"
+                        placeholder="Digite sua nova senha"
+                        className="border-gray-300 text-gray-900"
+                      />
+                    </div>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">Alterar Senha</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>

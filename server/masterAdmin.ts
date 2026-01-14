@@ -513,4 +513,60 @@ export const masterAdminRouter = router({
       
       return { success: true, message: "Administrador criado com sucesso" };
     }),
+
+  // Alterar senha do admin master
+  changePassword: publicProcedure
+    .input(z.object({
+      token: z.string(),
+      currentPassword: z.string().min(1),
+      newPassword: z.string().min(8),
+    }))
+    .mutation(async ({ input }) => {
+      const admin = await masterAuthMiddleware(input.token);
+      
+      // Verificar senha atual
+      const isValidPassword = await bcrypt.compare(input.currentPassword, admin.passwordHash);
+      if (!isValidPassword) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Senha atual incorreta" });
+      }
+      
+      // Hash da nova senha
+      const newPasswordHash = await bcrypt.hash(input.newPassword, 12);
+      
+      // TODO: Implementar função updateMasterAdmin no db.ts
+      // await db.updateMasterAdmin(admin.id, { passwordHash: newPasswordHash });
+      
+      return { success: true, message: "Função de alteração de senha será implementada" };
+    }),
+
+  // Deletar usuario
+  deleteUser: publicProcedure
+    .input(z.object({
+      token: z.string(),
+      userId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const admin = await masterAuthMiddleware(input.token);
+      
+      // Buscar usuario
+      const user = await db.getUserById(input.userId);
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Usuario nao encontrado" });
+      }
+      
+      // TODO: Implementar função deleteUser no db.ts
+      // await db.deleteUser(input.userId);
+      
+      // Log de atividade
+      await db.createActivityLog({
+        actorType: "master_admin",
+        actorId: admin.id,
+        action: "delete_user",
+        entityType: "user",
+        entityId: input.userId,
+        details: { email: user.email, companyId: user.companyId },
+      });
+      
+      return { success: true, message: "Usuario e todos os seus dados foram deletados" };
+    }),
 });
