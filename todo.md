@@ -433,3 +433,11 @@
 - [x] Adicionar informações sobre formato e padrão recomendados para fotos
 - [x] Implementar limite de 20 fotos por anúncio
 - [x] Implementar compressão automática de imagens antes do upload (reduzir tamanho sem perder qualidade)
+
+
+## Configurações do Usuário - Senha e Planos (14/01/2026)
+- [x] Implementar opção de alterar senha na página de configurações do usuário
+- [x] Adicionar validação de senha: mínimo 8 caracteres, 1 letra maiúscula, 1 caractere especial
+- [x] Criar aba de Planos na página de configurações
+- [x] Mostrar plano atual do usuário na aba de Planos
+- [x] Adicionar opção de mudança de plano

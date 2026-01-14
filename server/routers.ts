@@ -33,6 +33,44 @@ export const appRouter = router({
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
+    changePassword: protectedProcedure
+      .input(z.object({
+        currentPassword: z.string().min(1, "Senha atual é obrigatória"),
+        newPassword: z.string()
+          .min(8, "A senha deve ter no mínimo 8 caracteres")
+          .regex(/[A-Z]/, "A senha deve conter pelo menos 1 letra maiúscula")
+          .regex(/[!@#$%^&*(),.?":{}|<>]/, "A senha deve conter pelo menos 1 caractere especial"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userId = ctx.user.id;
+        
+        // Buscar usuário com hash da senha
+        const user = await db.getUserById(userId);
+        if (!user || !user.passwordHash) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Usuário não encontrado ou senha não configurada",
+          });
+        }
+
+        // Verificar senha atual
+        const bcrypt = await import("bcryptjs");
+        const isValid = await bcrypt.compare(input.currentPassword, user.passwordHash);
+        if (!isValid) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Senha atual incorreta",
+          });
+        }
+
+        // Hash da nova senha
+        const newPasswordHash = await bcrypt.hash(input.newPassword, 12);
+        
+        // Atualizar senha
+        await db.updateUserPassword(userId, newPasswordHash);
+        
+        return { success: true, message: "Senha alterada com sucesso" };
+      }),
   }),
 
   // Utilitários públicos
