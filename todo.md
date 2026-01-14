@@ -325,3 +325,5 @@
 
 ## Bug - Erro ao Alterar Status (14/01/2026)
 - [x] Corrigir erro ao alterar status de imóveis no dashboard (adicionado placeholder aos SelectValue para garantir exibição correta dos valores)
+
+- [x] Bug: Imóveis de parceiros permitem acesso à página de edição (corrigido - agora redireciona para página de parcerias)

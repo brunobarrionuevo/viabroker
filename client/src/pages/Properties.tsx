@@ -144,7 +144,7 @@ export default function Properties() {
         ) : properties && properties.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {properties.map((property) => (
-              <Link key={property.id} href={(property as any).isShared ? "#" : `/dashboard/properties/${property.id}/edit`}>
+              <Link key={property.id} href={(property as any).isShared ? `/dashboard/partnerships` : `/dashboard/properties/${property.id}/edit`}>
                 <Card className={`overflow-hidden hover:border-primary transition-colors cursor-pointer group ${(property as any).isShared ? 'border-purple-300 bg-purple-50/30' : ''}`}>
                   <div className="aspect-video bg-muted relative overflow-hidden">
                     {property.mainImageUrl ? (
