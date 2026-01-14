@@ -493,6 +493,28 @@ export const appRouter = router({
         return db.updatePropertyImageOrder(input.id, input.order);
       }),
     
+    reorderImages: protectedProcedure
+      .input(z.object({ 
+        propertyId: z.number(),
+        imageOrders: z.array(z.object({ 
+          id: z.number(), 
+          order: z.number() 
+        })) 
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const property = await db.getPropertyById(input.propertyId);
+        if (!property || property.companyId !== ctx.user.companyId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Imóvel não encontrado" });
+        }
+        
+        // Atualizar ordem de cada imagem
+        for (const imageOrder of input.imageOrders) {
+          await db.updatePropertyImageOrder(imageOrder.id, imageOrder.order);
+        }
+        
+        return { success: true };
+      }),
+    
     countImages: protectedProcedure
       .input(z.object({ propertyId: z.number() }))
       .query(async ({ input }) => {

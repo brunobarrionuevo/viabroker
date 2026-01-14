@@ -4,14 +4,326 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Loader2, Upload, Trash2, Star, GripVertical, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, Trash2, Star, GripVertical, Image as ImageIcon, X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import imageCompression from "browser-image-compression";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 
 const MAX_IMAGES = 20;
+
+interface PropertyImage {
+  id: number;
+  propertyId: number;
+  url: string;
+  fileKey: string | null;
+  caption: string | null;
+  order: number;
+  isMain: boolean;
+  createdAt: Date;
+}
+
+interface SortableImageProps {
+  image: PropertyImage;
+  index: number;
+  onDelete: (id: number) => void;
+  onSetMain: (id: number) => void;
+  onPreview: (index: number) => void;
+  totalImages: number;
+}
+
+function SortableImage({ image, index, onDelete, onSetMain, onPreview, totalImages }: SortableImageProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: image.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`relative group rounded-lg overflow-hidden border-2 ${
+        image.isMain ? "border-yellow-500" : "border-transparent"
+      }`}
+    >
+      <img
+        src={image.url}
+        alt={image.caption || `Foto ${index + 1}`}
+        className="w-full aspect-square object-cover cursor-pointer"
+        onClick={() => onPreview(index)}
+      />
+      
+      {/* Drag handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute top-2 left-2 bg-black/70 text-white p-1.5 rounded cursor-move opacity-0 group-hover:opacity-100 transition-opacity"
+        title="Arrastar para reordenar"
+      >
+        <GripVertical className="w-4 h-4" />
+      </div>
+
+      {/* Overlay com ações */}
+      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+        <Button
+          size="icon"
+          variant={image.isMain ? "default" : "secondary"}
+          className={image.isMain ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+          onClick={() => onSetMain(image.id)}
+          title={image.isMain ? "Foto principal" : "Definir como principal"}
+        >
+          <Star className={`w-4 h-4 ${image.isMain ? "fill-current" : ""}`} />
+        </Button>
+        <Button
+          size="icon"
+          variant="secondary"
+          onClick={() => onPreview(index)}
+          title="Visualizar"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="destructive"
+          onClick={() => onDelete(image.id)}
+          title="Remover foto"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Badge de foto principal */}
+      {image.isMain && (
+        <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
+          Principal
+        </div>
+      )}
+
+      {/* Número da foto */}
+      <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+        {index + 1}/{totalImages}
+      </div>
+    </div>
+  );
+}
+
+interface LightboxProps {
+  images: PropertyImage[];
+  currentIndex: number;
+  onClose: () => void;
+  onNavigate: (index: number) => void;
+}
+
+function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) {
+  const [zoom, setZoom] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      onNavigate(currentIndex - 1);
+      setZoom(1);
+      setPosition({ x: 0, y: 0 });
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < images.length - 1) {
+      onNavigate(currentIndex + 1);
+      setZoom(1);
+      setPosition({ x: 0, y: 0 });
+    }
+  };
+
+  const handleZoomIn = () => {
+    setZoom(prev => Math.min(prev + 0.5, 3));
+  };
+
+  const handleZoomOut = () => {
+    setZoom(prev => Math.max(prev - 0.5, 1));
+    if (zoom <= 1.5) {
+      setPosition({ x: 0, y: 0 });
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoom > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && zoom > 1) {
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') handlePrevious();
+    if (e.key === 'ArrowRight') handleNext();
+    if (e.key === 'Escape') onClose();
+  };
+
+  useState(() => {
+    window.addEventListener('keydown', handleKeyDown as any);
+    return () => window.removeEventListener('keydown', handleKeyDown as any);
+  });
+
+  const currentImage = images[currentIndex];
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+      {/* Header */}
+      <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between bg-gradient-to-b from-black/50 to-transparent">
+        <div className="text-white">
+          <p className="text-sm font-medium">
+            Foto {currentIndex + 1} de {images.length}
+          </p>
+          {currentImage.caption && (
+            <p className="text-xs text-white/70">{currentImage.caption}</p>
+          )}
+        </div>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="text-white hover:bg-white/20"
+          onClick={onClose}
+        >
+          <X className="w-6 h-6" />
+        </Button>
+      </div>
+
+      {/* Image */}
+      <div
+        className="relative w-full h-full flex items-center justify-center overflow-hidden"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+      >
+        <img
+          src={currentImage.url}
+          alt={currentImage.caption || `Foto ${currentIndex + 1}`}
+          className="max-w-full max-h-full object-contain select-none"
+          style={{
+            transform: `scale(${zoom}) translate(${position.x / zoom}px, ${position.y / zoom}px)`,
+            transition: isDragging ? 'none' : 'transform 0.2s',
+          }}
+          draggable={false}
+        />
+      </div>
+
+      {/* Navigation arrows */}
+      {currentIndex > 0 && (
+        <Button
+          size="icon"
+          variant="ghost"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12"
+          onClick={handlePrevious}
+        >
+          <ChevronLeft className="w-8 h-8" />
+        </Button>
+      )}
+      {currentIndex < images.length - 1 && (
+        <Button
+          size="icon"
+          variant="ghost"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12"
+          onClick={handleNext}
+        >
+          <ChevronRight className="w-8 h-8" />
+        </Button>
+      )}
+
+      {/* Zoom controls */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/50 rounded-lg p-2">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="text-white hover:bg-white/20"
+          onClick={handleZoomOut}
+          disabled={zoom <= 1}
+        >
+          <ZoomOut className="w-5 h-5" />
+        </Button>
+        <span className="text-white text-sm min-w-[3rem] text-center">
+          {Math.round(zoom * 100)}%
+        </span>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="text-white hover:bg-white/20"
+          onClick={handleZoomIn}
+          disabled={zoom >= 3}
+        >
+          <ZoomIn className="w-5 h-5" />
+        </Button>
+      </div>
+
+      {/* Thumbnails */}
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 bg-black/50 rounded-lg p-2 max-w-[90vw] overflow-x-auto">
+        {images.map((img, idx) => (
+          <button
+            key={img.id}
+            onClick={() => {
+              onNavigate(idx);
+              setZoom(1);
+              setPosition({ x: 0, y: 0 });
+            }}
+            className={`w-16 h-16 rounded overflow-hidden flex-shrink-0 border-2 ${
+              idx === currentIndex ? 'border-white' : 'border-transparent'
+            } hover:border-white/50 transition-colors`}
+          >
+            <img
+              src={img.url}
+              alt={`Miniatura ${idx + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function PropertyImages() {
   const params = useParams<{ id: string }>();
@@ -19,6 +331,7 @@ export default function PropertyImages() {
   
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: property, isLoading: loadingProperty } = trpc.properties.get.useQuery(
@@ -30,6 +343,15 @@ export default function PropertyImages() {
     { propertyId },
     { enabled: !!propertyId }
   );
+
+  const [localImages, setLocalImages] = useState<PropertyImage[]>([]);
+
+  // Sincronizar imagens locais com dados do servidor
+  useState(() => {
+    if (images) {
+      setLocalImages([...images].sort((a, b) => a.order - b.order));
+    }
+  });
 
   const addImageMutation = trpc.properties.addImage.useMutation({
     onSuccess: () => {
@@ -60,6 +382,46 @@ export default function PropertyImages() {
       toast.error(error.message || "Erro ao definir imagem principal");
     },
   });
+
+  const reorderImagesMutation = trpc.properties.reorderImages.useMutation({
+    onSuccess: () => {
+      refetchImages();
+      toast.success("Ordem das fotos atualizada!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao reordenar fotos");
+    },
+  });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = localImages.findIndex((img) => img.id === active.id);
+      const newIndex = localImages.findIndex((img) => img.id === over.id);
+
+      const newOrder = arrayMove(localImages, oldIndex, newIndex);
+      setLocalImages(newOrder);
+
+      // Atualizar ordem no servidor
+      const imageOrders = newOrder.map((img, index) => ({
+        id: img.id,
+        order: index,
+      }));
+
+      reorderImagesMutation.mutate({
+        propertyId,
+        imageOrders,
+      });
+    }
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -99,14 +461,16 @@ export default function PropertyImages() {
           continue;
         }
 
-        // Comprimir imagem antes do upload
+        // Comprimir imagem antes do upload com melhor qualidade
         let fileToUpload = file;
         try {
           const options = {
-            maxSizeMB: 1, // Tamanho máximo de 1MB
-            maxWidthOrHeight: 1920, // Largura/altura máxima de 1920px
+            maxSizeMB: 2, // Aumentado para 2MB para manter melhor qualidade
+            maxWidthOrHeight: 2560, // Aumentado para 2560px para imagens de alta resolução
             useWebWorker: true,
-            fileType: 'image/jpeg', // Converter para JPEG para melhor compressão
+            initialQuality: 0.85, // Qualidade inicial de 85% (padrão era 75%)
+            alwaysKeepResolution: false,
+            fileType: 'image/jpeg',
           };
           fileToUpload = await imageCompression(file, options);
           console.log(`Imagem comprimida: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`);
@@ -215,7 +579,7 @@ export default function PropertyImages() {
               {imageCount} de {MAX_IMAGES} fotos utilizadas. <br />
               <strong>Formato recomendado:</strong> JPG ou PNG em alta resolução (1920x1080px ou superior). <br />
               <strong>Dica:</strong> Use fotos bem iluminadas, horizontais e que destaquem os melhores ângulos do imóvel. <br />
-              As imagens serão automaticamente otimizadas para melhor desempenho.
+              As imagens serão automaticamente otimizadas mantendo alta qualidade.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -275,7 +639,7 @@ export default function PropertyImages() {
           <CardHeader>
             <CardTitle>Galeria de Fotos</CardTitle>
             <CardDescription>
-              Clique na estrela para definir a foto principal. A foto principal aparece em destaque nas listagens.
+              Arraste as fotos para reorganizar a ordem. Clique na estrela para definir a foto principal. Clique na foto para visualizar em tela cheia.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -283,56 +647,31 @@ export default function PropertyImages() {
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-primary" />
               </div>
-            ) : images && images.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {images.map((image, index) => (
-                  <div 
-                    key={image.id} 
-                    className={`relative group rounded-lg overflow-hidden border-2 ${
-                      image.isMain ? "border-yellow-500" : "border-transparent"
-                    }`}
-                  >
-                    <img
-                      src={image.url}
-                      alt={image.caption || `Foto ${index + 1}`}
-                      className="w-full aspect-square object-cover"
-                    />
-                    
-                    {/* Overlay com ações */}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <Button
-                        size="icon"
-                        variant={image.isMain ? "default" : "secondary"}
-                        className={image.isMain ? "bg-yellow-500 hover:bg-yellow-600" : ""}
-                        onClick={() => handleSetMainImage(image.id)}
-                        title={image.isMain ? "Foto principal" : "Definir como principal"}
-                      >
-                        <Star className={`w-4 h-4 ${image.isMain ? "fill-current" : ""}`} />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        onClick={() => handleDeleteImage(image.id)}
-                        title="Remover foto"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-
-                    {/* Badge de foto principal */}
-                    {image.isMain && (
-                      <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
-                        Principal
-                      </div>
-                    )}
-
-                    {/* Número da foto */}
-                    <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                      {index + 1}/{images.length}
-                    </div>
+            ) : localImages && localImages.length > 0 ? (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={localImages.map(img => img.id)}
+                  strategy={rectSortingStrategy}
+                >
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {localImages.map((image, index) => (
+                      <SortableImage
+                        key={image.id}
+                        image={image}
+                        index={index}
+                        onDelete={handleDeleteImage}
+                        onSetMain={handleSetMainImage}
+                        onPreview={(idx) => setLightboxIndex(idx)}
+                        totalImages={localImages.length}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <ImageIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -357,6 +696,16 @@ export default function PropertyImages() {
           </Button>
         </div>
       </div>
+
+      {/* Lightbox */}
+      {lightboxIndex !== null && localImages && (
+        <Lightbox
+          images={localImages}
+          currentIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onNavigate={setLightboxIndex}
+        />
+      )}
     </AppLayout>
   );
 }

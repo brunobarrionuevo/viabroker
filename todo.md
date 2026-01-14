@@ -444,3 +444,11 @@
 
 ## Ajustes de Autenticação (14/01/2026)
 - [x] Remover opção de login com Gmail da página de login
+
+
+## Melhorias na Galeria de Fotos (14/01/2026)
+- [x] Melhorar qualidade da compressão de imagens (ajustar configurações para manter melhor qualidade)
+- [x] Implementar drag-and-drop para reorganizar ordem das fotos
+- [x] Criar lightbox com visualização ampliada
+- [x] Adicionar navegação por setas no lightbox
+- [x] Implementar zoom nas imagens do lightbox
