@@ -395,3 +395,19 @@
 - [x] Corrigir contagem de usuários no dashboard master (contagem inclui admin master)
 - [x] Verificar se há cache ou problema de sincronização no banco de dados
 - [x] Testar cadastro completo após correção definitiva
+
+
+## Melhorias na Página de Cadastro de Imóveis (14/01/2026)
+- [ ] Reorganizar blocos: Localização em primeiro lugar, depois Informações Básicas
+- [ ] Implementar gerenciamento de imagens (upload, preview, reordenação, exclusão)
+- [ ] Adicionar suporte para múltiplas imagens
+- [ ] Implementar preview de imagens antes do upload
+- [ ] Testar funcionalidades de upload e gerenciamento de imagens
+
+
+## Melhorias na Página de Cadastro de Imóveis (14/01/2026)
+- [x] Reorganizar blocos: Localização em primeiro lugar, depois Informações Básicas
+- [x] Adicionar gerenciamento de imagens inline na página de cadastro
+- [x] Implementar upload de múltiplas imagens com preview
+- [x] Adicionar função de definir imagem principal
+- [x] Adicionar função de excluir imagens

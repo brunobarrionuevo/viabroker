@@ -7,9 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Loader2, Wand2, Search, Image, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, Wand2, Search, Image, Sparkles, Upload, Trash2, Star, GripVertical } from "lucide-react";
 import { Link, useLocation, useParams } from "wouter";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 // Funções de formatação
@@ -86,6 +86,10 @@ export default function PropertyForm() {
   const isEditing = !!params.id;
 
   const [cepLoading, setCepLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const MAX_IMAGES = 20;
 
   const [formData, setFormData] = useState({
     title: "",
@@ -147,6 +151,11 @@ export default function PropertyForm() {
     { enabled: isEditing }
   );
 
+  const { data: images, isLoading: loadingImages, refetch: refetchImages } = trpc.properties.getImages.useQuery(
+    { propertyId: Number(params.id) },
+    { enabled: isEditing && !!params.id }
+  );
+
   // Redirecionar se o imóvel não for encontrado (pode ser imóvel de parceiro)
   useEffect(() => {
     if (isEditing && propertyError) {
@@ -182,6 +191,36 @@ export default function PropertyForm() {
     },
     onError: (error) => {
       toast.error(error.message || "Erro ao gerar descrição");
+    },
+  });
+
+  const addImageMutation = trpc.properties.addImage.useMutation({
+    onSuccess: () => {
+      refetchImages();
+      toast.success("Imagem adicionada com sucesso!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao adicionar imagem");
+    },
+  });
+
+  const deleteImageMutation = trpc.properties.deleteImage.useMutation({
+    onSuccess: () => {
+      refetchImages();
+      toast.success("Imagem removida!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao remover imagem");
+    },
+  });
+
+  const setMainImageMutation = trpc.properties.setMainImage.useMutation({
+    onSuccess: () => {
+      refetchImages();
+      toast.success("Imagem principal definida!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao definir imagem principal");
     },
   });
 
@@ -320,6 +359,93 @@ export default function PropertyForm() {
     }
   };
 
+  // Funções de gerenciamento de imagens
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const currentCount = images?.length || 0;
+    const remainingSlots = MAX_IMAGES - currentCount;
+    
+    if (remainingSlots <= 0) {
+      toast.error(`Limite de ${MAX_IMAGES} fotos atingido`);
+      return;
+    }
+
+    const filesToUpload = Array.from(files).slice(0, remainingSlots);
+    
+    if (files.length > remainingSlots) {
+      toast.warning(`Apenas ${remainingSlots} fotos serão enviadas (limite de ${MAX_IMAGES})`);
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    try {
+      for (let i = 0; i < filesToUpload.length; i++) {
+        const file = filesToUpload[i];
+        setUploadProgress(Math.round(((i + 1) / filesToUpload.length) * 100));
+
+        // Validar tipo de arquivo
+        if (!file.type.startsWith("image/")) {
+          toast.error(`${file.name} não é uma imagem válida`);
+          continue;
+        }
+
+        // Validar tamanho (máximo 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          toast.error(`${file.name} excede o limite de 10MB`);
+          continue;
+        }
+
+        // Fazer upload para S3
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro no upload");
+        }
+
+        const { url, key } = await response.json();
+
+        // Salvar referência no banco
+        await addImageMutation.mutateAsync({
+          propertyId: Number(params.id),
+          url,
+          fileKey: key,
+          order: currentCount + i,
+          isMain: currentCount === 0 && i === 0, // Primeira imagem é a principal
+        });
+      }
+
+      toast.success(`${filesToUpload.length} imagem(ns) enviada(s) com sucesso!`);
+    } catch (error) {
+      console.error("Erro no upload:", error);
+      toast.error("Erro ao enviar imagens");
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleDeleteImage = (imageId: number) => {
+    if (confirm("Tem certeza que deseja remover esta imagem?")) {
+      deleteImageMutation.mutate({ id: imageId });
+    }
+  };
+
+  const handleSetMainImage = (imageId: number) => {
+    setMainImageMutation.mutate({ propertyId: Number(params.id), imageId });
+  };
+
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   if (isEditing && loadingProperty) {
@@ -355,6 +481,227 @@ export default function PropertyForm() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Location */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Localização</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="address">Endereço</Label>
+                    <Input
+                      id="address"
+                      value={formData.address}
+                      onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                      placeholder="Rua, Avenida..."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="number">Número</Label>
+                    <Input
+                      id="number"
+                      value={formData.number}
+                      onChange={(e) => setFormData(prev => ({ ...prev, number: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="complement">Complemento</Label>
+                    <Input
+                      id="complement"
+                      value={formData.complement}
+                      onChange={(e) => setFormData(prev => ({ ...prev, complement: e.target.value }))}
+                      placeholder="Apto, Bloco..."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="neighborhood">Bairro</Label>
+                    <Input
+                      id="neighborhood"
+                      value={formData.neighborhood}
+                      onChange={(e) => setFormData(prev => ({ ...prev, neighborhood: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="zipCode">CEP</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="zipCode"
+                        value={formData.zipCode}
+                        onChange={(e) => {
+                          const formatted = formatCEP(e.target.value);
+                          setFormData(prev => ({ ...prev, zipCode: formatted }));
+                          // Auto-buscar quando tiver 8 dígitos
+                          if (formatted.replace(/\D/g, "").length === 8) {
+                            searchCEP(formatted);
+                          }
+                        }}
+                        placeholder="00000-000"
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => searchCEP(formData.zipCode)}
+                        disabled={cepLoading}
+                      >
+                        {cepLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="city">Cidade *</Label>
+                    <Input
+                      id="city"
+                      value={formData.city}
+                      onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">Estado *</Label>
+                    <Select 
+                      key={`state-${formData.state}`}
+                      value={formData.state} 
+                      onValueChange={(v) => setFormData(prev => ({ ...prev, state: v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {brazilianStates.map((state) => (
+                          <SelectItem key={state} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Images Management */}
+            {isEditing ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Upload className="w-5 h-5" />
+                    Imagens do Imóvel
+                  </CardTitle>
+                  <CardDescription>
+                    {images?.length || 0} de {MAX_IMAGES} fotos. Formatos: JPG, PNG, WebP (máx. 10MB cada)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Upload Button */}
+                  <div>
+                    <Input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading || (images?.length || 0) >= MAX_IMAGES}
+                      className="w-full"
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Enviando {uploadProgress}%
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Selecionar Imagens
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Images Grid */}
+                  {loadingImages ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                    </div>
+                  ) : images && images.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {images.map((image) => (
+                        <div key={image.id} className="relative group">
+                          <img
+                            src={image.url}
+                            alt="Imóvel"
+                            className="w-full h-32 object-cover rounded-lg border"
+                          />
+                          {image.isMain && (
+                            <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-current" />
+                              Principal
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                            {!image.isMain && (
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="secondary"
+                                onClick={() => handleSetMainImage(image.id)}
+                                title="Definir como principal"
+                              >
+                                <Star className="w-4 h-4" />
+                              </Button>
+                            )}
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="destructive"
+                              onClick={() => handleDeleteImage(image.id)}
+                              title="Remover imagem"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 border-2 border-dashed rounded-lg">
+                      <Image className="w-12 h-12 mx-auto text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground">Nenhuma imagem adicionada</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Image className="w-5 h-5" />
+                    Imagens do Imóvel
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8 border-2 border-dashed rounded-lg">
+                    <Image className="w-12 h-12 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Salve o imóvel primeiro para adicionar imagens
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      As imagens poderão ser adicionadas após o cadastro inicial
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Basic Info */}
             <Card>
               <CardHeader>
@@ -453,107 +800,6 @@ export default function PropertyForm() {
                     placeholder="Descreva o imóvel..."
                     rows={5}
                   />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Location */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Localização</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="sm:col-span-2">
-                    <Label htmlFor="address">Endereço</Label>
-                    <Input
-                      id="address"
-                      value={formData.address}
-                      onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                      placeholder="Rua, Avenida..."
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="number">Número</Label>
-                    <Input
-                      id="number"
-                      value={formData.number}
-                      onChange={(e) => setFormData(prev => ({ ...prev, number: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="complement">Complemento</Label>
-                    <Input
-                      id="complement"
-                      value={formData.complement}
-                      onChange={(e) => setFormData(prev => ({ ...prev, complement: e.target.value }))}
-                      placeholder="Apto, Bloco..."
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="neighborhood">Bairro</Label>
-                    <Input
-                      id="neighborhood"
-                      value={formData.neighborhood}
-                      onChange={(e) => setFormData(prev => ({ ...prev, neighborhood: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="zipCode">CEP</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="zipCode"
-                        value={formData.zipCode}
-                        onChange={(e) => {
-                          const formatted = formatCEP(e.target.value);
-                          setFormData(prev => ({ ...prev, zipCode: formatted }));
-                          // Auto-buscar quando tiver 8 dígitos
-                          if (formatted.replace(/\D/g, "").length === 8) {
-                            searchCEP(formatted);
-                          }
-                        }}
-                        placeholder="00000-000"
-                        className="flex-1"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => searchCEP(formData.zipCode)}
-                        disabled={cepLoading}
-                      >
-                        {cepLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="city">Cidade *</Label>
-                    <Input
-                      id="city"
-                      value={formData.city}
-                      onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="state">Estado *</Label>
-                    <Select 
-                      key={`state-${formData.state}`}
-                      value={formData.state} 
-                      onValueChange={(v) => setFormData(prev => ({ ...prev, state: v }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {brazilianStates.map((state) => (
-                          <SelectItem key={state} value={state}>
-                            {state}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </CardContent>
             </Card>
