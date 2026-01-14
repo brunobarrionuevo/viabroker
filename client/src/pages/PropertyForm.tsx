@@ -131,10 +131,18 @@ export default function PropertyForm() {
     hasLaundry: false,
   });
 
-  const { data: property, isLoading: loadingProperty } = trpc.properties.get.useQuery(
+  const { data: property, isLoading: loadingProperty, isError: propertyError } = trpc.properties.get.useQuery(
     { id: Number(params.id) },
     { enabled: isEditing }
   );
+
+  // Redirecionar se o imóvel não for encontrado (pode ser imóvel de parceiro)
+  useEffect(() => {
+    if (isEditing && propertyError) {
+      toast.error("Imóvel não encontrado ou você não tem permissão para editá-lo");
+      navigate("/dashboard/properties");
+    }
+  }, [isEditing, propertyError, navigate]);
 
   const createMutation = trpc.properties.create.useMutation({
     onSuccess: () => {

@@ -327,3 +327,5 @@
 - [x] Corrigir erro ao alterar status de imóveis no dashboard (adicionado placeholder aos SelectValue para garantir exibição correta dos valores)
 
 - [x] Bug: Imóveis de parceiros permitem acesso à página de edição (corrigido - agora redireciona para página de parcerias)
+
+- [x] Bug persistente: Erro de SQL ao salvar imóvel 150001 (imóvel de parceiro) - adicionado redirecionamento automático quando imóvel não é encontrado
