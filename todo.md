@@ -411,3 +411,9 @@
 - [x] Implementar upload de múltiplas imagens com preview
 - [x] Adicionar função de definir imagem principal
 - [x] Adicionar função de excluir imagens
+
+
+## Ajustes na Página de Cadastro de Imóveis (14/01/2026)
+- [x] Remover bloco de gerenciamento de imagens inline
+- [x] Manter apenas botão "Gerenciar Fotos" no final do formulário (acima do botão Salvar)
+- [x] Reorganizar bloco de Localização: CEP em primeiro lugar

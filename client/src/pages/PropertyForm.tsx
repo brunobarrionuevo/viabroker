@@ -488,6 +488,34 @@ export default function PropertyForm() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="zipCode">CEP</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="zipCode"
+                        value={formData.zipCode}
+                        onChange={(e) => {
+                          const formatted = formatCEP(e.target.value);
+                          setFormData(prev => ({ ...prev, zipCode: formatted }));
+                          // Auto-buscar quando tiver 8 dígitos
+                          if (formatted.replace(/\D/g, "").length === 8) {
+                            searchCEP(formatted);
+                          }
+                        }}
+                        placeholder="00000-000"
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => searchCEP(formData.zipCode)}
+                        disabled={cepLoading}
+                      >
+                        {cepLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                  </div>
                   <div className="sm:col-span-2">
                     <Label htmlFor="address">Endereço</Label>
                     <Input
@@ -523,34 +551,6 @@ export default function PropertyForm() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="zipCode">CEP</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="zipCode"
-                        value={formData.zipCode}
-                        onChange={(e) => {
-                          const formatted = formatCEP(e.target.value);
-                          setFormData(prev => ({ ...prev, zipCode: formatted }));
-                          // Auto-buscar quando tiver 8 dígitos
-                          if (formatted.replace(/\D/g, "").length === 8) {
-                            searchCEP(formatted);
-                          }
-                        }}
-                        placeholder="00000-000"
-                        className="flex-1"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => searchCEP(formData.zipCode)}
-                        disabled={cepLoading}
-                      >
-                        {cepLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
                     <Label htmlFor="city">Cidade *</Label>
                     <Input
                       id="city"
@@ -582,125 +582,7 @@ export default function PropertyForm() {
               </CardContent>
             </Card>
 
-            {/* Images Management */}
-            {isEditing ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Upload className="w-5 h-5" />
-                    Imagens do Imóvel
-                  </CardTitle>
-                  <CardDescription>
-                    {images?.length || 0} de {MAX_IMAGES} fotos. Formatos: JPG, PNG, WebP (máx. 10MB cada)
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Upload Button */}
-                  <div>
-                    <Input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleFileSelect}
-                      className="hidden"
-                      id="image-upload"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploading || (images?.length || 0) >= MAX_IMAGES}
-                      className="w-full"
-                    >
-                      {uploading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Enviando {uploadProgress}%
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          Selecionar Imagens
-                        </>
-                      )}
-                    </Button>
-                  </div>
 
-                  {/* Images Grid */}
-                  {loadingImages ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                    </div>
-                  ) : images && images.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                      {images.map((image) => (
-                        <div key={image.id} className="relative group">
-                          <img
-                            src={image.url}
-                            alt="Imóvel"
-                            className="w-full h-32 object-cover rounded-lg border"
-                          />
-                          {image.isMain && (
-                            <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
-                              <Star className="w-3 h-3 fill-current" />
-                              Principal
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                            {!image.isMain && (
-                              <Button
-                                type="button"
-                                size="icon"
-                                variant="secondary"
-                                onClick={() => handleSetMainImage(image.id)}
-                                title="Definir como principal"
-                              >
-                                <Star className="w-4 h-4" />
-                              </Button>
-                            )}
-                            <Button
-                              type="button"
-                              size="icon"
-                              variant="destructive"
-                              onClick={() => handleDeleteImage(image.id)}
-                              title="Remover imagem"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 border-2 border-dashed rounded-lg">
-                      <Image className="w-12 h-12 mx-auto text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground">Nenhuma imagem adicionada</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Image className="w-5 h-5" />
-                    Imagens do Imóvel
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8 border-2 border-dashed rounded-lg">
-                    <Image className="w-12 h-12 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Salve o imóvel primeiro para adicionar imagens
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      As imagens poderão ser adicionadas após o cadastro inicial
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Basic Info */}
             <Card>
