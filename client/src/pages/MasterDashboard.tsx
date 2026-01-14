@@ -148,6 +148,49 @@ export default function MasterDashboard() {
     toggleStatusMutation.mutate({ token, companyId, isActive: !currentStatus });
   };
 
+  const deleteCompanyMutation = trpc.masterAdmin.deleteCompany.useMutation({
+    onSuccess: () => {
+      toast.success("Empresa deletada com sucesso!");
+      refetchCompanies();
+      refetchStats();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao deletar empresa");
+    },
+  });
+
+  const handleDeleteCompany = (companyId: number, companyName: string) => {
+    if (!token) return;
+    if (confirm(`Tem certeza que deseja deletar a empresa "${companyName}"? Esta ação não pode ser desfeita e todos os dados serão permanentemente removidos.`)) {
+      deleteCompanyMutation.mutate({ token, companyId });
+    }
+  };
+
+  const [passwordData, setPasswordData] = useState({ currentPassword: "", newPassword: "" });
+
+  const changePasswordMutation = trpc.masterAdmin.changePassword.useMutation({
+    onSuccess: () => {
+      toast.success("Senha alterada com sucesso!");
+      setPasswordData({ currentPassword: "", newPassword: "" });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao alterar senha");
+    },
+  });
+
+  const handleChangePassword = () => {
+    if (!token) return;
+    if (!passwordData.currentPassword || !passwordData.newPassword) {
+      toast.error("Preencha todos os campos");
+      return;
+    }
+    if (passwordData.newPassword.length < 8) {
+      toast.error("A nova senha deve ter pelo menos 8 caracteres");
+      return;
+    }
+    changePasswordMutation.mutate({ token, ...passwordData });
+  };
+
   const handleViewClient = (companyId: number) => {
     setLocation(`/master/client/${companyId}`);
   };
@@ -396,15 +439,26 @@ export default function MasterDashboard() {
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => handleViewClient(company.id)}
-                              className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Ver Detalhes
-                            </Button>
+                            <div className="flex gap-2 justify-end">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => handleViewClient(company.id)}
+                                className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                              >
+                                <Eye className="w-4 h-4 mr-1" />
+                                Ver Detalhes
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => handleDeleteCompany(company.id, company.name)}
+                                disabled={deleteCompanyMutation.isPending}
+                                className="border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))
@@ -833,19 +887,29 @@ export default function MasterDashboard() {
                         id="currentPassword"
                         type="password"
                         placeholder="Digite sua senha atual"
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
                         className="border-gray-300 text-gray-900"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="newPassword" className="text-gray-700">Nova Senha</Label>
+                      <Label htmlFor="newPassword" className="text-gray-700">Nova Senha (mínimo 8 caracteres)</Label>
                       <Input
                         id="newPassword"
                         type="password"
                         placeholder="Digite sua nova senha"
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                         className="border-gray-300 text-gray-900"
                       />
                     </div>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">Alterar Senha</Button>
+                    <Button 
+                      onClick={handleChangePassword}
+                      disabled={changePasswordMutation.isPending}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      {changePasswordMutation.isPending ? "Alterando..." : "Alterar Senha"}
+                    </Button>
                   </div>
                 </div>
               </CardContent>

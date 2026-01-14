@@ -359,3 +359,11 @@
 - [x] Adicionar página de configurações para alterar senha do admin master (aba Configurações adicionada)
 - [x] Adicionar função de exclusão de usuário no dashboard master (endpoint deleteUser adicionado)
 - [x] Adicionar aba "Configurações" no MasterDashboard (interface de alteração de senha)
+
+
+## Corre## Correções Dashboard Admin Master (14/01/2026)
+- [x] Adicionar opção de excluir empresa no dashboard admin master (botão vermelho com confirmação)
+- [x] Implementar funcionalidade de alterar senha do admin master (formulário funcional na aba Configurações)
+- [x] Adicionar endpoints de deleteCompany e changePassword no backend (masterAdmin.ts)
+- [x] Adicionar funções deleteCompany e updateMasterAdmin no db.tso admin master (formulário funcional)
+- [ ] Adicionar endpoints de deleteCompany e changePassword no backend

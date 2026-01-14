@@ -514,6 +514,37 @@ export const masterAdminRouter = router({
       return { success: true, message: "Administrador criado com sucesso" };
     }),
 
+  // Deletar empresa
+  deleteCompany: publicProcedure
+    .input(z.object({
+      token: z.string(),
+      companyId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const admin = await masterAuthMiddleware(input.token);
+      
+      // Buscar empresa
+      const company = await db.getCompanyById(input.companyId);
+      if (!company) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Empresa nao encontrada" });
+      }
+      
+      // Deletar empresa (cascata: usuarios, imoveis, etc)
+      await db.deleteCompany(input.companyId);
+      
+      // Log de atividade
+      await db.createActivityLog({
+        actorType: "master_admin",
+        actorId: admin.id,
+        action: "delete_company",
+        entityType: "company",
+        entityId: input.companyId,
+        details: { name: company.name, slug: company.slug },
+      });
+      
+      return { success: true, message: "Empresa e todos os seus dados foram deletados" };
+    }),
+
   // Alterar senha do admin master
   changePassword: publicProcedure
     .input(z.object({
@@ -533,10 +564,10 @@ export const masterAdminRouter = router({
       // Hash da nova senha
       const newPasswordHash = await bcrypt.hash(input.newPassword, 12);
       
-      // TODO: Implementar função updateMasterAdmin no db.ts
-      // await db.updateMasterAdmin(admin.id, { passwordHash: newPasswordHash });
+      // Atualizar senha
+      await db.updateMasterAdmin(admin.id, { passwordHash: newPasswordHash });
       
-      return { success: true, message: "Função de alteração de senha será implementada" };
+      return { success: true, message: "Senha alterada com sucesso" };
     }),
 
   // Deletar usuario
