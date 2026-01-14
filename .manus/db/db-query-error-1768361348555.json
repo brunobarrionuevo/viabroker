@@ -1,0 +1,8 @@
+{
+  "query": "SELECT ps.id, ps.propertyId, ps.ownerCompanyId, ps.partnerCompanyId, ps.status, ps.isHighlight, p.title, p.isHighlight as propertyIsHighlight\nFROM property_shares ps\nJOIN properties p ON ps.propertyId = p.id\nWHERE p.title LIKE '%Aldebaran%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT ps.id, ps.propertyId, ps.ownerCompanyId, ps.partnerCompanyId, ps.status, ps.isHighlight, p.title, p.isHighlight as propertyIsHighlight\nFROM property_shares ps\nJOIN properties p ON ps.propertyId = p.id\nWHERE p.title LIKE '%Aldebaran%';",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table '2bvimoergj5aebhy4vptbu.property_shares' doesn't exist"
+  ]
+}

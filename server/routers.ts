@@ -548,9 +548,14 @@ export const appRouter = router({
         if (companyId) {
           const sharedProperties = await db.getSharedPropertiesForPartner(companyId);
           // Adicionar imóveis compartilhados à lista (evitando duplicatas)
+          // Se estamos filtrando por isHighlight, só adicionar se o compartilhamento tiver isHighlight=true
           const existingIds = new Set(propertiesList.map(p => p.id));
           for (const shared of sharedProperties) {
             if (!existingIds.has(shared.id)) {
+              // Se estamos buscando apenas destaques, verificar o isHighlight do compartilhamento
+              if (input?.isHighlight === true && !shared.isHighlight) {
+                continue; // Pular imóveis compartilhados que não estão em destaque
+              }
               propertiesList.push(shared as any);
             }
           }

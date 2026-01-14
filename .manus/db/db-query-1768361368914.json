@@ -1,0 +1,20 @@
+{
+  "query": "SELECT ps.id, ps.propertyId, ps.ownerCompanyId, ps.partnerCompanyId, ps.status, ps.isHighlight, p.title, p.isHighlight as propertyIsHighlight\nFROM propertyShares ps\nJOIN properties p ON ps.propertyId = p.id\nWHERE p.title LIKE '%Aldebaran%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT ps.id, ps.propertyId, ps.ownerCompanyId, ps.partnerCompanyId, ps.status, ps.isHighlight, p.title, p.isHighlight as propertyIsHighlight\nFROM propertyShares ps\nJOIN properties p ON ps.propertyId = p.id\nWHERE p.title LIKE '%Aldebaran%';",
+  "rows": [
+    {
+      "id": "2",
+      "propertyId": "150001",
+      "ownerCompanyId": "2",
+      "partnerCompanyId": "1",
+      "status": "accepted",
+      "isHighlight": "0",
+      "title": "casa Aldebaran",
+      "propertyIsHighlight": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tpropertyId\townerCompanyId\tpartnerCompanyId\tstatus\tisHighlight\ttitle\tpropertyIsHighlight\n2\t150001\t2\t1\taccepted\t0\tcasa Aldebaran\t1\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}
