@@ -787,6 +787,12 @@ export async function updateMasterAdminLastLogin(id: number): Promise<void> {
   await db.update(masterAdmins).set({ lastLoginAt: new Date() }).where(eq(masterAdmins.id, id));
 }
 
+export async function updateMasterAdmin(id: number, data: Partial<InsertMasterAdmin>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(masterAdmins).set(data).where(eq(masterAdmins.id, id));
+}
+
 // ==========================================
 // ASSINATURAS
 // ==========================================

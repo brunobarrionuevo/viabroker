@@ -533,10 +533,18 @@ export const masterAdminRouter = router({
       // Hash da nova senha
       const newPasswordHash = await bcrypt.hash(input.newPassword, 12);
       
-      // TODO: Implementar função updateMasterAdmin no db.ts
-      // await db.updateMasterAdmin(admin.id, { passwordHash: newPasswordHash });
+      // Atualizar senha no banco
+      await db.updateMasterAdmin(admin.id, { passwordHash: newPasswordHash });
       
-      return { success: true, message: "Função de alteração de senha será implementada" };
+      // Log de atividade
+      await db.createActivityLog({
+        actorType: "master_admin",
+        actorId: admin.id,
+        action: "change_password",
+        details: { username: admin.username },
+      });
+      
+      return { success: true, message: "Senha alterada com sucesso" };
     }),
 
   // Deletar usuario

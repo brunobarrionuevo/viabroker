@@ -359,3 +359,9 @@
 - [x] Adicionar página de configurações para alterar senha do admin master (aba Configurações adicionada)
 - [x] Adicionar função de exclusão de usuário no dashboard master (endpoint deleteUser adicionado)
 - [x] Adicionar aba "Configurações" no MasterDashboard (interface de alteração de senha)
+
+## Funcionalidade Admin Master - Alteração de Senha (14/01/2026)
+- [x] Adicionar formulário de alteração de senha na aba Configurações do dashboard master
+- [x] Implementar endpoint changePassword no backend para admin master
+- [x] Validar senha atual antes de permitir alteração
+- [x] Testar funcionalidade de alteração de senha

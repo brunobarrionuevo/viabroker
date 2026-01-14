@@ -48,6 +48,11 @@ export default function MasterDashboard() {
     hasCustomDomain: true,
     isCourtesy: false,
   });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   useEffect(() => {
     const storedToken = localStorage.getItem("masterToken");
@@ -125,6 +130,20 @@ export default function MasterDashboard() {
     },
   });
 
+  const changePasswordMutation = trpc.masterAdmin.changePassword.useMutation({
+    onSuccess: () => {
+      toast.success("Senha alterada com sucesso!");
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao alterar senha");
+    },
+  });
+
   const handleCreatePlan = () => {
     if (!token) return;
     if (!newPlan.name || !newPlan.slug) {
@@ -134,6 +153,27 @@ export default function MasterDashboard() {
     createPlanMutation.mutate({
       token,
       ...newPlan,
+    });
+  };
+
+  const handleChangePassword = () => {
+    if (!token) return;
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      toast.error("Preencha todos os campos");
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("As senhas não coincidem");
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      toast.error("A nova senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+    changePasswordMutation.mutate({
+      token,
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword,
     });
   };
 
@@ -299,13 +339,13 @@ export default function MasterDashboard() {
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
-                      placeholder="Buscar por nome, email ou slug..."
+                      placeholder="Buscar por nome ou email..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+                      className="pl-10 border-gray-300 text-gray-900"
                     />
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex gap-2">
                     <Button
                       variant={activeFilter === undefined ? "default" : "outline"}
                       size="sm"
@@ -318,7 +358,7 @@ export default function MasterDashboard() {
                       variant={activeFilter === true ? "default" : "outline"}
                       size="sm"
                       onClick={() => setActiveFilter(true)}
-                      className={activeFilter === true ? "bg-green-600 text-white" : "border-gray-300 text-gray-700"}
+                      className={activeFilter === true ? "bg-blue-600 text-white" : "border-gray-300 text-gray-700"}
                     >
                       Ativos
                     </Button>
@@ -326,7 +366,7 @@ export default function MasterDashboard() {
                       variant={activeFilter === false ? "default" : "outline"}
                       size="sm"
                       onClick={() => setActiveFilter(false)}
-                      className={activeFilter === false ? "bg-red-600 text-white" : "border-gray-300 text-gray-700"}
+                      className={activeFilter === false ? "bg-blue-600 text-white" : "border-gray-300 text-gray-700"}
                     >
                       Inativos
                     </Button>
@@ -334,83 +374,59 @@ export default function MasterDashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-gray-200 bg-gray-50">
-                      <TableHead className="text-gray-700 font-semibold">Empresa</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Contato</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Assinatura</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Criado em</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Status</TableHead>
-                      <TableHead className="text-gray-700 font-semibold text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {companiesLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center text-gray-500 py-8">
-                          Carregando...
-                        </TableCell>
+                {companiesLoading ? (
+                  <div className="text-center py-8 text-gray-500">Carregando...</div>
+                ) : !companies || companies.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">Nenhum cliente encontrado</div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-gray-200">
+                        <TableHead className="text-gray-700">Cliente</TableHead>
+                        <TableHead className="text-gray-700">Plano</TableHead>
+                        <TableHead className="text-gray-700">Status</TableHead>
+                        <TableHead className="text-gray-700">Cadastro</TableHead>
+                        <TableHead className="text-gray-700 text-right">Ações</TableHead>
                       </TableRow>
-                    ) : companies?.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center text-gray-500 py-8">
-                          Nenhum cliente encontrado
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      companies?.map((company: any) => (
-                        <TableRow key={company.id} className="border-gray-200 hover:bg-gray-50">
+                    </TableHeader>
+                    <TableBody>
+                      {companies.map((company: any) => (
+                        <TableRow key={company.id} className="border-gray-200">
                           <TableCell>
                             <div>
-                              <p className="font-semibold text-gray-900">{company.name}</p>
-                              <p className="text-sm text-gray-500">{company.slug}</p>
+                              <div className="font-medium text-gray-900">{company.name}</div>
+                              <div className="text-sm text-gray-500">{company.email}</div>
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div>
-                              <p className="text-sm text-gray-900">{company.email || "-"}</p>
-                              <p className="text-sm text-gray-500">{company.phone || "-"}</p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {company.subscription ? (
-                              getStatusBadge(company.subscription.status)
-                            ) : (
-                              <Badge variant="outline" className="border-gray-300 text-gray-600">Sem assinatura</Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-gray-700">
-                            {formatDate(company.createdAt)}
+                            <div className="text-gray-900">{company.planName || "-"}</div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Switch
                                 checked={company.isActive}
                                 onCheckedChange={() => handleToggleStatus(company.id, company.isActive)}
-                                disabled={toggleStatusMutation.isPending}
                               />
-                              <span className={`font-medium ${company.isActive ? "text-green-600" : "text-red-600"}`}>
-                                {company.isActive ? "Ativo" : "Inativo"}
-                              </span>
+                              <span className="text-sm text-gray-700">{company.isActive ? "Ativo" : "Inativo"}</span>
                             </div>
                           </TableCell>
+                          <TableCell className="text-gray-700">{formatDate(company.createdAt)}</TableCell>
                           <TableCell className="text-right">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleViewClient(company.id)}
-                              className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                             >
                               <Eye className="w-4 h-4 mr-1" />
                               Ver Detalhes
                             </Button>
                           </TableCell>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -426,83 +442,43 @@ export default function MasterDashboard() {
                       Gerencie os planos de assinatura disponíveis
                     </CardDescription>
                   </div>
-                  <Button 
-                    onClick={() => setShowCreatePlanDialog(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Novo Plano
+                  <Button onClick={() => setShowCreatePlanDialog(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
+                    Criar Novo Plano
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-gray-200 bg-gray-50">
-                      <TableHead className="text-gray-700 font-semibold">Plano</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Preço</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Imóveis</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Usuários</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Recursos</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {plansLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center text-gray-500 py-8">
-                          Carregando...
-                        </TableCell>
-                      </TableRow>
-                    ) : plans?.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center text-gray-500 py-8">
-                          Nenhum plano cadastrado
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      plans?.map((plan: any) => (
-                        <TableRow key={plan.id} className="border-gray-200 hover:bg-gray-50">
-                          <TableCell>
-                            <div>
-                              <p className="font-semibold text-gray-900">{plan.name}</p>
-                              <p className="text-sm text-gray-500">{plan.slug}</p>
+                {plansLoading ? (
+                  <div className="text-center py-8 text-gray-500">Carregando...</div>
+                ) : !plans || plans.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">Nenhum plano cadastrado</div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {plans.map((plan: any) => (
+                      <Card key={plan.id} className="border-gray-200">
+                        <CardHeader>
+                          <CardTitle className="text-gray-900">{plan.name}</CardTitle>
+                          <CardDescription className="text-gray-500">{plan.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-2">
+                            <div className="text-3xl font-bold text-gray-900">{formatCurrency(plan.price)}</div>
+                            <div className="text-sm text-gray-500">por mês</div>
+                            <div className="pt-4 space-y-2 text-sm text-gray-700">
+                              <div>• {plan.maxProperties === -1 ? "Imóveis ilimitados" : `Até ${plan.maxProperties} imóveis`}</div>
+                              <div>• {plan.maxUsers === -1 ? "Usuários ilimitados" : `Até ${plan.maxUsers} usuários`}</div>
+                              {plan.hasAI && <div>• IA para descrições</div>}
+                              {plan.hasWhatsappIntegration && <div>• Integração WhatsApp</div>}
+                              {plan.hasPortalIntegration && <div>• Integração com portais</div>}
+                              {plan.hasCustomDomain && <div>• Domínio personalizado</div>}
+                              {plan.isCourtesy && <Badge variant="secondary" className="mt-2">Cortesia</Badge>}
                             </div>
-                          </TableCell>
-                          <TableCell className="text-gray-900 font-semibold">
-                            {formatCurrency(plan.price)}/mês
-                          </TableCell>
-                          <TableCell className="text-gray-700">
-                            {plan.maxProperties === -1 ? "Ilimitado" : plan.maxProperties}
-                          </TableCell>
-                          <TableCell className="text-gray-700">
-                            {plan.maxUsers === -1 ? "Ilimitado" : plan.maxUsers}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-wrap gap-1">
-                              {plan.hasAI && <Badge className="bg-purple-100 text-purple-700 text-xs">IA</Badge>}
-                              {plan.hasWhatsappIntegration && <Badge className="bg-green-100 text-green-700 text-xs">WhatsApp</Badge>}
-                              {plan.hasPortalIntegration && <Badge className="bg-blue-100 text-blue-700 text-xs">Portais</Badge>}
-                              {plan.hasCustomDomain && <Badge className="bg-orange-100 text-orange-700 text-xs">Domínio</Badge>}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-1">
-                              <Badge className={plan.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
-                                {plan.isActive ? "Ativo" : "Inativo"}
-                              </Badge>
-                              {plan.isCourtesy && (
-                                <Badge className="bg-yellow-100 text-yellow-700">
-                                  Cortesia
-                                </Badge>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -517,307 +493,104 @@ export default function MasterDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-gray-200 bg-gray-50">
-                      <TableHead className="text-gray-700 font-semibold">Cliente</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Valor</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Status</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Data</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Método</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paymentsLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
-                          Carregando...
-                        </TableCell>
+                {paymentsLoading ? (
+                  <div className="text-center py-8 text-gray-500">Carregando...</div>
+                ) : !payments || payments.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">Nenhum pagamento registrado</div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-gray-200">
+                        <TableHead className="text-gray-700">Cliente</TableHead>
+                        <TableHead className="text-gray-700">Valor</TableHead>
+                        <TableHead className="text-gray-700">Status</TableHead>
+                        <TableHead className="text-gray-700">Data</TableHead>
                       </TableRow>
-                    ) : payments?.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
-                          Nenhum pagamento registrado
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      payments?.map((payment: any) => (
-                        <TableRow key={payment.id} className="border-gray-200 hover:bg-gray-50">
-                          <TableCell className="text-gray-900 font-medium">
-                            {payment.companyName || `Empresa #${payment.companyId}`}
-                          </TableCell>
-                          <TableCell className="text-gray-900 font-semibold">
-                            {formatCurrency(payment.amount)}
-                          </TableCell>
+                    </TableHeader>
+                    <TableBody>
+                      {payments.map((payment: any) => (
+                        <TableRow key={payment.id} className="border-gray-200">
+                          <TableCell className="text-gray-900">{payment.companyName}</TableCell>
+                          <TableCell className="text-gray-900 font-medium">{formatCurrency(payment.amount)}</TableCell>
                           <TableCell>
-                            <Badge className={
-                              payment.status === 'succeeded' ? "bg-green-100 text-green-700" :
-                              payment.status === 'pending' ? "bg-yellow-100 text-yellow-700" :
-                              "bg-red-100 text-red-700"
-                            }>
-                              {payment.status === 'succeeded' ? 'Confirmado' :
-                               payment.status === 'pending' ? 'Pendente' : payment.status}
-                            </Badge>
+                            {payment.status === "succeeded" ? (
+                              <Badge variant="default" className="bg-green-600">Pago</Badge>
+                            ) : (
+                              <Badge variant="destructive">Falhou</Badge>
+                            )}
                           </TableCell>
-                          <TableCell className="text-gray-700">
-                            {formatDate(payment.createdAt)}
-                          </TableCell>
-                          <TableCell className="text-gray-700">
-                            {payment.paymentMethod || "Stripe"}
-                          </TableCell>
+                          <TableCell className="text-gray-700">{formatDate(payment.createdAt)}</TableCell>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Activity Logs Tab */}
+          {/* Logs Tab */}
           <TabsContent value="logs">
             <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
                 <CardTitle className="text-gray-900 text-xl">Atividades</CardTitle>
                 <CardDescription className="text-gray-500">
-                  Registro de atividades do sistema
+                  Log de atividades do sistema
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-gray-200 bg-gray-50">
-                      <TableHead className="text-gray-700 font-semibold">Ação</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Ator</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Entidade</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Data</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Detalhes</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {logsLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
-                          Carregando...
-                        </TableCell>
+                {logsLoading ? (
+                  <div className="text-center py-8 text-gray-500">Carregando...</div>
+                ) : !activityLogs || activityLogs.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">Nenhuma atividade registrada</div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-gray-200">
+                        <TableHead className="text-gray-700">Ação</TableHead>
+                        <TableHead className="text-gray-700">Ator</TableHead>
+                        <TableHead className="text-gray-700">Detalhes</TableHead>
+                        <TableHead className="text-gray-700">Data</TableHead>
                       </TableRow>
-                    ) : activityLogs?.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
-                          Nenhuma atividade registrada
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      activityLogs?.map((log: any) => (
-                        <TableRow key={log.id} className="border-gray-200 hover:bg-gray-50">
-                          <TableCell>
-                            <Badge className="bg-blue-100 text-blue-700">
-                              {log.action}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-gray-900">
-                            {log.actorType === 'master_admin' ? 'Admin Master' : log.actorType}
-                            {log.actorId && ` #${log.actorId}`}
-                          </TableCell>
-                          <TableCell className="text-gray-700">
-                            {log.entityType ? `${log.entityType} #${log.entityId}` : "-"}
-                          </TableCell>
-                          <TableCell className="text-gray-700">
-                            {formatDate(log.createdAt)}
-                          </TableCell>
-                          <TableCell className="text-gray-600 text-sm max-w-xs truncate">
-                            {log.details ? JSON.stringify(log.details) : "-"}
-                          </TableCell>
+                    </TableHeader>
+                    <TableBody>
+                      {activityLogs.map((log: any) => (
+                        <TableRow key={log.id} className="border-gray-200">
+                          <TableCell className="text-gray-900 font-medium">{log.action}</TableCell>
+                          <TableCell className="text-gray-700">{log.actorType}</TableCell>
+                          <TableCell className="text-gray-500 text-sm">{JSON.stringify(log.details)}</TableCell>
+                          <TableCell className="text-gray-700">{formatDate(log.createdAt)}</TableCell>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
-      </main>
 
-      {/* Dialog para criar novo plano */}
-      <Dialog open={showCreatePlanDialog} onOpenChange={setShowCreatePlanDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-gray-900">Criar Novo Plano</DialogTitle>
-            <DialogDescription className="text-gray-500">
-              Preencha as informações do novo plano de assinatura
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="planName" className="text-gray-700">Nome do Plano *</Label>
-                <Input
-                  id="planName"
-                  value={newPlan.name}
-                  onChange={(e) => setNewPlan(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Ex: Cortesia Premium"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="planSlug" className="text-gray-700">Slug *</Label>
-                <Input
-                  id="planSlug"
-                  value={newPlan.slug}
-                  onChange={(e) => setNewPlan(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))}
-                  placeholder="Ex: cortesia-premium"
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="planDescription" className="text-gray-700">Descrição</Label>
-              <Input
-                id="planDescription"
-                value={newPlan.description}
-                onChange={(e) => setNewPlan(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Descrição do plano"
-                className="mt-1"
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="planPrice" className="text-gray-700">Preço (R$)</Label>
-                <Input
-                  id="planPrice"
-                  type="number"
-                  step="0.01"
-                  value={newPlan.price}
-                  onChange={(e) => setNewPlan(prev => ({ ...prev, price: e.target.value }))}
-                  placeholder="0.00"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="maxProperties" className="text-gray-700">Máx. Imóveis (-1 = ilimitado)</Label>
-                <Input
-                  id="maxProperties"
-                  type="number"
-                  value={newPlan.maxProperties}
-                  onChange={(e) => setNewPlan(prev => ({ ...prev, maxProperties: parseInt(e.target.value) || -1 }))}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="maxUsers" className="text-gray-700">Máx. Usuários (-1 = ilimitado)</Label>
-                <Input
-                  id="maxUsers"
-                  type="number"
-                  value={newPlan.maxUsers}
-                  onChange={(e) => setNewPlan(prev => ({ ...prev, maxUsers: parseInt(e.target.value) || -1 }))}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="maxPhotos" className="text-gray-700">Máx. Fotos por Imóvel</Label>
-                <Input
-                  id="maxPhotos"
-                  type="number"
-                  value={newPlan.maxPhotosPerProperty}
-                  onChange={(e) => setNewPlan(prev => ({ ...prev, maxPhotosPerProperty: parseInt(e.target.value) || 20 }))}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="aiCredits" className="text-gray-700">Créditos IA/dia</Label>
-                <Input
-                  id="aiCredits"
-                  type="number"
-                  value={newPlan.aiCreditsPerDay}
-                  onChange={(e) => setNewPlan(prev => ({ ...prev, aiCreditsPerDay: parseInt(e.target.value) || 0 }))}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <Label className="text-gray-700 font-semibold mb-3 block">Recursos</Label>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="hasAI"
-                    checked={newPlan.hasAI}
-                    onCheckedChange={(checked) => setNewPlan(prev => ({ ...prev, hasAI: !!checked }))}
-                  />
-                  <Label htmlFor="hasAI" className="text-gray-600">Inteligência Artificial</Label>
+          {/* Users Tab */}
+          <TabsContent value="users">
+            <Card className="bg-white border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-gray-900 text-xl">Usuários</CardTitle>
+                <CardDescription className="text-gray-500">
+                  Gestão de usuários do sistema
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-gray-500">
+                  Funcionalidade em desenvolvimento
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="hasWhatsapp"
-                    checked={newPlan.hasWhatsappIntegration}
-                    onCheckedChange={(checked) => setNewPlan(prev => ({ ...prev, hasWhatsappIntegration: !!checked }))}
-                  />
-                  <Label htmlFor="hasWhatsapp" className="text-gray-600">Integração WhatsApp</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="hasPortal"
-                    checked={newPlan.hasPortalIntegration}
-                    onCheckedChange={(checked) => setNewPlan(prev => ({ ...prev, hasPortalIntegration: !!checked }))}
-                  />
-                  <Label htmlFor="hasPortal" className="text-gray-600">Integração Portais</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="hasCustomDomain"
-                    checked={newPlan.hasCustomDomain}
-                    onCheckedChange={(checked) => setNewPlan(prev => ({ ...prev, hasCustomDomain: !!checked }))}
-                  />
-                  <Label htmlFor="hasCustomDomain" className="text-gray-600">Domínio Personalizado</Label>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <div className="flex items-center space-x-2 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-                <Checkbox
-                  id="isCourtesy"
-                  checked={newPlan.isCourtesy}
-                  onCheckedChange={(checked) => setNewPlan(prev => ({ ...prev, isCourtesy: !!checked, price: checked ? "0" : prev.price }))}
-                />
-                <div>
-                  <Label htmlFor="isCourtesy" className="text-yellow-800 font-semibold">Plano de Cortesia</Label>
-                  <p className="text-yellow-700 text-sm">Planos de cortesia não expiram e podem ser atribuídos/removidos a qualquer momento pelo admin master.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreatePlanDialog(false)} className="text-gray-700">
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleCreatePlan} 
-              disabled={createPlanMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {createPlanMutation.isPending ? "Criando..." : "Criar Plano"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Settings Tab */}
           <TabsContent value="settings">
             <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-gray-900 text-xl">Configuracoes do Admin Master</CardTitle>
+                <CardTitle className="text-gray-900 text-xl">Configurações do Admin Master</CardTitle>
                 <CardDescription className="text-gray-500">
                   Gerencie sua conta de administrador
                 </CardDescription>
@@ -834,6 +607,8 @@ export default function MasterDashboard() {
                         type="password"
                         placeholder="Digite sua senha atual"
                         className="border-gray-300 text-gray-900"
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                       />
                     </div>
                     <div>
@@ -843,11 +618,173 @@ export default function MasterDashboard() {
                         type="password"
                         placeholder="Digite sua nova senha"
                         className="border-gray-300 text-gray-900"
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                       />
                     </div>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">Alterar Senha</Button>
+                    <div>
+                      <Label htmlFor="confirmPassword" className="text-gray-700">Confirmar Nova Senha</Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="Confirme sua nova senha"
+                        className="border-gray-300 text-gray-900"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                      />
+                    </div>
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      onClick={handleChangePassword}
+                      disabled={changePasswordMutation.isPending}
+                    >
+                      {changePasswordMutation.isPending ? "Alterando..." : "Alterar Senha"}
+                    </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
+        </Tabs>
+      </main>
+
+      {/* Create Plan Dialog */}
+      <Dialog open={showCreatePlanDialog} onOpenChange={setShowCreatePlanDialog}>
+        <DialogContent className="bg-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-gray-900">Criar Novo Plano</DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Preencha os detalhes do novo plano de assinatura
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="planName" className="text-gray-700">Nome do Plano</Label>
+                <Input
+                  id="planName"
+                  value={newPlan.name}
+                  onChange={(e) => setNewPlan({ ...newPlan, name: e.target.value })}
+                  className="border-gray-300 text-gray-900"
+                />
+              </div>
+              <div>
+                <Label htmlFor="planSlug" className="text-gray-700">Slug</Label>
+                <Input
+                  id="planSlug"
+                  value={newPlan.slug}
+                  onChange={(e) => setNewPlan({ ...newPlan, slug: e.target.value })}
+                  className="border-gray-300 text-gray-900"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="planDescription" className="text-gray-700">Descrição</Label>
+              <Input
+                id="planDescription"
+                value={newPlan.description}
+                onChange={(e) => setNewPlan({ ...newPlan, description: e.target.value })}
+                className="border-gray-300 text-gray-900"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="planPrice" className="text-gray-700">Preço (R$)</Label>
+                <Input
+                  id="planPrice"
+                  type="number"
+                  value={newPlan.price}
+                  onChange={(e) => setNewPlan({ ...newPlan, price: e.target.value })}
+                  className="border-gray-300 text-gray-900"
+                />
+              </div>
+              <div>
+                <Label htmlFor="planMaxProperties" className="text-gray-700">Máx. Imóveis (-1 = ilimitado)</Label>
+                <Input
+                  id="planMaxProperties"
+                  type="number"
+                  value={newPlan.maxProperties}
+                  onChange={(e) => setNewPlan({ ...newPlan, maxProperties: parseInt(e.target.value) })}
+                  className="border-gray-300 text-gray-900"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="planMaxUsers" className="text-gray-700">Máx. Usuários (-1 = ilimitado)</Label>
+                <Input
+                  id="planMaxUsers"
+                  type="number"
+                  value={newPlan.maxUsers}
+                  onChange={(e) => setNewPlan({ ...newPlan, maxUsers: parseInt(e.target.value) })}
+                  className="border-gray-300 text-gray-900"
+                />
+              </div>
+              <div>
+                <Label htmlFor="planMaxPhotos" className="text-gray-700">Máx. Fotos por Imóvel</Label>
+                <Input
+                  id="planMaxPhotos"
+                  type="number"
+                  value={newPlan.maxPhotosPerProperty}
+                  onChange={(e) => setNewPlan({ ...newPlan, maxPhotosPerProperty: parseInt(e.target.value) })}
+                  className="border-gray-300 text-gray-900"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="hasAI"
+                  checked={newPlan.hasAI}
+                  onCheckedChange={(checked) => setNewPlan({ ...newPlan, hasAI: checked as boolean })}
+                />
+                <Label htmlFor="hasAI" className="text-gray-700">IA para descrições</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="hasWhatsapp"
+                  checked={newPlan.hasWhatsappIntegration}
+                  onCheckedChange={(checked) => setNewPlan({ ...newPlan, hasWhatsappIntegration: checked as boolean })}
+                />
+                <Label htmlFor="hasWhatsapp" className="text-gray-700">Integração WhatsApp</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="hasPortal"
+                  checked={newPlan.hasPortalIntegration}
+                  onCheckedChange={(checked) => setNewPlan({ ...newPlan, hasPortalIntegration: checked as boolean })}
+                />
+                <Label htmlFor="hasPortal" className="text-gray-700">Integração com portais</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="hasCustomDomain"
+                  checked={newPlan.hasCustomDomain}
+                  onCheckedChange={(checked) => setNewPlan({ ...newPlan, hasCustomDomain: checked as boolean })}
+                />
+                <Label htmlFor="hasCustomDomain" className="text-gray-700">Domínio personalizado</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="isCourtesy"
+                  checked={newPlan.isCourtesy}
+                  onCheckedChange={(checked) => setNewPlan({ ...newPlan, isCourtesy: checked as boolean })}
+                />
+                <Label htmlFor="isCourtesy" className="text-gray-700">Plano de cortesia</Label>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              onClick={handleCreatePlan}
+              disabled={createPlanMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {createPlanMutation.isPending ? "Criando..." : "Criar Plano"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
