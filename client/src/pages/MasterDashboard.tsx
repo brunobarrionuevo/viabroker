@@ -53,8 +53,6 @@ export default function MasterDashboard() {
     newPassword: "",
     confirmPassword: "",
   });
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [companyToDelete, setCompanyToDelete] = useState<{ id: number; name: string } | null>(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("masterToken");
@@ -146,19 +144,6 @@ export default function MasterDashboard() {
     },
   });
 
-  const deleteCompanyMutation = trpc.masterAdmin.deleteCompany.useMutation({
-    onSuccess: () => {
-      toast.success("Empresa excluída com sucesso!");
-      setShowDeleteDialog(false);
-      setCompanyToDelete(null);
-      refetchCompanies();
-      refetchStats();
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "Erro ao excluir empresa");
-    },
-  });
-
   const handleCreatePlan = () => {
     if (!token) return;
     if (!newPlan.name || !newPlan.slug) {
@@ -205,16 +190,6 @@ export default function MasterDashboard() {
 
   const handleViewClient = (companyId: number) => {
     setLocation(`/master/client/${companyId}`);
-  };
-
-  const handleDeleteCompany = (companyId: number, companyName: string) => {
-    setCompanyToDelete({ id: companyId, name: companyName });
-    setShowDeleteDialog(true);
-  };
-
-  const confirmDeleteCompany = () => {
-    if (!token || !companyToDelete) return;
-    deleteCompanyMutation.mutate({ token, companyId: companyToDelete.id });
   };
 
   const formatCurrency = (value: number | string | null | undefined) => {
@@ -437,26 +412,15 @@ export default function MasterDashboard() {
                           </TableCell>
                           <TableCell className="text-gray-700">{formatDate(company.createdAt)}</TableCell>
                           <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleViewClient(company.id)}
-                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                              >
-                                <Eye className="w-4 h-4 mr-1" />
-                                Ver Detalhes
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDeleteCompany(company.id, company.name)}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className="w-4 h-4 mr-1" />
-                                Excluir
-                              </Button>
-                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleViewClient(company.id)}
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              Ver Detalhes
+                            </Button>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -817,52 +781,6 @@ export default function MasterDashboard() {
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               {createPlanMutation.isPending ? "Criando..." : "Criar Plano"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Company Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="bg-white">
-          <DialogHeader>
-            <DialogTitle className="text-gray-900">Confirmar Exclusão</DialogTitle>
-            <DialogDescription className="text-gray-500">
-              Tem certeza que deseja excluir a empresa <strong>{companyToDelete?.name}</strong>?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
-                <div className="text-sm text-red-800">
-                  <p className="font-semibold mb-2">Esta ação é irreversível!</p>
-                  <p>Todos os dados relacionados serão excluídos permanentemente:</p>
-                  <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Todos os imóveis cadastrados</li>
-                    <li>Todos os leads e clientes</li>
-                    <li>Todos os usuários da empresa</li>
-                    <li>Todas as configurações e personalizações</li>
-                    <li>Todo o histórico de atividades</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteDialog(false)}
-              className="border-gray-300 text-gray-700"
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={confirmDeleteCompany}
-              disabled={deleteCompanyMutation.isPending}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              {deleteCompanyMutation.isPending ? "Excluindo..." : "Sim, Excluir Empresa"}
             </Button>
           </DialogFooter>
         </DialogContent>

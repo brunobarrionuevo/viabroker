@@ -289,42 +289,6 @@ export async function updateCompany(id: number, data: Partial<InsertCompany>): P
   return getCompanyById(id);
 }
 
-export async function deleteCompanyAndRelatedData(companyId: number): Promise<void> {
-  const db = await getDb();
-  if (!db) return;
-  
-  // Excluir em ordem para respeitar as foreign keys
-  // 1. Excluir leads (dependem de properties e users)
-  await db.delete(leads).where(eq(leads.companyId, companyId));
-  
-  // 2. Excluir property_photos (dependem de properties)
-  const companyProperties = await db.select({ id: properties.id })
-    .from(properties)
-    .where(eq(properties.companyId, companyId));
-  const propertyIds = companyProperties.map(p => p.id);
-  if (propertyIds.length > 0) {
-    await db.delete(propertyPhotos).where(sql`${propertyPhotos.propertyId} IN (${sql.join(propertyIds.map(id => sql`${id}`), sql`, `)})`); 
-  }
-  
-  // 3. Excluir properties
-  await db.delete(properties).where(eq(properties.companyId, companyId));
-  
-  // 4. Excluir users
-  await db.delete(users).where(eq(users.companyId, companyId));
-  
-  // 5. Excluir subscriptions
-  await db.delete(subscriptions).where(eq(subscriptions.companyId, companyId));
-  
-  // 6. Excluir payments
-  await db.delete(payments).where(eq(payments.companyId, companyId));
-  
-  // 7. Excluir activity_logs
-  await db.delete(activityLogs).where(eq(activityLogs.companyId, companyId));
-  
-  // 8. Finalmente, excluir a empresa
-  await db.delete(companies).where(eq(companies.id, companyId));
-}
-
 // ==========================================
 // PLANOS
 // ==========================================
