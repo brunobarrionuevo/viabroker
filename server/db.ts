@@ -1279,6 +1279,8 @@ export async function getSharedPropertiesForPartner(partnerCompanyId: number): P
     const ownerCompany = companyMap.get(property.companyId);
     return {
       ...property,
+      // Sobrescrever o isHighlight do imóvel original com o isHighlight do compartilhamento
+      isHighlight: share?.isHighlight || false,
       sharedFromCompanyId: property.companyId,
       sharedFromCompanyName: ownerCompany?.name || 'Parceiro',
       sharedFromPartnerCode: ownerCompany?.partnerCode || '',

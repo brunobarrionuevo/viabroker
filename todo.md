@@ -303,3 +303,7 @@
 - [x] Notificações por email: enviar email quando compartilhamento for aceito
 - [x] Filtro de origem na listagem: "Meus imóveis" / "Imóveis de parceiros" (seletor "Todos os imóveis" adicionado)
 - [x] Histórico de atividades de parcerias (log de ações) - aba Histórico na página de parcerias
+
+
+## Bug Destaque de Imóveis de Parceiros (14/01/2026)
+- [x] Corrigir: Imóvel de parceiro continua aparecendo como destaque no site mesmo após remover destaque na aba de parcerias (isHighlight do compartilhamento agora sobrescreve o do imóvel original)
