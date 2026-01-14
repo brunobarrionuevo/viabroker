@@ -16,7 +16,7 @@ import {
   Shield, Building2, Users, CreditCard, Activity, 
   LogOut, Search, RefreshCw, ChevronRight, DollarSign,
   TrendingUp, CheckCircle, XCircle, Clock, AlertCircle,
-  Eye, Home, UserCheck
+  Eye, Home, UserCheck, Trash2, Power, Edit
 } from "lucide-react";
 
 interface MasterAdmin {
@@ -268,6 +268,10 @@ export default function MasterDashboard() {
             <TabsTrigger value="logs" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700">
               <Activity className="w-4 h-4 mr-2" />
               Atividades
+            </TabsTrigger>
+            <TabsTrigger value="users" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-700">
+              <Users className="w-4 h-4 mr-2" />
+              Usuários
             </TabsTrigger>
           </TabsList>
 

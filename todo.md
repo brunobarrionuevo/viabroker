@@ -338,3 +338,18 @@
 - [x] Atualizar VITE_APP_TITLE para Viabroker (alterar em Settings → General da interface Manus)
 - [x] Preparar configurações para domínio viabroker.app (URLs atualizadas no código)
 - [x] Atualizar textos e referências no código (brokvia_token → viabroker_token, etc)
+
+
+## Dashboard Admin Master - Gerenciamento de Usuários (14/01/2026)
+- [ ] Adicionar endpoint para deletar usuário (cascata: deletar empresas, imóveis, etc)
+- [ ] Adicionar endpoint para alterar plano do usuário
+- [ ] Adicionar endpoint para desativar/ativar usuário
+- [ ] Adicionar interface no dashboard admin para gerenciar usuários
+- [ ] Adicionar botões de ação: Deletar, Alterar Plano, Desativar
+
+
+## Dashboard Admin Master - Gerenciamento de Usuários (14/01/2026)
+- [x] Adicionar opção de exclusão de cadastro de usuário (endpoint deleteUser)
+- [x] Adicionar opção de alterar plano de usuário (endpoint changeUserPlan)
+- [x] Adicionar aba "Usuários" no dashboard master com funcionalidades de gerenciamento
+- [x] Adicionar interface no MasterDashboard para gerenciar usuários

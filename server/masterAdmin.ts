@@ -1,6 +1,6 @@
-import { router, publicProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { router, publicProcedure } from "./_core/trpc";
 import * as db from "./db";
 import * as bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -378,14 +378,13 @@ export const masterAdminRouter = router({
         });
       }
       
-      // Atualizar também o usuário principal para remover trial expirado
-      const users = await db.getUsersByCompanyId(input.companyId);
-      if (users.length > 0) {
-        await db.updateUser(users[0].id, {
-          isTrialExpired: false,
-          trialEndDate: periodEnd,
-        });
-      }
+        // Atualizar também o usuário principal para remover trial expirado
+        const users = await db.getUsersByCompanyId(input.companyId);
+        if (users.length > 0) {
+          await db.updateUser(users[0].id, {
+            trialEndDate: periodEnd,
+          });
+        }
       
       // Log de atividade
       await db.createActivityLog({
@@ -399,6 +398,94 @@ export const masterAdminRouter = router({
       
       return { success: true };
     }),
+
+
+
+
+
+  // Alterar plano de um usuário
+  changeUserPlan: publicProcedure
+    .input(z.object({
+      token: z.string(),
+      userId: z.number(),
+      planId: z.number().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const admin = await masterAuthMiddleware(input.token);
+      
+      // Buscar usuário
+      const user = await db.getUserById(input.userId);
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Usuário não encontrado" });
+      }
+      
+      // Se planId for fornecido, alterar o plano
+      if (input.planId) {
+        // Verificar se o plano existe
+        const plan = await db.getPlanById(input.planId);
+        if (!plan) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Plano não encontrado" });
+        }
+        
+        // Buscar ou criar assinatura
+        const subscription = user.companyId ? await db.getSubscriptionByCompanyId(user.companyId) : null;
+        
+        // Se é plano de cortesia, não define data de expiração
+        const isCourtesy = (plan as any).isCourtesy;
+        const periodEnd = isCourtesy 
+          ? new Date('2037-12-31')
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        
+        if (subscription) {
+          // Atualizar assinatura existente
+          await db.updateSubscription(subscription.id, {
+            planId: input.planId,
+            status: 'active',
+            currentPeriodEnd: periodEnd,
+          });
+        } else if (user.companyId) {
+          await db.createSubscription({
+            companyId: user.companyId,
+            planId: input.planId,
+            status: 'active',
+            currentPeriodStart: new Date(),
+            currentPeriodEnd: periodEnd,
+          });
+        }   
+        await db.createActivityLog({
+          actorType: "master_admin",
+          actorId: admin.id,
+          action: "change_plan",
+          entityType: "user",
+          entityId: input.userId,
+          details: { planId: input.planId, planName: plan.name, isCourtesy },
+        });
+        
+        return { success: true };
+      } else {
+        // Se planId não for fornecido, remover o plano (deixar desativado)
+        const subscription = user.companyId ? await db.getSubscriptionByCompanyId(user.companyId) : null;
+        if (subscription) {
+          await db.updateSubscription(subscription.id, {
+            status: 'canceled',
+          });
+        }
+        
+        // Log de atividade
+        await db.createActivityLog({
+          actorType: "master_admin",
+          actorId: admin.id,
+          action: "disable_plan",
+          entityType: "user",
+          entityId: input.userId,
+          details: { email: user.email },
+        });
+        
+        return { success: true };
+      }
+    }),
+
+
 
   // Criar administrador master inicial (só funciona se não existir nenhum)
   setupInitialAdmin: publicProcedure
