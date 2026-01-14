@@ -8,6 +8,7 @@ import { ArrowLeft, Loader2, Upload, Trash2, Star, GripVertical, Image as ImageI
 import { Link, useParams } from "wouter";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import imageCompression from "browser-image-compression";
 
 
 const MAX_IMAGES = 20;
@@ -98,9 +99,25 @@ export default function PropertyImages() {
           continue;
         }
 
+        // Comprimir imagem antes do upload
+        let fileToUpload = file;
+        try {
+          const options = {
+            maxSizeMB: 1, // Tamanho máximo de 1MB
+            maxWidthOrHeight: 1920, // Largura/altura máxima de 1920px
+            useWebWorker: true,
+            fileType: 'image/jpeg', // Converter para JPEG para melhor compressão
+          };
+          fileToUpload = await imageCompression(file, options);
+          console.log(`Imagem comprimida: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`);
+        } catch (error) {
+          console.error("Erro ao comprimir imagem:", error);
+          // Se falhar a compressão, usa o arquivo original
+        }
+
         // Fazer upload para S3
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", fileToUpload);
 
         const response = await fetch("/api/upload", {
           method: "POST",
@@ -195,7 +212,10 @@ export default function PropertyImages() {
               Enviar Fotos
             </CardTitle>
             <CardDescription>
-              {imageCount} de {MAX_IMAGES} fotos utilizadas. Formatos aceitos: JPG, PNG, WebP (máx. 10MB cada)
+              {imageCount} de {MAX_IMAGES} fotos utilizadas. <br />
+              <strong>Formato recomendado:</strong> JPG ou PNG em alta resolução (1920x1080px ou superior). <br />
+              <strong>Dica:</strong> Use fotos bem iluminadas, horizontais e que destaquem os melhores ângulos do imóvel. <br />
+              As imagens serão automaticamente otimizadas para melhor desempenho.
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -427,3 +427,9 @@
 ## Melhorias no Formulário de Cadastro (14/01/2026)
 - [x] Adicionar texto informativo sobre geração de descrição com IA (recomendar preencher todos os campos antes)
 - [x] Corrigir item "Portaria" para "Portaria 24h" na seção de detalhes do imóvel
+
+
+## Melhorias no Gerenciamento de Fotos (14/01/2026)
+- [x] Adicionar informações sobre formato e padrão recomendados para fotos
+- [x] Implementar limite de 20 fotos por anúncio
+- [x] Implementar compressão automática de imagens antes do upload (reduzir tamanho sem perder qualidade)
