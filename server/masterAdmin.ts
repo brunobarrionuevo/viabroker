@@ -547,6 +547,37 @@ export const masterAdminRouter = router({
       return { success: true, message: "Senha alterada com sucesso" };
     }),
 
+  // Deletar empresa
+  deleteCompany: publicProcedure
+    .input(z.object({
+      token: z.string(),
+      companyId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const admin = await masterAuthMiddleware(input.token);
+      
+      // Buscar empresa
+      const company = await db.getCompanyById(input.companyId);
+      if (!company) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Empresa não encontrada" });
+      }
+      
+      // Excluir todos os dados relacionados
+      await db.deleteCompanyAndRelatedData(input.companyId);
+      
+      // Log de atividade
+      await db.createActivityLog({
+        actorType: "master_admin",
+        actorId: admin.id,
+        action: "delete_company",
+        entityType: "company",
+        entityId: input.companyId,
+        details: { name: company.name, email: company.email },
+      });
+      
+      return { success: true, message: "Empresa e todos os seus dados foram excluídos" };
+    }),
+
   // Deletar usuario
   deleteUser: publicProcedure
     .input(z.object({
