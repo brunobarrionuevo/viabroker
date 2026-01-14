@@ -313,3 +313,11 @@
 ## Gestão de Imóveis de Parceiros (14/01/2026)
 - [x] Adicionar opção de inativar imóvel de parceiro na aba Recebidos (botão Inativar/Ativar com toggle)
 - [x] Adicionar opção de excluir/rejeitar imóvel de parceiro na aba Recebidos (botão Excluir com confirmação)
+
+
+## Sincronização de Status de Imóveis (14/01/2026)
+- [x] Imóvel Inativo: remover da exibição do site do proprietário e parceiros (filtro no backend)
+- [x] Imóvel Reservado: exibir badge "Reservado" no site do proprietário e parceiros (overlay amarelo)
+- [x] Imóvel Alugado: exibir badge "Alugado" no site do proprietário e parceiros (overlay azul)
+- [x] Imóvel Vendido: exibir badge "Vendido" no site do proprietário e parceiros (overlay vermelho)
+- [x] Imóvel Excluído: remover compartilhamentos de todos os parceiros (cascata no deleteProperty)

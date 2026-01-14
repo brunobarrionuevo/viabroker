@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, name, slug FROM companies WHERE name LIKE '%Bruno%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, name, slug FROM companies WHERE name LIKE '%Bruno%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Bruno Barrionuevo",
+      "slug": "joao-da-silva-corretor"
+    },
+    {
+      "id": "2",
+      "name": "Bruno Uzeda",
+      "slug": "bruno-uzeda"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tslug\n1\tBruno Barrionuevo\tjoao-da-silva-corretor\n2\tBruno Uzeda\tbruno-uzeda\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

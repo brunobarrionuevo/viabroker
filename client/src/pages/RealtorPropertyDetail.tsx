@@ -534,6 +534,16 @@ export default function RealtorPropertyDetail() {
                     {property.code && (
                       <Badge variant="secondary">Cód: {property.code}</Badge>
                     )}
+                    {/* Badge de status do imóvel */}
+                    {property.status === 'reservado' && (
+                      <Badge className="bg-yellow-500 text-white">Reservado</Badge>
+                    )}
+                    {property.status === 'vendido' && (
+                      <Badge className="bg-red-500 text-white">Vendido</Badge>
+                    )}
+                    {property.status === 'alugado' && (
+                      <Badge className="bg-blue-500 text-white">Alugado</Badge>
+                    )}
                   </div>
                   <h1 className="text-2xl md:text-3xl font-bold mb-2">{property.title}</h1>
                   <p className="text-muted-foreground flex items-center gap-2">

@@ -409,6 +409,22 @@ export default function RealtorSite() {
                       >
                         {property.purpose === "aluguel" ? "Aluguel" : "Venda"}
                       </Badge>
+                      {/* Badge de status do imóvel */}
+                      {property.status === 'reservado' && (
+                        <div className="absolute inset-0 bg-yellow-500/80 flex items-center justify-center">
+                          <span className="text-white font-bold text-2xl uppercase tracking-wider transform -rotate-12">Reservado</span>
+                        </div>
+                      )}
+                      {property.status === 'vendido' && (
+                        <div className="absolute inset-0 bg-red-500/80 flex items-center justify-center">
+                          <span className="text-white font-bold text-2xl uppercase tracking-wider transform -rotate-12">Vendido</span>
+                        </div>
+                      )}
+                      {property.status === 'alugado' && (
+                        <div className="absolute inset-0 bg-blue-500/80 flex items-center justify-center">
+                          <span className="text-white font-bold text-2xl uppercase tracking-wider transform -rotate-12">Alugado</span>
+                        </div>
+                      )}
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-primary transition-colors">
@@ -685,6 +701,22 @@ export default function RealtorSite() {
                       >
                         {property.purpose === "aluguel" ? "Aluguel" : "Venda"}
                       </Badge>
+                      {/* Badge de status do imóvel */}
+                      {property.status === 'reservado' && (
+                        <div className="absolute inset-0 bg-yellow-500/80 flex items-center justify-center">
+                          <span className="text-white font-bold text-xl uppercase tracking-wider transform -rotate-12">Reservado</span>
+                        </div>
+                      )}
+                      {property.status === 'vendido' && (
+                        <div className="absolute inset-0 bg-red-500/80 flex items-center justify-center">
+                          <span className="text-white font-bold text-xl uppercase tracking-wider transform -rotate-12">Vendido</span>
+                        </div>
+                      )}
+                      {property.status === 'alugado' && (
+                        <div className="absolute inset-0 bg-blue-500/80 flex items-center justify-center">
+                          <span className="text-white font-bold text-xl uppercase tracking-wider transform -rotate-12">Alugado</span>
+                        </div>
+                      )}
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-semibold line-clamp-1 group-hover:text-primary transition-colors">

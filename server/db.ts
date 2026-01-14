@@ -410,7 +410,11 @@ export async function updateProperty(id: number, data: Partial<InsertProperty>):
 export async function deleteProperty(id: number): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
+  // Excluir imagens do imóvel
   await db.delete(propertyImages).where(eq(propertyImages.propertyId, id));
+  // Excluir todos os compartilhamentos deste imóvel (cascata para parceiros)
+  await db.delete(propertyShares).where(eq(propertyShares.propertyId, id));
+  // Excluir o imóvel
   await db.delete(properties).where(eq(properties.id, id));
   return true;
 }
@@ -1257,11 +1261,13 @@ export async function getSharedPropertiesForPartner(partnerCompanyId: number): P
   if (shares.length === 0) return [];
   
   // Buscar os imóveis correspondentes
+  // Filtrar imóveis que não estão inativos (inativo não aparece em nenhum site)
   const propertyIds = shares.map(s => s.propertyId);
   const sharedProperties = await db.select().from(properties)
     .where(and(
       sql`${properties.id} IN (${sql.join(propertyIds.map(id => sql`${id}`), sql`, `)})`,
-      eq(properties.isPublished, true)
+      eq(properties.isPublished, true),
+      sql`${properties.status} != 'inativo'`
     ));
   
   // Criar mapa de compartilhamentos para adicionar informações do parceiro

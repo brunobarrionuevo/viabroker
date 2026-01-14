@@ -508,6 +508,9 @@ export const appRouter = router({
         
         let propertiesList = await db.getProperties(filters, input?.limit || 50, input?.offset || 0);
         
+        // Filtrar imóveis inativos (não devem aparecer no site público)
+        propertiesList = propertiesList.filter(p => p.status !== 'inativo');
+        
         // Filtros adicionais que não estão no banco
         if (input?.minPrice || input?.maxPrice) {
           propertiesList = propertiesList.filter(p => {
