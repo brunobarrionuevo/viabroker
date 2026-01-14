@@ -441,3 +441,6 @@
 - [x] Criar aba de Planos na página de configurações
 - [x] Mostrar plano atual do usuário na aba de Planos
 - [x] Adicionar opção de mudança de plano
+
+## Ajustes de Autenticação (14/01/2026)
+- [x] Remover opção de login com Gmail da página de login
