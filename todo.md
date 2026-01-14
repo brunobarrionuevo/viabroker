@@ -417,3 +417,8 @@
 - [x] Remover bloco de gerenciamento de imagens inline
 - [x] Manter apenas botão "Gerenciar Fotos" no final do formulário (acima do botão Salvar)
 - [x] Reorganizar bloco de Localização: CEP em primeiro lugar
+
+
+## Ajuste Botão Gerenciar Fotos (14/01/2026)
+- [x] Adicionar botão "Gerenciar Fotos" visível na página de cadastro inicial do imóvel
+- [x] Posicionar botão acima do botão "Salvar" no formulário

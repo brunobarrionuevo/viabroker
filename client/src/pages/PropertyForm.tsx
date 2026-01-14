@@ -1077,18 +1077,28 @@ export default function PropertyForm() {
 
             {/* Actions */}
             <div className="flex flex-col gap-2">
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {isEditing ? "Salvar Alterações" : "Cadastrar Imóvel"}
-              </Button>
-              {isEditing && (
+              {isEditing ? (
                 <Button type="button" variant="secondary" asChild>
                   <Link href={`/dashboard/properties/${params.id}/images`}>
                     <Image className="w-4 h-4 mr-2" />
                     Gerenciar Fotos
                   </Link>
                 </Button>
+              ) : (
+                <Button 
+                  type="button" 
+                  variant="secondary" 
+                  disabled
+                  title="Salve o imóvel primeiro para adicionar fotos"
+                >
+                  <Image className="w-4 h-4 mr-2" />
+                  Gerenciar Fotos (disponível após salvar)
+                </Button>
               )}
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {isEditing ? "Salvar Alterações" : "Cadastrar Imóvel"}
+              </Button>
               <Button type="button" variant="outline" asChild>
                 <Link href="/dashboard/properties">Cancelar</Link>
               </Button>
