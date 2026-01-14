@@ -1,0 +1,21 @@
+ALTER TABLE `properties` ADD `hasServiceArea` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasBedroomCloset` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasKitchenCabinets` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `isFurnished` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasAirConditioning` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasBarbecue` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasBalcony` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasGourmetBalcony` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasServiceRoom` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `isGatedCommunity` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasElevator` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `has24hSecurity` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasLobby` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `allowsPets` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasGym` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasPool` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasPartyRoom` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasGourmetSpace` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasSauna` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasVisitorParking` boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `properties` ADD `hasLaundry` boolean DEFAULT false NOT NULL;

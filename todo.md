@@ -264,3 +264,13 @@
 - [x] Exibir imagens dos anúncios no dashboard principal
 - [x] Implementar código de referência automático nos anúncios
 - [x] Exibir código de referência na página do anúncio
+
+
+## Formatação, Detalhes e Compartilhamento (13/01/2026)
+- [x] Corrigir formatação de preço para padrão brasileiro (xxx.xxx.xxx,xx)
+- [x] Adicionar campos de detalhes do imóvel (área de serviço, armários, mobiliado, ar condicionado, churrasqueira, varanda, varanda gourmet, quarto de serviço)
+- [x] Adicionar campos de detalhes do condomínio (fechado, elevador, segurança 24h, portaria, animais, academia, piscina, salão de festa, espaço gourmet, sauna, estacionamento visitantes, lavanderia)
+- [x] Implementar sistema de compartilhamento de imóveis entre corretores
+- [x] Criar mecanismo de autorização/aceitação de parceria
+- [x] Personalizar códigos de imóveis por corretor (evitar duplicatas)
+- [x] Exibir imóveis compartilhados na página do corretor parceiro

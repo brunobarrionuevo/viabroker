@@ -21,7 +21,8 @@ import {
   LayoutDashboard,
   ChevronDown,
   Share2,
-  Globe
+  Globe,
+  Handshake
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
@@ -39,6 +40,7 @@ const navigation = [
   { name: "Agenda", href: "/dashboard/appointments", icon: Calendar },
   { name: "Meu Site", href: "/dashboard/site", icon: Globe },
   { name: "Integrações", href: "/dashboard/integrations", icon: Share2 },
+  { name: "Parcerias", href: "/dashboard/partnerships", icon: Handshake },
   { name: "Configurações", href: "/dashboard/settings", icon: Settings },
 ];
 

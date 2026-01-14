@@ -220,6 +220,29 @@ export const appRouter = router({
         metaDescription: z.string().optional(),
         videoUrl: z.string().optional(),
         hideAddress: z.boolean().default(false),
+        // Detalhes do imóvel
+        hasServiceArea: z.boolean().default(false),
+        hasBedroomCloset: z.boolean().default(false),
+        hasKitchenCabinets: z.boolean().default(false),
+        isFurnished: z.boolean().default(false),
+        hasAirConditioning: z.boolean().default(false),
+        hasBarbecue: z.boolean().default(false),
+        hasBalcony: z.boolean().default(false),
+        hasGourmetBalcony: z.boolean().default(false),
+        hasServiceRoom: z.boolean().default(false),
+        // Detalhes do condomínio
+        isGatedCommunity: z.boolean().default(false),
+        hasElevator: z.boolean().default(false),
+        has24hSecurity: z.boolean().default(false),
+        hasLobby: z.boolean().default(false),
+        allowsPets: z.boolean().default(false),
+        hasGym: z.boolean().default(false),
+        hasPool: z.boolean().default(false),
+        hasPartyRoom: z.boolean().default(false),
+        hasGourmetSpace: z.boolean().default(false),
+        hasSauna: z.boolean().default(false),
+        hasVisitorParking: z.boolean().default(false),
+        hasLaundry: z.boolean().default(false),
       }))
       .mutation(async ({ ctx, input }) => {
         if (!ctx.user.companyId) {
@@ -293,6 +316,29 @@ export const appRouter = router({
         metaDescription: z.string().optional(),
         videoUrl: z.string().optional(),
         hideAddress: z.boolean().optional(),
+        // Detalhes do imóvel
+        hasServiceArea: z.boolean().optional(),
+        hasBedroomCloset: z.boolean().optional(),
+        hasKitchenCabinets: z.boolean().optional(),
+        isFurnished: z.boolean().optional(),
+        hasAirConditioning: z.boolean().optional(),
+        hasBarbecue: z.boolean().optional(),
+        hasBalcony: z.boolean().optional(),
+        hasGourmetBalcony: z.boolean().optional(),
+        hasServiceRoom: z.boolean().optional(),
+        // Detalhes do condomínio
+        isGatedCommunity: z.boolean().optional(),
+        hasElevator: z.boolean().optional(),
+        has24hSecurity: z.boolean().optional(),
+        hasLobby: z.boolean().optional(),
+        allowsPets: z.boolean().optional(),
+        hasGym: z.boolean().optional(),
+        hasPool: z.boolean().optional(),
+        hasPartyRoom: z.boolean().optional(),
+        hasGourmetSpace: z.boolean().optional(),
+        hasSauna: z.boolean().optional(),
+        hasVisitorParking: z.boolean().optional(),
+        hasLaundry: z.boolean().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
@@ -467,6 +513,18 @@ export const appRouter = router({
           propertiesList = propertiesList.filter(p => (p.parkingSpaces || 0) >= (input.parkingSpaces || 0));
         }
         
+        // Se temos um companyId, buscar também imóveis compartilhados aceitos
+        if (companyId) {
+          const sharedProperties = await db.getSharedPropertiesForPartner(companyId);
+          // Adicionar imóveis compartilhados à lista (evitando duplicatas)
+          const existingIds = new Set(propertiesList.map(p => p.id));
+          for (const shared of sharedProperties) {
+            if (!existingIds.has(shared.id)) {
+              propertiesList.push(shared as any);
+            }
+          }
+        }
+        
         // Buscar imagens principais de todos os imóveis
         const propertyIds = propertiesList.map(p => p.id);
         const mainImages = await db.getPropertiesMainImages(propertyIds);
@@ -475,6 +533,7 @@ export const appRouter = router({
         return propertiesList.map(property => ({
           ...property,
           mainImageUrl: mainImages.get(property.id) || null,
+          isShared: property.companyId !== companyId, // Indicar se é imóvel compartilhado
         }));
       }),
 
@@ -978,6 +1037,254 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
       const url = await createBillingPortalSession(ctx.user.companyId, origin);
       return { url };
     }),
+  }),
+
+  // Parcerias entre corretores
+  partnerships: router({
+    // Listar parcerias do corretor
+    list: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) return [];
+      return db.getPartnershipsByCompany(ctx.user.companyId);
+    }),
+
+    // Listar parcerias pendentes (recebidas)
+    pending: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) return [];
+      return db.getPendingPartnerships(ctx.user.companyId);
+    }),
+
+    // Listar parcerias aceitas
+    accepted: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) return [];
+      return db.getAcceptedPartnerships(ctx.user.companyId);
+    }),
+
+    // Solicitar parceria
+    request: protectedProcedure
+      .input(z.object({
+        partnerSlug: z.string(),
+        shareAllProperties: z.boolean().default(false),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        // Buscar empresa parceira pelo slug
+        const partner = await db.getCompanyBySlug(input.partnerSlug);
+        if (!partner) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Corretor não encontrado" });
+        }
+        
+        if (partner.id === ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Você não pode criar parceria consigo mesmo" });
+        }
+        
+        // Verificar se já existe parceria
+        const existing = await db.getExistingPartnership(ctx.user.companyId, partner.id);
+        if (existing) {
+          throw new TRPCError({ code: "CONFLICT", message: "Já existe uma parceria com este corretor" });
+        }
+        
+        return db.createPartnership({
+          requesterId: ctx.user.companyId,
+          partnerId: partner.id,
+          shareAllProperties: input.shareAllProperties,
+        });
+      }),
+
+    // Aceitar parceria
+    accept: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const partnership = await db.getPartnershipById(input.id);
+        if (!partnership || partnership.partnerId !== ctx.user.companyId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Parceria não encontrada" });
+        }
+        
+        if (partnership.status !== 'pending') {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Esta parceria já foi processada" });
+        }
+        
+        await db.updatePartnership(input.id, {
+          status: 'accepted',
+          acceptedAt: new Date(),
+        });
+        
+        return { success: true };
+      }),
+
+    // Rejeitar parceria
+    reject: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const partnership = await db.getPartnershipById(input.id);
+        if (!partnership || partnership.partnerId !== ctx.user.companyId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Parceria não encontrada" });
+        }
+        
+        await db.updatePartnership(input.id, {
+          status: 'rejected',
+          rejectedAt: new Date(),
+        });
+        
+        return { success: true };
+      }),
+
+    // Cancelar parceria
+    cancel: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const partnership = await db.getPartnershipById(input.id);
+        if (!partnership || (partnership.requesterId !== ctx.user.companyId && partnership.partnerId !== ctx.user.companyId)) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Parceria não encontrada" });
+        }
+        
+        await db.updatePartnership(input.id, { status: 'canceled' });
+        
+        return { success: true };
+      }),
+  }),
+
+  // Compartilhamento de imóveis
+  propertyShares: router({
+    // Listar compartilhamentos enviados (como dono)
+    sentList: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) return [];
+      return db.getPropertySharesByOwner(ctx.user.companyId);
+    }),
+
+    // Listar compartilhamentos recebidos (como parceiro)
+    receivedList: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) return [];
+      return db.getPropertySharesByPartner(ctx.user.companyId);
+    }),
+
+    // Listar compartilhamentos pendentes
+    pending: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) return [];
+      return db.getPendingPropertyShares(ctx.user.companyId);
+    }),
+
+    // Listar imóveis compartilhados aceitos (para exibir no site do parceiro)
+    sharedProperties: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.companyId) return [];
+      return db.getSharedPropertiesForPartner(ctx.user.companyId);
+    }),
+
+    // Compartilhar imóvel com parceiro
+    share: protectedProcedure
+      .input(z.object({
+        propertyId: z.number(),
+        partnerCompanyId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        // Verificar se o imóvel pertence ao usuário
+        const property = await db.getPropertyById(input.propertyId);
+        if (!property || property.companyId !== ctx.user.companyId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Imóvel não encontrado" });
+        }
+        
+        // Verificar se existe parceria aceita
+        const partnership = await db.getExistingPartnership(ctx.user.companyId, input.partnerCompanyId);
+        if (!partnership || partnership.status !== 'accepted') {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Não existe parceria ativa com este corretor" });
+        }
+        
+        // Verificar se já existe compartilhamento
+        const existing = await db.getPropertyShareByPropertyAndPartner(input.propertyId, input.partnerCompanyId);
+        if (existing) {
+          throw new TRPCError({ code: "CONFLICT", message: "Este imóvel já foi compartilhado com este parceiro" });
+        }
+        
+        return db.createPropertyShare({
+          propertyId: input.propertyId,
+          ownerCompanyId: ctx.user.companyId,
+          partnerCompanyId: input.partnerCompanyId,
+          partnershipId: partnership.id,
+        });
+      }),
+
+    // Aceitar compartilhamento
+    accept: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const share = await db.getPropertyShareById(input.id);
+        if (!share || share.partnerCompanyId !== ctx.user.companyId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Compartilhamento não encontrado" });
+        }
+        
+        if (share.status !== 'pending') {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Este compartilhamento já foi processado" });
+        }
+        
+        // Gerar código único para o parceiro
+        const partnerCode = await db.generatePartnerPropertyCode(ctx.user.companyId);
+        
+        await db.updatePropertyShare(input.id, {
+          status: 'accepted',
+          acceptedAt: new Date(),
+          partnerPropertyCode: partnerCode,
+        });
+        
+        return { success: true, partnerCode };
+      }),
+
+    // Rejeitar compartilhamento
+    reject: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const share = await db.getPropertyShareById(input.id);
+        if (!share || share.partnerCompanyId !== ctx.user.companyId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Compartilhamento não encontrado" });
+        }
+        
+        await db.updatePropertyShare(input.id, { status: 'rejected' });
+        
+        return { success: true };
+      }),
+
+    // Revogar compartilhamento (pelo dono)
+    revoke: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const share = await db.getPropertyShareById(input.id);
+        if (!share || share.ownerCompanyId !== ctx.user.companyId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Compartilhamento não encontrado" });
+        }
+        
+        await db.updatePropertyShare(input.id, { status: 'revoked' });
+        
+        return { success: true };
+      }),
   }),
 });
 

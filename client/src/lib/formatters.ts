@@ -188,3 +188,84 @@ export function displayPhone(phone: string | null | undefined): string {
   if (numbers.length === 0) return '';
   return formatPhone(numbers);
 }
+
+
+/**
+ * Formata valor monetário no padrão brasileiro (xxx.xxx.xxx,xx)
+ * @param value Valor numérico ou string
+ * @returns String formatada no padrão brasileiro
+ */
+export function formatCurrency(value: number | string | null | undefined): string {
+  if (value === null || value === undefined || value === '') return '';
+  
+  // Converte para número
+  let numValue: number;
+  if (typeof value === 'string') {
+    // Remove formatação existente e converte
+    const cleaned = value.replace(/[^\d,.-]/g, '').replace(',', '.');
+    numValue = parseFloat(cleaned);
+  } else {
+    numValue = value;
+  }
+  
+  if (isNaN(numValue)) return '';
+  
+  // Formata no padrão brasileiro
+  return numValue.toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+/**
+ * Formata valor monetário com símbolo R$
+ * @param value Valor numérico ou string
+ * @returns String formatada com R$ no padrão brasileiro
+ */
+export function formatCurrencyWithSymbol(value: number | string | null | undefined): string {
+  const formatted = formatCurrency(value);
+  if (!formatted) return '';
+  return `R$ ${formatted}`;
+}
+
+/**
+ * Formata input de preço enquanto o usuário digita
+ * @param value Valor digitado
+ * @returns String formatada para exibição no input
+ */
+export function formatPriceInput(value: string): string {
+  // Remove tudo que não é número
+  const numbers = value.replace(/\D/g, '');
+  
+  if (numbers.length === 0) return '';
+  
+  // Converte para centavos (últimos 2 dígitos são centavos)
+  const cents = parseInt(numbers, 10);
+  const reais = cents / 100;
+  
+  return formatCurrency(reais);
+}
+
+/**
+ * Remove formatação de preço e retorna valor numérico em centavos
+ * @param value Valor formatado
+ * @returns Número em centavos
+ */
+export function unformatPrice(value: string): number {
+  if (!value) return 0;
+  // Remove tudo que não é número
+  const numbers = value.replace(/\D/g, '');
+  return parseInt(numbers, 10) || 0;
+}
+
+/**
+ * Converte valor formatado para número decimal
+ * @param value Valor formatado (ex: "1.234.567,89")
+ * @returns Número decimal (ex: 1234567.89)
+ */
+export function parseFormattedPrice(value: string): number {
+  if (!value) return 0;
+  // Remove pontos de milhar e substitui vírgula por ponto
+  const cleaned = value.replace(/\./g, '').replace(',', '.');
+  return parseFloat(cleaned) || 0;
+}

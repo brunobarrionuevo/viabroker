@@ -71,6 +71,20 @@
       "when": 1768328008968,
       "tag": "0009_fat_prowler",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1768353581442,
+      "tag": "0010_slimy_bedlam",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1768353843070,
+      "tag": "0011_thin_timeslip",
+      "breakpoints": true
     }
   ]
 }

@@ -31,6 +31,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ResendVerification from "./pages/ResendVerification";
 import Plans from "./pages/Plans";
+import Partnerships from "./pages/Partnerships";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
@@ -153,6 +154,11 @@ function Router() {
       {/* Settings Routes */}
       <Route path="/dashboard/settings">
         {() => <ProtectedRoute component={Settings} />}
+      </Route>
+      
+      {/* Partnerships Route */}
+      <Route path="/dashboard/partnerships">
+        {() => <ProtectedRoute component={Partnerships} />}
       </Route>
       
       {/* Integrations Routes */}

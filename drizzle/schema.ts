@@ -138,6 +138,32 @@ export const properties = mysqlTable("properties", {
   metaDescription: varchar("metaDescription", { length: 160 }),
   videoUrl: text("videoUrl"),
   hideAddress: boolean("hideAddress").default(false).notNull(),
+  
+  // Detalhes do imóvel
+  hasServiceArea: boolean("hasServiceArea").default(false).notNull(),
+  hasBedroomCloset: boolean("hasBedroomCloset").default(false).notNull(),
+  hasKitchenCabinets: boolean("hasKitchenCabinets").default(false).notNull(),
+  isFurnished: boolean("isFurnished").default(false).notNull(),
+  hasAirConditioning: boolean("hasAirConditioning").default(false).notNull(),
+  hasBarbecue: boolean("hasBarbecue").default(false).notNull(),
+  hasBalcony: boolean("hasBalcony").default(false).notNull(),
+  hasGourmetBalcony: boolean("hasGourmetBalcony").default(false).notNull(),
+  hasServiceRoom: boolean("hasServiceRoom").default(false).notNull(),
+  
+  // Detalhes do condomínio
+  isGatedCommunity: boolean("isGatedCommunity").default(false).notNull(),
+  hasElevator: boolean("hasElevator").default(false).notNull(),
+  has24hSecurity: boolean("has24hSecurity").default(false).notNull(),
+  hasLobby: boolean("hasLobby").default(false).notNull(),
+  allowsPets: boolean("allowsPets").default(false).notNull(),
+  hasGym: boolean("hasGym").default(false).notNull(),
+  hasPool: boolean("hasPool").default(false).notNull(),
+  hasPartyRoom: boolean("hasPartyRoom").default(false).notNull(),
+  hasGourmetSpace: boolean("hasGourmetSpace").default(false).notNull(),
+  hasSauna: boolean("hasSauna").default(false).notNull(),
+  hasVisitorParking: boolean("hasVisitorParking").default(false).notNull(),
+  hasLaundry: boolean("hasLaundry").default(false).notNull(),
+  
   publishedAt: timestamp("publishedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -392,3 +418,43 @@ export const activityLogs = mysqlTable("activity_logs", {
 
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type InsertActivityLog = typeof activityLogs.$inferInsert;
+
+
+// ==========================================
+// PARCERIAS ENTRE CORRETORES
+// ==========================================
+
+export const partnerships = mysqlTable("partnerships", {
+  id: int("id").autoincrement().primaryKey(),
+  requesterId: int("requesterId").notNull(), // Corretor que solicita a parceria
+  partnerId: int("partnerId").notNull(), // Corretor que recebe a solicitação
+  status: mysqlEnum("status", ["pending", "accepted", "rejected", "canceled"]).default("pending").notNull(),
+  shareAllProperties: boolean("shareAllProperties").default(false).notNull(), // Se compartilha todos os imóveis automaticamente
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  acceptedAt: timestamp("acceptedAt"),
+  rejectedAt: timestamp("rejectedAt"),
+});
+
+export type Partnership = typeof partnerships.$inferSelect;
+export type InsertPartnership = typeof partnerships.$inferInsert;
+
+// ==========================================
+// COMPARTILHAMENTO DE IMÓVEIS
+// ==========================================
+
+export const propertyShares = mysqlTable("propertyShares", {
+  id: int("id").autoincrement().primaryKey(),
+  propertyId: int("propertyId").notNull(), // Imóvel sendo compartilhado
+  ownerCompanyId: int("ownerCompanyId").notNull(), // Empresa dona do imóvel
+  partnerCompanyId: int("partnerCompanyId").notNull(), // Empresa parceira que recebe o compartilhamento
+  partnershipId: int("partnershipId").notNull(), // Referência à parceria
+  status: mysqlEnum("status", ["pending", "accepted", "rejected", "revoked"]).default("pending").notNull(),
+  partnerPropertyCode: varchar("partnerPropertyCode", { length: 50 }), // Código único do imóvel para o parceiro
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  acceptedAt: timestamp("acceptedAt"),
+});
+
+export type PropertyShare = typeof propertyShares.$inferSelect;
+export type InsertPropertyShare = typeof propertyShares.$inferInsert;

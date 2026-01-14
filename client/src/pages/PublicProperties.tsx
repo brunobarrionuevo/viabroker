@@ -55,7 +55,9 @@ export default function PublicProperties() {
   const formatPrice = (price: string | null) => {
     if (!price) return "Consulte";
     const num = parseFloat(price);
-    return num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    if (isNaN(num) || num === 0) return "Consulte";
+    // Formato brasileiro: R$ xxx.xxx.xxx,xx
+    return `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   return (

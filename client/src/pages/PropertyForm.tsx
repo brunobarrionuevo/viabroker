@@ -106,6 +106,29 @@ export default function PropertyForm() {
     metaDescription: "",
     videoUrl: "",
     hideAddress: false,
+    // Detalhes do imóvel
+    hasServiceArea: false,
+    hasBedroomCloset: false,
+    hasKitchenCabinets: false,
+    isFurnished: false,
+    hasAirConditioning: false,
+    hasBarbecue: false,
+    hasBalcony: false,
+    hasGourmetBalcony: false,
+    hasServiceRoom: false,
+    // Detalhes do condomínio
+    isGatedCommunity: false,
+    hasElevator: false,
+    has24hSecurity: false,
+    hasLobby: false,
+    allowsPets: false,
+    hasGym: false,
+    hasPool: false,
+    hasPartyRoom: false,
+    hasGourmetSpace: false,
+    hasSauna: false,
+    hasVisitorParking: false,
+    hasLaundry: false,
   });
 
   const { data: property, isLoading: loadingProperty } = trpc.properties.get.useQuery(
@@ -175,6 +198,29 @@ export default function PropertyForm() {
         metaDescription: property.metaDescription || "",
         videoUrl: property.videoUrl || "",
         hideAddress: property.hideAddress || false,
+        // Detalhes do imóvel
+        hasServiceArea: property.hasServiceArea || false,
+        hasBedroomCloset: property.hasBedroomCloset || false,
+        hasKitchenCabinets: property.hasKitchenCabinets || false,
+        isFurnished: property.isFurnished || false,
+        hasAirConditioning: property.hasAirConditioning || false,
+        hasBarbecue: property.hasBarbecue || false,
+        hasBalcony: property.hasBalcony || false,
+        hasGourmetBalcony: property.hasGourmetBalcony || false,
+        hasServiceRoom: property.hasServiceRoom || false,
+        // Detalhes do condomínio
+        isGatedCommunity: property.isGatedCommunity || false,
+        hasElevator: property.hasElevator || false,
+        has24hSecurity: property.has24hSecurity || false,
+        hasLobby: property.hasLobby || false,
+        allowsPets: property.allowsPets || false,
+        hasGym: property.hasGym || false,
+        hasPool: property.hasPool || false,
+        hasPartyRoom: property.hasPartyRoom || false,
+        hasGourmetSpace: property.hasGourmetSpace || false,
+        hasSauna: property.hasSauna || false,
+        hasVisitorParking: property.hasVisitorParking || false,
+        hasLaundry: property.hasLaundry || false,
       });
     }
   }, [property]);
@@ -555,6 +601,196 @@ export default function PropertyForm() {
                       value={formData.builtArea}
                       onChange={(e) => setFormData(prev => ({ ...prev, builtArea: e.target.value }))}
                     />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Detalhes do Imóvel */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Detalhes do Imóvel</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasServiceArea"
+                      checked={formData.hasServiceArea}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasServiceArea: checked }))}
+                    />
+                    <Label htmlFor="hasServiceArea" className="cursor-pointer">Area de Serviço</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasBedroomCloset"
+                      checked={formData.hasBedroomCloset}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasBedroomCloset: checked }))}
+                    />
+                    <Label htmlFor="hasBedroomCloset" className="cursor-pointer">Armário no Quarto</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasKitchenCabinets"
+                      checked={formData.hasKitchenCabinets}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasKitchenCabinets: checked }))}
+                    />
+                    <Label htmlFor="hasKitchenCabinets" className="cursor-pointer">Armário na Cozinha</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="isFurnished"
+                      checked={formData.isFurnished}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isFurnished: checked }))}
+                    />
+                    <Label htmlFor="isFurnished" className="cursor-pointer">Mobiliado</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasAirConditioning"
+                      checked={formData.hasAirConditioning}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasAirConditioning: checked }))}
+                    />
+                    <Label htmlFor="hasAirConditioning" className="cursor-pointer">Ar Condicionado</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasBarbecue"
+                      checked={formData.hasBarbecue}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasBarbecue: checked }))}
+                    />
+                    <Label htmlFor="hasBarbecue" className="cursor-pointer">Churrasqueira</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasBalcony"
+                      checked={formData.hasBalcony}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasBalcony: checked }))}
+                    />
+                    <Label htmlFor="hasBalcony" className="cursor-pointer">Varanda</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasGourmetBalcony"
+                      checked={formData.hasGourmetBalcony}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasGourmetBalcony: checked }))}
+                    />
+                    <Label htmlFor="hasGourmetBalcony" className="cursor-pointer">Varanda Gourmet</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasServiceRoom"
+                      checked={formData.hasServiceRoom}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasServiceRoom: checked }))}
+                    />
+                    <Label htmlFor="hasServiceRoom" className="cursor-pointer">Quarto de Serviço</Label>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Detalhes do Condomínio */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Detalhes do Condomínio</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="isGatedCommunity"
+                      checked={formData.isGatedCommunity}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isGatedCommunity: checked }))}
+                    />
+                    <Label htmlFor="isGatedCommunity" className="cursor-pointer">Condomínio Fechado</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasElevator"
+                      checked={formData.hasElevator}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasElevator: checked }))}
+                    />
+                    <Label htmlFor="hasElevator" className="cursor-pointer">Elevador</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="has24hSecurity"
+                      checked={formData.has24hSecurity}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, has24hSecurity: checked }))}
+                    />
+                    <Label htmlFor="has24hSecurity" className="cursor-pointer">Segurança 24h</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasLobby"
+                      checked={formData.hasLobby}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasLobby: checked }))}
+                    />
+                    <Label htmlFor="hasLobby" className="cursor-pointer">Portaria</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="allowsPets"
+                      checked={formData.allowsPets}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, allowsPets: checked }))}
+                    />
+                    <Label htmlFor="allowsPets" className="cursor-pointer">Permite Animais</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasGym"
+                      checked={formData.hasGym}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasGym: checked }))}
+                    />
+                    <Label htmlFor="hasGym" className="cursor-pointer">Academia</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasPool"
+                      checked={formData.hasPool}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasPool: checked }))}
+                    />
+                    <Label htmlFor="hasPool" className="cursor-pointer">Piscina</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasPartyRoom"
+                      checked={formData.hasPartyRoom}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasPartyRoom: checked }))}
+                    />
+                    <Label htmlFor="hasPartyRoom" className="cursor-pointer">Salão de Festa</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasGourmetSpace"
+                      checked={formData.hasGourmetSpace}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasGourmetSpace: checked }))}
+                    />
+                    <Label htmlFor="hasGourmetSpace" className="cursor-pointer">Espaço Gourmet</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasSauna"
+                      checked={formData.hasSauna}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasSauna: checked }))}
+                    />
+                    <Label htmlFor="hasSauna" className="cursor-pointer">Sauna</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasVisitorParking"
+                      checked={formData.hasVisitorParking}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasVisitorParking: checked }))}
+                    />
+                    <Label htmlFor="hasVisitorParking" className="cursor-pointer">Estacionamento Visitantes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="hasLaundry"
+                      checked={formData.hasLaundry}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasLaundry: checked }))}
+                    />
+                    <Label htmlFor="hasLaundry" className="cursor-pointer">Lavanderia</Label>
                   </div>
                 </div>
               </CardContent>

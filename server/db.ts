@@ -13,7 +13,9 @@ import {
   masterAdmins, InsertMasterAdmin, MasterAdmin,
   subscriptions, InsertSubscription, Subscription,
   payments, InsertPayment, Payment,
-  activityLogs, InsertActivityLog, ActivityLog
+  activityLogs, InsertActivityLog, ActivityLog,
+  partnerships, InsertPartnership, Partnership,
+  propertyShares, InsertPropertyShare, PropertyShare
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -974,4 +976,172 @@ export async function getLeadsByCompanyId(companyId: number): Promise<Lead[]> {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(leads).where(eq(leads.companyId, companyId)).orderBy(desc(leads.createdAt));
+}
+
+
+// ==========================================
+// PARCERIAS ENTRE CORRETORES
+// ==========================================
+
+export async function createPartnership(data: InsertPartnership): Promise<Partnership> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(partnerships).values(data);
+  const inserted = await db.select().from(partnerships).where(eq(partnerships.id, Number(result[0].insertId))).limit(1);
+  return inserted[0];
+}
+
+export async function getPartnershipById(id: number): Promise<Partnership | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(partnerships).where(eq(partnerships.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getPartnershipsByCompany(companyId: number): Promise<Partnership[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(partnerships)
+    .where(or(eq(partnerships.requesterId, companyId), eq(partnerships.partnerId, companyId)))
+    .orderBy(desc(partnerships.createdAt));
+}
+
+export async function getPendingPartnerships(companyId: number): Promise<Partnership[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(partnerships)
+    .where(and(eq(partnerships.partnerId, companyId), eq(partnerships.status, 'pending')))
+    .orderBy(desc(partnerships.createdAt));
+}
+
+export async function getAcceptedPartnerships(companyId: number): Promise<Partnership[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(partnerships)
+    .where(and(
+      or(eq(partnerships.requesterId, companyId), eq(partnerships.partnerId, companyId)),
+      eq(partnerships.status, 'accepted')
+    ))
+    .orderBy(desc(partnerships.createdAt));
+}
+
+export async function updatePartnership(id: number, data: Partial<InsertPartnership>): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(partnerships).set(data).where(eq(partnerships.id, id));
+}
+
+export async function getExistingPartnership(requesterId: number, partnerId: number): Promise<Partnership | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(partnerships)
+    .where(or(
+      and(eq(partnerships.requesterId, requesterId), eq(partnerships.partnerId, partnerId)),
+      and(eq(partnerships.requesterId, partnerId), eq(partnerships.partnerId, requesterId))
+    ))
+    .limit(1);
+  return result[0];
+}
+
+// ==========================================
+// COMPARTILHAMENTO DE IMÓVEIS
+// ==========================================
+
+export async function createPropertyShare(data: InsertPropertyShare): Promise<PropertyShare> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(propertyShares).values(data);
+  const inserted = await db.select().from(propertyShares).where(eq(propertyShares.id, Number(result[0].insertId))).limit(1);
+  return inserted[0];
+}
+
+export async function getPropertyShareById(id: number): Promise<PropertyShare | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(propertyShares).where(eq(propertyShares.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getPropertySharesByOwner(ownerCompanyId: number): Promise<PropertyShare[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(propertyShares)
+    .where(eq(propertyShares.ownerCompanyId, ownerCompanyId))
+    .orderBy(desc(propertyShares.createdAt));
+}
+
+export async function getPropertySharesByPartner(partnerCompanyId: number): Promise<PropertyShare[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(propertyShares)
+    .where(eq(propertyShares.partnerCompanyId, partnerCompanyId))
+    .orderBy(desc(propertyShares.createdAt));
+}
+
+export async function getPendingPropertyShares(partnerCompanyId: number): Promise<PropertyShare[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(propertyShares)
+    .where(and(eq(propertyShares.partnerCompanyId, partnerCompanyId), eq(propertyShares.status, 'pending')))
+    .orderBy(desc(propertyShares.createdAt));
+}
+
+export async function getAcceptedPropertyShares(partnerCompanyId: number): Promise<PropertyShare[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(propertyShares)
+    .where(and(eq(propertyShares.partnerCompanyId, partnerCompanyId), eq(propertyShares.status, 'accepted')))
+    .orderBy(desc(propertyShares.createdAt));
+}
+
+export async function updatePropertyShare(id: number, data: Partial<InsertPropertyShare>): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(propertyShares).set(data).where(eq(propertyShares.id, id));
+}
+
+export async function getPropertyShareByPropertyAndPartner(propertyId: number, partnerCompanyId: number): Promise<PropertyShare | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(propertyShares)
+    .where(and(eq(propertyShares.propertyId, propertyId), eq(propertyShares.partnerCompanyId, partnerCompanyId)))
+    .limit(1);
+  return result[0];
+}
+
+export async function getSharedPropertiesForPartner(partnerCompanyId: number): Promise<Property[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Buscar todos os compartilhamentos aceitos para este parceiro
+  const shares = await db.select().from(propertyShares)
+    .where(and(eq(propertyShares.partnerCompanyId, partnerCompanyId), eq(propertyShares.status, 'accepted')));
+  
+  if (shares.length === 0) return [];
+  
+  // Buscar os imóveis correspondentes
+  const propertyIds = shares.map(s => s.propertyId);
+  const sharedProperties = await db.select().from(properties)
+    .where(and(
+      sql`${properties.id} IN (${sql.join(propertyIds.map(id => sql`${id}`), sql`, `)})`,
+      eq(properties.isPublished, true)
+    ));
+  
+  return sharedProperties;
+}
+
+export async function generatePartnerPropertyCode(partnerCompanyId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Contar quantos imóveis compartilhados este parceiro já tem
+  const result = await db.select({ count: sql<number>`count(*)` })
+    .from(propertyShares)
+    .where(eq(propertyShares.partnerCompanyId, partnerCompanyId));
+  
+  const count = result[0]?.count || 0;
+  const companyPrefix = partnerCompanyId.toString().padStart(3, '0');
+  const shareNumber = (count + 1).toString().padStart(4, '0');
+  
+  return `PRC${companyPrefix}${shareNumber}`;
 }

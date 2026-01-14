@@ -122,7 +122,8 @@ export default function PublicPropertyDetail() {
     if (!price) return null;
     const num = parseFloat(price);
     if (isNaN(num) || num === 0) return null;
-    return num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    // Formato brasileiro: R$ xxx.xxx.xxx,xx
+    return `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   const handleContactSubmit = (e: React.FormEvent) => {
