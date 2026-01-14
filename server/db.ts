@@ -1387,20 +1387,3 @@ export async function getReceivedPropertyShares(partnerCompanyId: number): Promi
   }));
   return enriched;
 }
-
-
-export async function deleteCompany(companyId: number): Promise<void> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  // Deletar empresa (cascata: usuarios, imoveis, imagens, compartilhamentos, etc)
-  // O banco de dados deve ter ON DELETE CASCADE configurado nas foreign keys
-  await db.delete(companies).where(eq(companies.id, companyId));
-}
-
-export async function updateMasterAdmin(adminId: number, data: { passwordHash?: string }): Promise<void> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  await db.update(masterAdmins).set(data).where(eq(masterAdmins.id, adminId));
-}
