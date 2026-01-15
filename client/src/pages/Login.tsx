@@ -55,9 +55,9 @@ export default function Login() {
               <img 
                 src="/images/viabroker-logo.jpg" 
                 alt="Viabroker" 
-                className="h-12 w-auto"
+                className="h-16 w-auto"
               />
-              <p className="text-gray-600 text-sm">Plataforma de Sites para Corretores</p>
+              <p className="text-gray-600 text-sm">Gestão inteligente para corretores e imobiliárias</p>
             </div>
           </Link>
         </div>

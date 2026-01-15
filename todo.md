@@ -490,3 +490,9 @@
 
 ## Substituição de Logo (14/01/2026)
 - [x] Substituir logos transparentes pela logo com fundo branco fornecida pelo usuário
+
+
+## Ajustes de Logo e Descrição (14/01/2026)
+- [x] Aumentar tamanho da logo em todos os locais para dar mais relevância
+- [x] Atualizar favicon para usar apenas o ícone (sem texto)
+- [x] Mudar descrição para "Gestão inteligente para corretores e imobiliárias"

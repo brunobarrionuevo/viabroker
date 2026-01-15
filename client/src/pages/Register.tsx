@@ -211,7 +211,7 @@ export default function Register() {
               <img 
                 src="/images/viabroker-logo.jpg" 
                 alt="Viabroker" 
-                className="h-12 w-auto"
+                className="h-16 w-auto"
               />
             </div>
           </Link>

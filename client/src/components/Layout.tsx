@@ -17,7 +17,7 @@ export default function Layout({ children }: LayoutProps) {
               <img 
                 src="/images/viabroker-logo.jpg" 
                 alt="Viabroker" 
-                className="h-8 w-auto"
+                className="h-12 w-auto"
               />
             </div>
           </Link>

@@ -173,14 +173,14 @@ function DashboardLayoutContent({
                   <img 
                     src="/images/viabroker-logo.jpg" 
                     alt="Viabroker" 
-                    className="h-6 w-auto"
+                    className="h-8 w-auto"
                   />
                 </div>
               ) : (
                 <img 
-                  src="/images/viabroker-logo-icon-transparent.png" 
+                  src="/images/viabroker-icon.jpg" 
                   alt="Viabroker" 
-                  className="h-8 w-8"
+                  className="h-10 w-10"
                 />
               )}
             </div>

@@ -112,7 +112,7 @@ export default function Home() {
             <img 
               src="/images/viabroker-logo.jpg" 
               alt="Viabroker" 
-              className="h-8 w-auto"
+              className="h-12 w-auto"
             />
           </Link>
           
@@ -289,7 +289,7 @@ export default function Home() {
               <img 
                 src="/images/viabroker-logo.jpg" 
                 alt="Viabroker" 
-                className="h-6 w-auto"
+                className="h-8 w-auto"
               />
             </div>
             <p className="text-sm text-muted-foreground">
