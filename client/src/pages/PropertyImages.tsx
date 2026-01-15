@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Loader2, Upload, Trash2, Star, GripVertical, Image as ImageIcon, X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useParams } from "wouter";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import imageCompression from "browser-image-compression";
 import {
@@ -202,10 +202,10 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
     if (e.key === 'Escape') onClose();
   };
 
-  useState(() => {
+  useEffect(() => {
     window.addEventListener('keydown', handleKeyDown as any);
     return () => window.removeEventListener('keydown', handleKeyDown as any);
-  });
+  }, [currentIndex, images.length]);
 
   const currentImage = images[currentIndex];
 
@@ -224,7 +224,7 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
         <Button
           size="icon"
           variant="ghost"
-          className="text-white hover:bg-white/20"
+          className="text-white hover:bg-white/20 relative z-10"
           onClick={onClose}
         >
           <X className="w-6 h-6" />
@@ -347,11 +347,11 @@ export default function PropertyImages() {
   const [localImages, setLocalImages] = useState<PropertyImage[]>([]);
 
   // Sincronizar imagens locais com dados do servidor
-  useState(() => {
+  useEffect(() => {
     if (images) {
       setLocalImages([...images].sort((a, b) => a.order - b.order));
     }
-  });
+  }, [images]);
 
   const addImageMutation = trpc.properties.addImage.useMutation({
     onSuccess: () => {

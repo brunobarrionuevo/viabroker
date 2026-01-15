@@ -452,3 +452,8 @@
 - [x] Criar lightbox com visualização ampliada
 - [x] Adicionar navegação por setas no lightbox
 - [x] Implementar zoom nas imagens do lightbox
+
+
+## Correções na Galeria de Fotos (14/01/2026)
+- [x] Corrigir função de arrastar para reorganizar fotos (drag-and-drop não está funcionando)
+- [x] Corrigir botão de fechar (X) no modo de visualização lightbox
