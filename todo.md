@@ -486,3 +486,7 @@
 - [x] Implementar logo no dashboard (sidebar)
 - [x] Implementar logo no footer
 - [x] Atualizar meta tags com nova logo
+
+
+## Substituição de Logo (14/01/2026)
+- [x] Substituir logos transparentes pela logo com fundo branco fornecida pelo usuário

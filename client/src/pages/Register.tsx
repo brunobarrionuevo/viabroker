@@ -209,7 +209,7 @@ export default function Register() {
           <Link href="/">
             <div className="inline-flex flex-col items-center gap-2">
               <img 
-                src="/images/viabroker-logo-full-transparent.png" 
+                src="/images/viabroker-logo.jpg" 
                 alt="Viabroker" 
                 className="h-12 w-auto"
               />

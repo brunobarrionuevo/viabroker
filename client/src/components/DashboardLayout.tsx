@@ -171,7 +171,7 @@ function DashboardLayoutContent({
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <img 
-                    src="/images/viabroker-logo-full-transparent.png" 
+                    src="/images/viabroker-logo.jpg" 
                     alt="Viabroker" 
                     className="h-6 w-auto"
                   />

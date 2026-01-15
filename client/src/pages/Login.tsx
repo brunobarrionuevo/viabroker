@@ -53,7 +53,7 @@ export default function Login() {
           <Link href="/">
             <div className="inline-flex flex-col items-center gap-3">
               <img 
-                src="/images/viabroker-logo-full-transparent.png" 
+                src="/images/viabroker-logo.jpg" 
                 alt="Viabroker" 
                 className="h-12 w-auto"
               />

@@ -110,7 +110,7 @@ export default function Home() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <img 
-              src="/images/viabroker-logo-full-transparent.png" 
+              src="/images/viabroker-logo.jpg" 
               alt="Viabroker" 
               className="h-8 w-auto"
             />
@@ -287,7 +287,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <img 
-                src="/images/viabroker-logo-full-transparent.png" 
+                src="/images/viabroker-logo.jpg" 
                 alt="Viabroker" 
                 className="h-6 w-auto"
               />

@@ -15,7 +15,7 @@ export default function Layout({ children }: LayoutProps) {
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer">
               <img 
-                src="/images/viabroker-logo-full-transparent.png" 
+                src="/images/viabroker-logo.jpg" 
                 alt="Viabroker" 
                 className="h-8 w-auto"
               />
