@@ -18,7 +18,7 @@ import { Link } from "wouter";
 import { getLoginUrl } from "@/const";
 
 export default function Home() {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const features = [
     {
