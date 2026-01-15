@@ -457,3 +457,11 @@
 ## Correções na Galeria de Fotos (14/01/2026)
 - [x] Corrigir função de arrastar para reorganizar fotos (resolvido conflito de event handlers com pointer-events)
 - [x] Corrigir botão de fechar (X) no modo de visualização lightbox
+
+
+## Apontamento de Domínio (14/01/2026)
+- [x] Verificar configuração DNS do domínio brunobarrionuevo.com.br
+- [x] Criar interface de solicitação de apontamento na aba Domínio
+- [x] Adicionar instruções detalhadas passo a passo para configuração DNS
+- [x] Implementar verificação automática de status do domínio
+- [x] Criar backend para validar apontamento DNS

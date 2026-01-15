@@ -1083,6 +1083,42 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
         }
         return db.upsertSiteSettings(ctx.user.companyId, input);
       }),
+    
+    verifyDomain: protectedProcedure
+      .input(z.object({ domain: z.string() }))
+      .mutation(async ({ input }) => {
+        const domain = input.domain.toLowerCase().trim();
+        
+        try {
+          // Tentar fazer uma requisição HTTP para o domínio
+          const response = await fetch(`http://${domain}`, {
+            method: 'HEAD',
+            redirect: 'follow',
+            signal: AbortSignal.timeout(10000), // 10 segundos timeout
+          }).catch(() => null);
+          
+          if (response && response.ok) {
+            return {
+              success: true,
+              message: 'Domínio está apontando corretamente!',
+              status: 'active',
+            };
+          }
+          
+          return {
+            success: false,
+            message: 'Domínio ainda não está apontando corretamente. Verifique as configurações DNS e aguarde a propagação (pode levar até 48 horas).',
+            status: 'pending',
+          };
+        } catch (error) {
+          return {
+            success: false,
+            message: 'Não foi possível verificar o domínio. Verifique se o domínio está correto e tente novamente.',
+            status: 'error',
+            error: error instanceof Error ? error.message : 'Erro desconhecido',
+          };
+        }
+      }),
   }),
 
   // Geração de XML para portais imobiliários

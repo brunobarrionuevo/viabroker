@@ -100,6 +100,19 @@ export default function SiteCustomization() {
     },
   });
 
+  const verifyDomainMutation = trpc.siteSettings.verifyDomain.useMutation({
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.warning(data.message);
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao verificar domínio");
+    },
+  });
+
   useEffect(() => {
     if (siteSettings) {
       setSettingsData({
@@ -951,49 +964,232 @@ export default function SiteCustomization() {
                     <Globe className="w-5 h-5" />
                     Domínio Personalizado
                   </CardTitle>
-                  <CardDescription>Configure um domínio próprio para seu site</CardDescription>
+                  <CardDescription>Configure um domínio próprio para seu site imobiliário</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Free Domain */}
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <h3 className="font-semibold text-green-800 mb-2">Domínio Gratuito</h3>
+                    <h3 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
+                      <Check className="w-5 h-5" />
+                      Domínio Gratuito Ativo
+                    </h3>
                     <p className="text-sm text-green-700 mb-3">
                       Seu site já está disponível gratuitamente em:
                     </p>
-                    <code className="bg-white px-3 py-2 rounded border text-green-800 font-mono">
-                      {siteUrl || "Configure o slug da empresa"}
-                    </code>
+                    <div className="flex items-center gap-2">
+                      <code className="bg-white px-3 py-2 rounded border text-green-800 font-mono flex-1">
+                        {siteUrl || "Configure o slug da empresa"}
+                      </code>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          if (siteUrl) {
+                            window.open(siteUrl, '_blank');
+                          }
+                        }}
+                        title="Abrir site"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Custom Domain */}
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="customDomain">Domínio Próprio (Opcional)</Label>
-                      <p className="text-xs text-muted-foreground">
-                        Se você possui um domínio próprio, configure-o aqui. Você precisará apontar o DNS para nossos servidores.
+                      <Label htmlFor="customDomain" className="text-base font-semibold">Domínio Próprio (Opcional)</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Conecte seu próprio domínio para profissionalizar ainda mais seu site. 
+                        Exemplos: <code className="text-xs">www.suaimobiliaria.com.br</code> ou <code className="text-xs">suaimobiliaria.com.br</code>
                       </p>
                       <Input
                         id="customDomain"
                         value={settingsData.customDomain}
-                        onChange={(e) => setSettingsData(prev => ({ ...prev, customDomain: e.target.value }))}
+                        onChange={(e) => setSettingsData(prev => ({ ...prev, customDomain: e.target.value.toLowerCase().trim() }))}
                         placeholder="www.suaimobiliaria.com.br"
+                        className="font-mono"
                       />
                     </div>
 
                     {settingsData.customDomain && (
-                      <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                        <h4 className="font-semibold text-amber-800 mb-2">Configuração de DNS</h4>
-                        <p className="text-sm text-amber-700 mb-3">
-                          Para ativar seu domínio personalizado, adicione o seguinte registro CNAME no seu provedor de DNS:
-                        </p>
-                        <div className="bg-white p-3 rounded border font-mono text-sm">
-                          <p><strong>Tipo:</strong> CNAME</p>
-                          <p><strong>Nome:</strong> www (ou @)</p>
-                          <p><strong>Valor:</strong> domains.manus.space</p>
+                      <div className="space-y-4">
+                        {/* Instruções Detalhadas */}
+                        <div className="p-5 bg-blue-50 border-2 border-blue-200 rounded-lg space-y-4">
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">
+                              1
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-blue-900 mb-2">Acesse o painel do seu provedor de domínio</h4>
+                              <p className="text-sm text-blue-800 mb-2">
+                                Entre no site onde você registrou seu domínio (Registro.br, GoDaddy, HostGator, Locaweb, etc.) e faça login.
+                              </p>
+                              <div className="bg-white/70 p-3 rounded border border-blue-300 text-xs">
+                                <p className="font-medium text-blue-900 mb-1">⚠️ Provedores comuns no Brasil:</p>
+                                <ul className="list-disc list-inside text-blue-800 space-y-0.5">
+                                  <li><strong>Registro.br:</strong> <a href="https://registro.br" target="_blank" rel="noopener" className="underline">registro.br</a></li>
+                                  <li><strong>GoDaddy:</strong> <a href="https://godaddy.com" target="_blank" rel="noopener" className="underline">godaddy.com</a></li>
+                                  <li><strong>HostGator:</strong> <a href="https://hostgator.com.br" target="_blank" rel="noopener" className="underline">hostgator.com.br</a></li>
+                                  <li><strong>Locaweb:</strong> <a href="https://locaweb.com.br" target="_blank" rel="noopener" className="underline">locaweb.com.br</a></li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">
+                              2
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-blue-900 mb-2">Localize a seção de gerenciamento de DNS</h4>
+                              <p className="text-sm text-blue-800 mb-2">
+                                Procure por opções como: "Gerenciar DNS", "Zona DNS", "DNS Settings", "Configurações de DNS" ou "Registros DNS".
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">
+                              3
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-blue-900 mb-2">Adicione o registro CNAME</h4>
+                              <p className="text-sm text-blue-800 mb-3">
+                                Crie um novo registro DNS com as seguintes informações:
+                              </p>
+                              <div className="bg-white p-4 rounded border-2 border-blue-400 space-y-2">
+                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
+                                  <span className="font-bold text-blue-900">Tipo:</span>
+                                  <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">CNAME</code>
+                                </div>
+                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
+                                  <span className="font-bold text-blue-900">Nome/Host:</span>
+                                  <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">
+                                    {settingsData.customDomain.startsWith('www.') ? 'www' : '@'}
+                                  </code>
+                                </div>
+                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
+                                  <span className="font-bold text-blue-900">Valor/Destino:</span>
+                                  <div className="flex items-center gap-2">
+                                    <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900 flex-1">
+                                      domains.manus.space
+                                    </code>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText('domains.manus.space');
+                                        toast.success('Copiado para área de transferência!');
+                                      }}
+                                      title="Copiar"
+                                    >
+                                      <Copy className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
+                                  <span className="font-bold text-blue-900">TTL:</span>
+                                  <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">3600 (ou padrão)</code>
+                                </div>
+                              </div>
+                              <p className="text-xs text-blue-700 mt-2">
+                                💡 <strong>Dica:</strong> Se seu domínio não começa com "www", use <code className="text-xs">@</code> no campo Nome/Host. 
+                                Alguns provedores chamam de "root" ou deixam em branco.
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">
+                              4
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-blue-900 mb-2">Salve as alterações e aguarde</h4>
+                              <p className="text-sm text-blue-800 mb-2">
+                                Após salvar o registro DNS, clique em "Salvar Configurações" aqui na plataforma.
+                              </p>
+                              <div className="bg-amber-50 border border-amber-300 rounded p-3 text-xs text-amber-800">
+                                <p className="font-medium mb-1">⏳ Tempo de propagação:</p>
+                                <p>A propagação do DNS pode levar de <strong>15 minutos até 48 horas</strong>. 
+                                Na maioria dos casos, funciona em 1-2 horas. Use o botão "Verificar Status" abaixo para checar.</p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-xs text-amber-600 mt-2">
-                          A propagação do DNS pode levar até 48 horas.
-                        </p>
+
+                        {/* Botão de Verificação */}
+                        <div className="flex gap-3">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="flex-1"
+                            disabled={verifyDomainMutation.isPending}
+                            onClick={() => {
+                              verifyDomainMutation.mutate({ domain: settingsData.customDomain });
+                            }}
+                          >
+                            {verifyDomainMutation.isPending ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Verificando...
+                              </>
+                            ) : (
+                              <>
+                                <Globe className="w-4 h-4 mr-2" />
+                                Verificar Status do Domínio
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => {
+                              const helpUrl = 'https://help.manus.im';
+                              window.open(helpUrl, '_blank');
+                            }}
+                          >
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            Precisa de Ajuda?
+                          </Button>
+                        </div>
+
+                        {/* Troubleshooting */}
+                        <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                          <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                            <Settings className="w-4 h-4" />
+                            Problemas Comuns
+                          </h4>
+                          <ul className="text-sm text-gray-700 space-y-2">
+                            <li className="flex items-start gap-2">
+                              <span className="text-red-500 font-bold flex-shrink-0">•</span>
+                              <div>
+                                <strong>Erro "Domínio não encontrado":</strong> Verifique se digitou o domínio corretamente e se o registro DNS foi salvo.
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-red-500 font-bold flex-shrink-0">•</span>
+                              <div>
+                                <strong>Demora na propagação:</strong> DNS pode levar até 48h. Teste em <a href="https://dnschecker.org" target="_blank" rel="noopener" className="underline text-blue-600">dnschecker.org</a>
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-red-500 font-bold flex-shrink-0">•</span>
+                              <div>
+                                <strong>Registro.br não aceita CNAME em @:</strong> Use um subdomínio como <code className="text-xs">www</code> ou configure redirecionamento.
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-red-500 font-bold flex-shrink-0">•</span>
+                              <div>
+                                <strong>Já tenho um site no domínio:</strong> O CNAME substituirá o apontamento atual. Considere usar um subdomínio (ex: <code className="text-xs">imoveis.seudominio.com.br</code>).
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
                     )}
                   </div>
