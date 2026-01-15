@@ -494,5 +494,11 @@
 
 ## Ajustes de Logo e Descrição (14/01/2026)
 - [x] Aumentar tamanho da logo em todos os locais para dar mais relevância
-- [x] Corrigir favicon que não está aparecendo (criados múltiplos tamanhos)
-- [x] Ajustar title da página para "Gestão inteligente para corretores e imobiliárias | Viabroker"
+- [ ] Corrigir favicon que não está aparecendo - REABERTO (implementação anterior não funcionou)
+- [ ] Ajustar title da página para "Gestão inteligente para corretores e imobiliárias" SEM "Viabroker" - REABERTO
+
+## Correção URGENTE Favicon e Title (15/01/2026)
+- [x] Gerar favicon correto a partir da imagem fornecida (Image_202601140348.jpeg - ícone azul/verde)
+- [x] Atualizar index.html com links corretos para o favicon
+- [x] Atualizar title para APENAS "Gestão inteligente para corretores e imobiliárias" (sem Viabroker)
+- [x] Testar e validar que favicon aparece no navegador
