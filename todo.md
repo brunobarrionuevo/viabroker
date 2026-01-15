@@ -502,3 +502,20 @@
 - [x] Atualizar index.html com links corretos para o favicon
 - [x] Atualizar title para APENAS "Gestão inteligente para corretores e imobiliárias" (sem Viabroker)
 - [x] Testar e validar que favicon aparece no navegador
+
+
+## Diagnóstico de Domínio Personalizado (15/01/2026)
+- [x] Verificar configuração do domínio no banco de dados (site do corretor)
+- [x] Verificar registros DNS do domínio
+- [x] Verificar roteamento de domínio personalizado no backend
+- [x] Identificar problema: Funcionalidade de domínio personalizado NÃO IMPLEMENTADA
+
+## Implementação de Domínios Personalizados (15/01/2026)
+- [x] Criar middleware de detecção de domínio personalizado (customDomainMiddleware.ts)
+- [x] Integrar middleware no servidor Express
+- [x] Criar endpoints de API para gerenciamento de domínios (verificar, salvar, remover)
+- [x] Implementar sistema de verificação DNS
+- [x] Criar interface de gerenciamento de domínio no painel (SiteCustomization)
+- [x] Adicionar instruções de configuração DNS para o usuário
+- [x] Testar domínio personalizado funcionando end-to-end
+- [x] Escrever testes unitários para middleware e verificação (5 testes passando)

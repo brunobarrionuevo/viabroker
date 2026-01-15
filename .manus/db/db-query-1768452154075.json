@@ -1,0 +1,19 @@
+{
+  "query": "SELECT ss.id, ss.companyId, ss.customDomain, ss.domainVerified, c.name as companyName, c.email, c.slug\nFROM site_settings ss \nJOIN companies c ON ss.companyId = c.id \nWHERE ss.customDomain LIKE '%bruno%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT ss.id, ss.companyId, ss.customDomain, ss.domainVerified, c.name as companyName, c.email, c.slug\nFROM site_settings ss \nJOIN companies c ON ss.companyId = c.id \nWHERE ss.customDomain LIKE '%bruno%';",
+  "rows": [
+    {
+      "id": "60001",
+      "companyId": "60001",
+      "customDomain": "www.brunobarrionuevo.com.br",
+      "domainVerified": "0",
+      "companyName": "Bruno Barrionuevo",
+      "email": "busb@hotmail.com",
+      "slug": "bruno-barrionuevo"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcompanyId\tcustomDomain\tdomainVerified\tcompanyName\temail\tslug\n60001\t60001\twww.brunobarrionuevo.com.br\t0\tBruno Barrionuevo\tbusb@hotmail.com\tbruno-barrionuevo\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

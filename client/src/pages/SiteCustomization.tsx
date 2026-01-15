@@ -104,12 +104,24 @@ export default function SiteCustomization() {
     onSuccess: (data) => {
       if (data.success) {
         toast.success(data.message);
+        refetch();
       } else {
         toast.warning(data.message);
       }
     },
     onError: (error) => {
       toast.error(error.message || "Erro ao verificar domínio");
+    },
+  });
+  
+  const removeDomainMutation = trpc.siteSettings.removeDomain.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+      setSettingsData(prev => ({ ...prev, customDomain: "" }));
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao remover domínio");
     },
   });
 
@@ -1055,26 +1067,27 @@ export default function SiteCustomization() {
                               3
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-semibold text-blue-900 mb-2">Adicione o registro CNAME</h4>
+                              <h4 className="font-semibold text-blue-900 mb-2">Adicione o registro A (ou CNAME)</h4>
                               <p className="text-sm text-blue-800 mb-3">
-                                Crie um novo registro DNS com as seguintes informações:
+                                Crie um novo registro DNS no seu provedor de domínio:
                               </p>
-                              <div className="bg-white p-4 rounded border-2 border-blue-400 space-y-2">
+                              
+                              {/* Opção 1: Registro A (Recomendado para Registro.br) */}
+                              <div className="bg-white p-4 rounded border-2 border-blue-400 space-y-2 mb-3">
+                                <p className="text-xs font-bold text-blue-900 mb-2">✅ OPÇÃO 1: Registro A (Recomendado)</p>
                                 <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
                                   <span className="font-bold text-blue-900">Tipo:</span>
-                                  <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">CNAME</code>
+                                  <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">A</code>
                                 </div>
                                 <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
                                   <span className="font-bold text-blue-900">Nome/Host:</span>
-                                  <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">
-                                    {settingsData.customDomain.startsWith('www.') ? 'www' : '@'}
-                                  </code>
+                                  <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">@ (ou deixe vazio)</code>
                                 </div>
                                 <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                                  <span className="font-bold text-blue-900">Valor/Destino:</span>
+                                  <span className="font-bold text-blue-900">Valor/IP:</span>
                                   <div className="flex items-center gap-2">
                                     <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900 flex-1">
-                                      domains.manus.space
+                                      104.19.169.112
                                     </code>
                                     <Button
                                       type="button"
@@ -1082,10 +1095,10 @@ export default function SiteCustomization() {
                                       size="icon"
                                       className="h-8 w-8"
                                       onClick={() => {
-                                        navigator.clipboard.writeText('domains.manus.space');
-                                        toast.success('Copiado para área de transferência!');
+                                        navigator.clipboard.writeText('104.19.169.112');
+                                        toast.success('IP copiado!');
                                       }}
-                                      title="Copiar"
+                                      title="Copiar IP"
                                     >
                                       <Copy className="w-4 h-4" />
                                     </Button>
@@ -1096,9 +1109,26 @@ export default function SiteCustomization() {
                                   <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">3600 (ou padrão)</code>
                                 </div>
                               </div>
-                              <p className="text-xs text-blue-700 mt-2">
-                                💡 <strong>Dica:</strong> Se seu domínio não começa com "www", use <code className="text-xs">@</code> no campo Nome/Host. 
-                                Alguns provedores chamam de "root" ou deixam em branco.
+                              
+                              {/* Opção 2: CNAME (apenas para subdomínios) */}
+                              <div className="bg-white p-4 rounded border-2 border-gray-300 space-y-2">
+                                <p className="text-xs font-bold text-gray-700 mb-2">OPÇÃO 2: CNAME (apenas se usar www.seudominio.com)</p>
+                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
+                                  <span className="font-bold text-gray-700">Tipo:</span>
+                                  <code className="bg-gray-100 px-2 py-1 rounded font-mono text-gray-700">CNAME</code>
+                                </div>
+                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
+                                  <span className="font-bold text-gray-700">Nome/Host:</span>
+                                  <code className="bg-gray-100 px-2 py-1 rounded font-mono text-gray-700">www</code>
+                                </div>
+                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
+                                  <span className="font-bold text-gray-700">Valor/Destino:</span>
+                                  <code className="bg-gray-100 px-2 py-1 rounded font-mono text-gray-700">domains.manus.space</code>
+                                </div>
+                              </div>
+                              
+                              <p className="text-xs text-blue-700 mt-3">
+                                💡 <strong>Registro.br:</strong> Use a <strong>Opção 1 (Registro A)</strong>, pois o Registro.br não permite CNAME no domínio raiz.
                               </p>
                             </div>
                           </div>
@@ -1121,15 +1151,15 @@ export default function SiteCustomization() {
                           </div>
                         </div>
 
-                        {/* Botão de Verificação */}
+                        {/* Botões de Ação */}
                         <div className="flex gap-3">
                           <Button
                             type="button"
                             variant="outline"
                             className="flex-1"
-                            disabled={verifyDomainMutation.isPending}
+                            disabled={verifyDomainMutation.isPending || !settingsData.customDomain}
                             onClick={() => {
-                              verifyDomainMutation.mutate({ domain: settingsData.customDomain });
+                              verifyDomainMutation.mutate();
                             }}
                           >
                             {verifyDomainMutation.isPending ? (
@@ -1140,10 +1170,36 @@ export default function SiteCustomization() {
                             ) : (
                               <>
                                 <Globe className="w-4 h-4 mr-2" />
-                                Verificar Status do Domínio
+                                Verificar Status
                               </>
                             )}
                           </Button>
+                          
+                          {settingsData.customDomain && (
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              disabled={removeDomainMutation.isPending}
+                              onClick={() => {
+                                if (confirm('Tem certeza que deseja remover o domínio personalizado?')) {
+                                  removeDomainMutation.mutate();
+                                }
+                              }}
+                            >
+                              {removeDomainMutation.isPending ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Removendo...
+                                </>
+                              ) : (
+                                <>
+                                  <X className="w-4 h-4 mr-2" />
+                                  Remover Domínio
+                                </>
+                              )}
+                            </Button>
+                          )}
+                          
                           <Button
                             type="button"
                             variant="secondary"
@@ -1153,7 +1209,7 @@ export default function SiteCustomization() {
                             }}
                           >
                             <ExternalLink className="w-4 h-4 mr-2" />
-                            Precisa de Ajuda?
+                            Ajuda
                           </Button>
                         </div>
 

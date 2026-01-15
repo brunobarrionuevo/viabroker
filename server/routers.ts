@@ -1085,39 +1085,102 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
       }),
     
     verifyDomain: protectedProcedure
-      .input(z.object({ domain: z.string() }))
-      .mutation(async ({ input }) => {
-        const domain = input.domain.toLowerCase().trim();
+      .mutation(async ({ ctx }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        // Buscar configurações do site para obter o domínio personalizado
+        const settings = await db.getSiteSettings(ctx.user.companyId);
+        
+        if (!settings?.customDomain) {
+          return {
+            success: false,
+            message: 'Nenhum domínio personalizado configurado.',
+            status: 'not_configured',
+          };
+        }
+        
+        const domain = settings.customDomain.toLowerCase().trim();
         
         try {
-          // Tentar fazer uma requisição HTTP para o domínio
-          const response = await fetch(`http://${domain}`, {
-            method: 'HEAD',
-            redirect: 'follow',
-            signal: AbortSignal.timeout(10000), // 10 segundos timeout
-          }).catch(() => null);
+          // Verificar DNS usando API pública do Cloudflare
+          const dnsResponse = await fetch(
+            `https://cloudflare-dns.com/dns-query?name=${domain}&type=A`,
+            {
+              headers: { 'accept': 'application/dns-json' },
+              signal: AbortSignal.timeout(10000),
+            }
+          );
           
-          if (response && response.ok) {
+          if (!dnsResponse.ok) {
+            throw new Error('Falha ao consultar DNS');
+          }
+          
+          const dnsData = await dnsResponse.json();
+          
+          // Verificar se há registros A
+          const hasARecords = dnsData.Answer && dnsData.Answer.length > 0;
+          
+          if (hasARecords) {
+            // Atualizar domainVerified no banco
+            await db.upsertSiteSettings(ctx.user.companyId, {
+              domainVerified: true,
+            });
+            
+            // Limpar cache do middleware
+            const { clearDomainCache } = await import('./_core/customDomainMiddleware');
+            clearDomainCache(domain);
+            
             return {
               success: true,
-              message: 'Domínio está apontando corretamente!',
-              status: 'active',
+              message: 'Domínio verificado com sucesso! Seu site já está acessível pelo domínio personalizado.',
+              status: 'verified',
+              records: dnsData.Answer.map((r: any) => r.data),
             };
           }
           
           return {
             success: false,
-            message: 'Domínio ainda não está apontando corretamente. Verifique as configurações DNS e aguarde a propagação (pode levar até 48 horas).',
+            message: 'Domínio ainda não possui registros DNS configurados. Configure o registro A no seu provedor de domínio e aguarde a propagação (1-48 horas).',
             status: 'pending',
           };
         } catch (error) {
           return {
             success: false,
-            message: 'Não foi possível verificar o domínio. Verifique se o domínio está correto e tente novamente.',
+            message: 'Não foi possível verificar o domínio. Verifique sua conexão e tente novamente.',
             status: 'error',
             error: error instanceof Error ? error.message : 'Erro desconhecido',
           };
         }
+      }),
+    
+    removeDomain: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        // Buscar domínio atual
+        const settings = await db.getSiteSettings(ctx.user.companyId);
+        const oldDomain = settings?.customDomain;
+        
+        // Remover domínio
+        await db.upsertSiteSettings(ctx.user.companyId, {
+          customDomain: null,
+          domainVerified: false,
+        });
+        
+        // Limpar cache
+        if (oldDomain) {
+          const { clearDomainCache } = await import('./_core/customDomainMiddleware');
+          clearDomainCache(oldDomain);
+        }
+        
+        return {
+          success: true,
+          message: 'Domínio personalizado removido com sucesso.',
+        };
       }),
   }),
 
