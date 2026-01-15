@@ -86,18 +86,18 @@ function SortableImage({ image, index, onDelete, onSetMain, onPreview, totalImag
       <div
         {...attributes}
         {...listeners}
-        className="absolute top-2 left-2 bg-black/70 text-white p-1.5 rounded cursor-move opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-2 left-2 bg-black/70 text-white p-1.5 rounded cursor-move z-20"
         title="Arrastar para reordenar"
       >
         <GripVertical className="w-4 h-4" />
       </div>
 
       {/* Overlay com ações */}
-      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none">
         <Button
           size="icon"
           variant={image.isMain ? "default" : "secondary"}
-          className={image.isMain ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+          className={`pointer-events-auto ${image.isMain ? "bg-yellow-500 hover:bg-yellow-600" : ""}`}
           onClick={() => onSetMain(image.id)}
           title={image.isMain ? "Foto principal" : "Definir como principal"}
         >
@@ -106,6 +106,7 @@ function SortableImage({ image, index, onDelete, onSetMain, onPreview, totalImag
         <Button
           size="icon"
           variant="secondary"
+          className="pointer-events-auto"
           onClick={() => onPreview(index)}
           title="Visualizar"
         >
@@ -114,6 +115,7 @@ function SortableImage({ image, index, onDelete, onSetMain, onPreview, totalImag
         <Button
           size="icon"
           variant="destructive"
+          className="pointer-events-auto"
           onClick={() => onDelete(image.id)}
           title="Remover foto"
         >

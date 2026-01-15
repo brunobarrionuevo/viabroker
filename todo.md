@@ -455,5 +455,5 @@
 
 
 ## Correções na Galeria de Fotos (14/01/2026)
-- [x] Corrigir função de arrastar para reorganizar fotos (drag-and-drop não está funcionando)
+- [x] Corrigir função de arrastar para reorganizar fotos (resolvido conflito de event handlers com pointer-events)
 - [x] Corrigir botão de fechar (X) no modo de visualização lightbox
