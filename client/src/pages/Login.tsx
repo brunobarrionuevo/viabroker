@@ -51,12 +51,15 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/">
-            <div className="inline-flex items-center gap-2">
-              <img src="/viabroker-logo.png" alt="Viabroker" className="h-10 w-10" />
-              <span className="text-2xl font-bold text-blue-900">Viabroker</span>
+            <div className="inline-flex flex-col items-center gap-3">
+              <img 
+                src="/images/viabroker-logo-full-transparent.png" 
+                alt="Viabroker" 
+                className="h-12 w-auto"
+              />
+              <p className="text-gray-600 text-sm">Plataforma de Sites para Corretores</p>
             </div>
           </Link>
-          <p className="text-gray-600 mt-2">Plataforma de Sites para Corretores</p>
         </div>
 
         <Card className="shadow-xl border-0">

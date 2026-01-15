@@ -14,12 +14,11 @@ export default function Layout({ children }: LayoutProps) {
         <div className="container mx-auto px-4 h-20 flex items-center justify-between">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                M
-              </div>
-              <span className="text-xl font-bold tracking-tight text-foreground">
-                MigMídia<span className="text-primary">.pitch</span>
-              </span>
+              <img 
+                src="/images/viabroker-logo-full-transparent.png" 
+                alt="Viabroker" 
+                className="h-8 w-auto"
+              />
             </div>
           </Link>
 

@@ -170,11 +170,19 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">
-                    Navigation
-                  </span>
+                  <img 
+                    src="/images/viabroker-logo-full-transparent.png" 
+                    alt="Viabroker" 
+                    className="h-6 w-auto"
+                  />
                 </div>
-              ) : null}
+              ) : (
+                <img 
+                  src="/images/viabroker-logo-icon-transparent.png" 
+                  alt="Viabroker" 
+                  className="h-8 w-8"
+                />
+              )}
             </div>
           </SidebarHeader>
 
