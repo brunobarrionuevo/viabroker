@@ -468,7 +468,7 @@
 
 
 ## Melhorias de Login e Cadastro (14/01/2026)
-- [x] Implementar redirecionamento automático para dashboard após login bem-sucedido
+- [x] Corrigir redirecionamento automático para dashboard após login (corrigido com window.location.href)
 - [x] Adicionar informação sobre requisitos de senha na página de cadastro
 - [x] Implementar validação de senha no cadastro (mínimo 8 caracteres, 1 maiúscula, 1 especial)
 - [x] Exibir mensagens de erro específicas quando senha não atender requisitos

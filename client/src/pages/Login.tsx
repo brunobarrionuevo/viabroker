@@ -24,12 +24,15 @@ export default function Login() {
       
       toast.success("Login realizado com sucesso!");
       
-      // Verificar se precisa de assinatura
-      if (data.user.isTrialExpired && !data.user.isTrialActive) {
-        setLocation("/planos");
-      } else {
-        setLocation("/dashboard");
-      }
+      // Redirecionar após pequeno delay para garantir que o toast seja exibido
+      setTimeout(() => {
+        // Verificar se precisa de assinatura
+        if (data.user.isTrialExpired && !data.user.isTrialActive) {
+          window.location.href = "/planos";
+        } else {
+          window.location.href = "/dashboard";
+        }
+      }, 500);
     },
     onError: (error) => {
       setError(error.message);
