@@ -91,6 +91,10 @@ export default function Register() {
       setError("Senha deve ter pelo menos 8 caracteres");
       return false;
     }
+    if (!/[A-Z]/.test(formData.password)) {
+      setError("Senha deve conter pelo menos 1 letra maiúscula (A-Z)");
+      return false;
+    }
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
       setError("Senha deve conter pelo menos 1 caractere especial (!@#$%^&*(),.?\":{}|<>)");
       return false;
@@ -101,6 +105,11 @@ export default function Register() {
     }
     return true;
   };
+
+  // Funções auxiliares para verificar requisitos de senha
+  const hasMinLength = formData.password.length >= 8;
+  const hasUpperCase = /[A-Z]/.test(formData.password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(formData.password);
 
   const validateStep2 = () => {
     if (!formData.companyName || formData.companyName.length < 2) {
@@ -271,7 +280,7 @@ export default function Register() {
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Mínimo 8 caracteres com 1 especial"
+                      placeholder="Digite sua senha"
                       value={formData.password}
                       onChange={handleChange}
                       className="pl-10 pr-10"
@@ -285,6 +294,35 @@ export default function Register() {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                  {/* Indicadores de requisitos de senha */}
+                  {formData.password && (
+                    <div className="space-y-1.5 text-xs mt-2">
+                      <div className={`flex items-center gap-2 ${hasMinLength ? "text-green-600" : "text-gray-500"}`}>
+                        {hasMinLength ? (
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        ) : (
+                          <div className="w-3.5 h-3.5 rounded-full border-2 border-current" />
+                        )}
+                        <span>Mínimo 8 caracteres</span>
+                      </div>
+                      <div className={`flex items-center gap-2 ${hasUpperCase ? "text-green-600" : "text-gray-500"}`}>
+                        {hasUpperCase ? (
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        ) : (
+                          <div className="w-3.5 h-3.5 rounded-full border-2 border-current" />
+                        )}
+                        <span>Pelo menos 1 letra maiúscula (A-Z)</span>
+                      </div>
+                      <div className={`flex items-center gap-2 ${hasSpecialChar ? "text-green-600" : "text-gray-500"}`}>
+                        {hasSpecialChar ? (
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        ) : (
+                          <div className="w-3.5 h-3.5 rounded-full border-2 border-current" />
+                        )}
+                        <span>Pelo menos 1 caractere especial (!@#$%^&*)</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
