@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: viabroker-platform
+    runtime: node
+    plan: free  # Mude para 'starter' ($7/mês) quando precisar de mais recursos
+    buildCommand: pnpm install && pnpm build
+    startCommand: node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false  # Será configurado manualmente no painel do Render
+      - key: JWT_SECRET
+        generateValue: true  # Render gera automaticamente
+      - key: PORT
+        value: 10000  # Porta padrão do Render
+    healthCheckPath: /api/health
+    autoDeploy: true  # Deploy automático quando houver push no GitHub

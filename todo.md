@@ -519,3 +519,12 @@
 - [x] Adicionar instruções de configuração DNS para o usuário
 - [x] Testar domínio personalizado funcionando end-to-end
 - [x] Escrever testes unitários para middleware e verificação (5 testes passando)
+
+
+## Deploy da Plataforma no Render (15/01/2026)
+- [x] Criar arquivo render.yaml com configuração do serviço
+- [x] Preparar lista de variáveis de ambiente necessárias
+- [x] Criar guia passo a passo de deploy no Render
+- [x] Documentar configuração do TiDB
+- [x] Documentar configuração de domínios personalizados pós-deploy
+- [ ] Testar deploy funcionando (aguardando usuário fazer deploy)
