@@ -563,5 +563,5 @@
 ## Correção Conexão SSL TiDB (16/01/2026)
 - [x] Modificar drizzle.config.ts para suportar SSL
 - [x] Modificar código de conexão do banco para usar SSL
-- [ ] Fazer commit e push
+- [x] Fazer commit e push
 - [ ] Testar site funcionando em viabroker.app
