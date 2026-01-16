@@ -551,3 +551,17 @@
 - [x] Fazer commit e push para GitHub
 - [ ] Testar deploy no Render
 - [ ] Verificar se servidor inicia sem erros
+
+
+## Correção Domínio viabroker.app (16/01/2026)
+- [ ] Investigar por que viabroker.app não está carregando
+- [ ] Verificar configuração DNS do domínio
+- [ ] Verificar configuração de domínio customizado no Render
+- [ ] Testar acesso ao domínio após correção
+
+
+## Correção Conexão SSL TiDB (16/01/2026)
+- [x] Modificar drizzle.config.ts para suportar SSL
+- [x] Modificar código de conexão do banco para usar SSL
+- [ ] Fazer commit e push
+- [ ] Testar site funcionando em viabroker.app
