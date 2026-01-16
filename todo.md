@@ -593,5 +593,5 @@
 ## Configurar viabroker.app como Domínio da Plataforma (16/01/2026)
 - [x] Adicionar viabroker.app e www.viabroker.app na lista PLATFORM_DOMAINS
 - [x] Remover viabroker.app do banco de dados como domínio de corretor
-- [ ] Fazer commit e push
+- [x] Fazer commit e push
 - [ ] Testar plataforma funcionando completamente em viabroker.app
