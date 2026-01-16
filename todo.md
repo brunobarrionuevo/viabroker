@@ -571,6 +571,20 @@
 - [x] Verificar código atual no GitHub
 - [x] Identificar problema de conexão SSL no código de produção
 - [x] Corrigir configuração de conexão do banco
-- [ ] Fazer commit e push para GitHub
+- [x] Fazer commit e push para GitHub
 - [ ] Validar deploy no Render
 - [ ] Testar viabroker.app funcionando
+
+
+## Criar Corretor Demo e Configurar viabroker.app (16/01/2026)
+- [x] Criar script SQL para inserir corretor Bruno Barrionuevo
+- [x] Executar SQL no banco TiDB
+- [x] Configurar viabroker.app como domínio personalizado
+- [ ] Testar site funcionando em viabroker.app
+
+
+## Corrigir Middleware de Domínio Personalizado (16/01/2026)
+- [x] Localizar código do middleware no servidor
+- [x] Adicionar exceção para arquivos estáticos (JS, CSS, imagens)
+- [ ] Fazer commit e push
+- [ ] Testar site carregando completamente

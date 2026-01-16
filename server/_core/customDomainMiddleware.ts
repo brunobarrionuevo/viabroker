@@ -156,6 +156,12 @@ export async function customDomainMiddleware(
       return next();
     }
     
+    // Se é um arquivo estático (assets), não redireciona
+    if (req.path.startsWith('/assets/') || 
+        req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map|json)$/)) {
+      return next();
+    }
+    
     // Busca empresa por domínio personalizado
     const companySlug = await findCompanyByDomain(hostname);
     
