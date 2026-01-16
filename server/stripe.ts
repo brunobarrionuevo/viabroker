@@ -3,10 +3,19 @@ import { Router, Request, Response } from "express";
 import * as db from "./db";
 import { BROKVIA_PLANS, getPlanById } from "./products";
 
-// Inicializar Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-12-15.clover",
-});
+// Inicializar Stripe (opcional)
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2025-12-15.clover",
+    })
+  : null;
+
+function ensureStripe(): Stripe {
+  if (!stripe) {
+    throw new Error("Stripe not configured. Set STRIPE_SECRET_KEY environment variable.");
+  }
+  return stripe;
+}
 
 export const stripeRouter = Router();
 
@@ -25,7 +34,7 @@ stripeRouter.post(
     let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+      event = ensureStripe().webhooks.constructEvent(req.body, sig, webhookSecret);
     } catch (err: any) {
       console.error("[Stripe Webhook] Signature verification failed:", err.message);
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
@@ -101,7 +110,7 @@ export async function createCheckoutSession(
   // Buscar ou criar customer no Stripe
   let customerId = company.stripeCustomerId;
   if (!customerId) {
-    const customer = await stripe.customers.create({
+    const customer = await ensureStripe().customers.create({
       email: userEmail,
       name: company.name,
       metadata: {
@@ -117,7 +126,7 @@ export async function createCheckoutSession(
   const price = billingCycle === "yearly" ? plan.priceYearly : plan.priceMonthly;
   const interval = billingCycle === "yearly" ? "year" : "month";
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await ensureStripe().checkout.sessions.create({
     customer: customerId,
     mode: "subscription",
     payment_method_types: ["card"],
@@ -167,7 +176,7 @@ export async function createBillingPortalSession(
     throw new Error("Empresa não possui customer no Stripe");
   }
 
-  const session = await stripe.billingPortal.sessions.create({
+  const session = await ensureStripe().billingPortal.sessions.create({
     customer: company.stripeCustomerId,
     return_url: `${origin}/dashboard/settings`,
   });

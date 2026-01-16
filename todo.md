@@ -531,8 +531,23 @@
 
 
 ## Configuração GitHub Manual (15/01/2026)
-- [ ] Criar repositório no GitHub.com
-- [ ] Configurar Git local com credenciais
-- [ ] Adicionar remote do GitHub
-- [ ] Fazer push do código
-- [ ] Verificar código no GitHub
+- [x] Criar repositório no GitHub.com
+- [x] Configurar Git local com credenciais
+- [x] Adicionar remote do GitHub
+- [x] Fazer push do código
+- [x] Verificar código no GitHub
+
+
+## Correção Build Render (16/01/2026)
+- [ ] Corrigir comando de build no Render (usar pnpm ao invés de npm)
+- [ ] Verificar se build passa com sucesso
+- [ ] Testar acesso à plataforma
+- [ ] Testar domínio personalizado
+
+
+## Tornar Stripe e OAuth Opcionais (16/01/2026)
+- [x] Modificar inicialização do Stripe para ser opcional
+- [x] Modificar inicialização do OAuth para ser opcional
+- [ ] Fazer commit e push para GitHub
+- [ ] Testar deploy no Render
+- [ ] Verificar se servidor inicia sem erros
