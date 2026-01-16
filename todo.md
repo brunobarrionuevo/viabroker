@@ -586,5 +586,5 @@
 ## Corrigir Middleware de Domínio Personalizado (16/01/2026)
 - [x] Localizar código do middleware no servidor
 - [x] Adicionar exceção para arquivos estáticos (JS, CSS, imagens)
-- [ ] Fazer commit e push
+- [x] Fazer commit e push
 - [ ] Testar site carregando completamente
