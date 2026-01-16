@@ -28,12 +28,9 @@ export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
       // Create connection pool with SSL enabled for TiDB
-      _pool = mysql.createPool({
-        uri: process.env.DATABASE_URL,
-        ssl: {
-          rejectUnauthorized: true
-        }
-      });
+      // Parse DATABASE_URL and add SSL configuration
+      const connectionString = process.env.DATABASE_URL;
+      _pool = mysql.createPool(connectionString + '?ssl={"rejectUnauthorized":true}');
       _db = drizzle(_pool);
       console.log("[Database] Connected successfully with SSL");
     } catch (error) {
