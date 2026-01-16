@@ -548,6 +548,6 @@
 ## Tornar Stripe e OAuth Opcionais (16/01/2026)
 - [x] Modificar inicialização do Stripe para ser opcional
 - [x] Modificar inicialização do OAuth para ser opcional
-- [ ] Fazer commit e push para GitHub
+- [x] Fazer commit e push para GitHub
 - [ ] Testar deploy no Render
 - [ ] Verificar se servidor inicia sem erros
