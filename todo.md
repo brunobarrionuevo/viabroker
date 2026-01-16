@@ -528,3 +528,11 @@
 - [x] Documentar configuração do TiDB
 - [x] Documentar configuração de domínios personalizados pós-deploy
 - [ ] Testar deploy funcionando (aguardando usuário fazer deploy)
+
+
+## Configuração GitHub Manual (15/01/2026)
+- [ ] Criar repositório no GitHub.com
+- [ ] Configurar Git local com credenciais
+- [ ] Adicionar remote do GitHub
+- [ ] Fazer push do código
+- [ ] Verificar código no GitHub
