@@ -23,8 +23,12 @@ const PLATFORM_DOMAINS = [
   '::1',
   'viabroker.com',
   'www.viabroker.com',
+  'viabroker.app',
+  'www.viabroker.app',
+  'viabroker.onrender.com',
   'manus.computer',
   'manus.space',
+  'onrender.com',
 ];
 
 // Cache de domínios para evitar consultas repetidas ao banco
