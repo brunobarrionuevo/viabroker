@@ -39,15 +39,16 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx?v=${nanoid()}"`
       );
       
-      // Debug log
-      console.log(`[Vite] req.url: ${req.url}, req.originalUrl: ${req.originalUrl}`);
+      // Debug log - In app.use("*"), req.url is always "/" and the matched path is in req.baseUrl
+      console.log(`[Vite] req.url: ${req.url}, req.originalUrl: ${req.originalUrl}, req.baseUrl: ${req.baseUrl}`);
       
       // Check if this is a custom domain redirect (url was rewritten by middleware)
-      // The middleware sets req.url to /site/:slug/ but originalUrl stays as the browser URL
-      const isCustomDomainRewrite = req.url.startsWith('/site/') && !req.originalUrl.startsWith('/site/');
+      // The middleware sets the URL to /site/:slug/... but originalUrl stays as the browser URL
+      // In app.use("*"), the rewritten path is in req.baseUrl, not req.url
+      const isCustomDomainRewrite = req.baseUrl.startsWith('/site/') && !req.originalUrl.startsWith('/site/');
       
       if (isCustomDomainRewrite) {
-        const match = req.url.match(/^\/site\/([^\/]+)/);
+        const match = req.baseUrl.match(/^\/site\/([^\/]+)/);
         if (match) {
           const slug = match[1];
           console.log(`[Vite] Injecting custom domain redirect for slug: ${slug}`);
@@ -83,17 +84,17 @@ export function serveStatic(app: Express) {
   app.use("*", (req, res) => {
     const indexPath = path.resolve(distPath, "index.html");
     
-    // Debug log
+    // Debug log - In app.use("*"), req.url is always "/" and the matched path is in req.baseUrl
     console.log(`[ServeStatic] req.url: ${req.url}, req.originalUrl: ${req.originalUrl}, req.baseUrl: ${req.baseUrl}`);
     
     // Check if this is a custom domain redirect (url was rewritten by middleware)
-    // The middleware sets req.url to /site/:slug/ but originalUrl stays as the browser URL
-    // We detect custom domain by checking if req.url starts with /site/ but originalUrl doesn't
-    const isCustomDomainRewrite = req.url.startsWith('/site/') && !req.originalUrl.startsWith('/site/');
+    // The middleware sets the URL to /site/:slug/... but originalUrl stays as the browser URL
+    // In app.use("*"), the rewritten path is in req.baseUrl, not req.url
+    const isCustomDomainRewrite = req.baseUrl.startsWith('/site/') && !req.originalUrl.startsWith('/site/');
     
     if (isCustomDomainRewrite) {
-      // Extract slug from rewritten URL
-      const match = req.url.match(/^\/site\/([^\/]+)/);
+      // Extract slug from rewritten URL (in baseUrl)
+      const match = req.baseUrl.match(/^\/site\/([^\/]+)/);
       if (match) {
         const slug = match[1];
         console.log(`[ServeStatic] Injecting custom domain redirect for slug: ${slug}`);
