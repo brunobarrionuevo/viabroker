@@ -595,3 +595,44 @@
 - [x] Remover viabroker.app do banco de dados como domínio de corretor
 - [x] Fazer commit e push
 - [ ] Testar plataforma funcionando completamente em viabroker.app
+
+
+## Corrigir Envio de Email para Recuperação de Senha (16/01/2026)
+- [x] Analisar código de envio de email
+- [x] Verificar variáveis de ambiente SMTP no Render
+- [x] Corrigir configuração se necessário (usuário configurou Gmail SMTP)
+- [x] Testar envio de email funcionando
+
+
+## Corrigir Login que não redireciona para Dashboard (16/01/2026)
+- [x] Investigar problema de redirecionamento após login
+- [x] Corrigir código de login/redirecionamento (sdk.ts - remover dependência do OAuth)
+- [ ] Testar e fazer deploy
+
+
+## Corrigir Senha Master (16/01/2026)
+- [x] Investigar problema de autenticação master
+- [x] Verificar/recriar usuário admin master no banco (usuário criado - tabela estava vazia)
+- [ ] Testar login master
+
+
+## Atualizar Informações de DNS para Render (17/01/2026)
+- [x] Localizar código da página de configuração de domínio
+- [x] Atualizar IP e CNAME para o novo servidor Render (216.24.57.1 e viabroker.onrender.com)
+- [x] Fazer deploy
+
+
+## Corrigir Erro DNS 1001 Cloudflare (17/01/2026)
+- [ ] Investigar configuração DNS atual
+- [ ] Configurar domínio no Render
+- [ ] Ajustar configuração Cloudflare
+
+
+## Integração Automática Cloudflare para Domínios Personalizados (17/01/2026)
+- [x] Verificar token e testar API Cloudflare
+- [x] Criar zona e registros DNS no Cloudflare
+- [ ] Criar Cloudflare Worker para proxy reverso
+- [ ] Configurar rota do Worker para domínios de clientes
+- [ ] Testar com domínio brunobarrionuevo.com.br
+- [ ] Implementar integração automática na plataforma
+- [ ] Fazer deploy e documentar

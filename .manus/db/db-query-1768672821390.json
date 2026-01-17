@@ -1,0 +1,18 @@
+{
+  "query": "SELECT ss.id, ss.companyId, ss.customDomain, ss.domainVerified, c.name as companyName, c.slug \nFROM site_settings ss \nJOIN companies c ON c.id = ss.companyId \nWHERE ss.customDomain IS NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT ss.id, ss.companyId, ss.customDomain, ss.domainVerified, c.name as companyName, c.slug \nFROM site_settings ss \nJOIN companies c ON c.id = ss.companyId \nWHERE ss.customDomain IS NOT NULL;",
+  "rows": [
+    {
+      "id": "60001",
+      "companyId": "60001",
+      "customDomain": "www.brunobarrionuevo.com.br",
+      "domainVerified": "1",
+      "companyName": "Bruno Barrionuevo",
+      "slug": "bruno-barrionuevo"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcompanyId\tcustomDomain\tdomainVerified\tcompanyName\tslug\n60001\t60001\twww.brunobarrionuevo.com.br\t1\tBruno Barrionuevo\tbruno-barrionuevo\n",
+  "stderr": "",
+  "execution_time_ms": 376
+}

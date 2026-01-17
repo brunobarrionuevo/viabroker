@@ -14,6 +14,8 @@ import { eq, and } from "drizzle-orm";
  * 
  * Isso permite que sites de corretores sejam acessados via domínio próprio
  * sem precisar da URL /site/:slug
+ * 
+ * Suporta Cloudflare Worker proxy via headers X-Original-Host ou X-Forwarded-Host
  */
 
 // Domínios que NÃO devem ser tratados como personalizados
@@ -22,18 +24,43 @@ const PLATFORM_DOMAINS = [
   '127.0.0.1',
   '::1',
   'viabroker.com',
-  'www.viabroker.com',
   'viabroker.app',
   'www.viabroker.app',
   'viabroker.onrender.com',
+  'onrender.com',
+  'www.viabroker.com',
   'manus.computer',
   'manus.space',
-  'onrender.com',
 ];
 
 // Cache de domínios para evitar consultas repetidas ao banco
 const domainCache = new Map<string, { companySlug: string; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+
+/**
+ * Obtém o hostname real da requisição
+ * Prioriza headers de proxy (Cloudflare Worker) sobre req.hostname
+ */
+function getRealHostname(req: Request): string {
+  // Prioridade: X-Original-Host > X-Forwarded-Host > req.hostname
+  const originalHost = req.headers['x-original-host'] as string;
+  const forwardedHost = req.headers['x-forwarded-host'] as string;
+  
+  // Remove porta se presente
+  const cleanHost = (host: string) => host?.split(':')[0]?.toLowerCase();
+  
+  if (originalHost) {
+    console.log(`[CustomDomain] Using X-Original-Host: ${originalHost}`);
+    return cleanHost(originalHost);
+  }
+  
+  if (forwardedHost) {
+    console.log(`[CustomDomain] Using X-Forwarded-Host: ${forwardedHost}`);
+    return cleanHost(forwardedHost);
+  }
+  
+  return cleanHost(req.hostname);
+}
 
 /**
  * Verifica se o hostname é um domínio da plataforma
@@ -63,11 +90,16 @@ function isPlatformDomain(hostname: string): boolean {
  * Busca empresa por domínio personalizado (com cache)
  */
 async function findCompanyByDomain(hostname: string): Promise<string | null> {
-  // Verifica cache
+  // Verifica cache primeiro (com hostname original)
   const cached = domainCache.get(hostname);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    console.log(`[CustomDomain] Cache hit for ${hostname}: ${cached.companySlug}`);
     return cached.companySlug;
   }
+  
+  // Prepara variantes do hostname para busca
+  const hostnameWithoutWww = hostname.replace(/^www\./, '');
+  const hostnameWithWww = hostname.startsWith('www.') ? hostname : `www.${hostname}`;
   
   try {
     const db = await getDb();
@@ -76,8 +108,8 @@ async function findCompanyByDomain(hostname: string): Promise<string | null> {
       return null;
     }
     
-    // Busca no banco de dados
-    const result = await db
+    // Busca no banco de dados - tenta hostname exato primeiro
+    let result = await db
       .select({
         companySlug: siteSettings.companyId,
       })
@@ -90,7 +122,42 @@ async function findCompanyByDomain(hostname: string): Promise<string | null> {
       )
       .limit(1);
     
+    // Se não encontrou, tenta sem www
+    if (result.length === 0 && hostname.startsWith('www.')) {
+      console.log(`[CustomDomain] Trying without www: ${hostnameWithoutWww}`);
+      result = await db
+        .select({
+          companySlug: siteSettings.companyId,
+        })
+        .from(siteSettings)
+        .where(
+          and(
+            eq(siteSettings.customDomain, hostnameWithoutWww),
+            eq(siteSettings.domainVerified, true)
+          )
+        )
+        .limit(1);
+    }
+    
+    // Se não encontrou, tenta com www
+    if (result.length === 0 && !hostname.startsWith('www.')) {
+      console.log(`[CustomDomain] Trying with www: ${hostnameWithWww}`);
+      result = await db
+        .select({
+          companySlug: siteSettings.companyId,
+        })
+        .from(siteSettings)
+        .where(
+          and(
+            eq(siteSettings.customDomain, hostnameWithWww),
+            eq(siteSettings.domainVerified, true)
+          )
+        )
+        .limit(1);
+    }
+    
     if (result.length === 0) {
+      console.log(`[CustomDomain] No verified domain found for: ${hostname}`);
       return null;
     }
     
@@ -102,17 +169,27 @@ async function findCompanyByDomain(hostname: string): Promise<string | null> {
       .limit(1);
     
     if (company.length === 0) {
+      console.log(`[CustomDomain] Company not found for domain: ${hostname}`);
       return null;
     }
     
     const slug = company[0].slug;
     
-    // Atualiza cache
+    // Atualiza cache (para ambas versões: com e sem www)
     domainCache.set(hostname, {
       companySlug: slug,
       timestamp: Date.now(),
     });
+    domainCache.set(hostnameWithoutWww, {
+      companySlug: slug,
+      timestamp: Date.now(),
+    });
+    domainCache.set(hostnameWithWww, {
+      companySlug: slug,
+      timestamp: Date.now(),
+    });
     
+    console.log(`[CustomDomain] Found company ${slug} for domain ${hostname}`);
     return slug;
   } catch (error) {
     console.error('[CustomDomain] Error finding company by domain:', error);
@@ -124,7 +201,9 @@ async function findCompanyByDomain(hostname: string): Promise<string | null> {
  * Limpa cache de domínio específico
  */
 export function clearDomainCache(hostname: string) {
-  domainCache.delete(hostname);
+  const normalizedHostname = hostname.replace(/^www\./, '');
+  domainCache.delete(normalizedHostname);
+  domainCache.delete(`www.${normalizedHostname}`);
 }
 
 /**
@@ -143,10 +222,14 @@ export async function customDomainMiddleware(
   next: NextFunction
 ) {
   try {
-    const hostname = req.hostname;
+    // Obtém hostname real (considerando proxy headers)
+    const hostname = getRealHostname(req);
+    
+    console.log(`[CustomDomain] Processing request - hostname: ${hostname}, path: ${req.path}`);
     
     // Se é domínio da plataforma, continua normalmente
     if (isPlatformDomain(hostname)) {
+      console.log(`[CustomDomain] Platform domain detected: ${hostname}`);
       return next();
     }
     

@@ -1087,7 +1087,7 @@ export default function SiteCustomization() {
                                   <span className="font-bold text-blue-900">Valor/IP:</span>
                                   <div className="flex items-center gap-2">
                                     <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900 flex-1">
-                                      104.19.169.112
+                                      216.24.57.1
                                     </code>
                                     <Button
                                       type="button"
@@ -1095,7 +1095,7 @@ export default function SiteCustomization() {
                                       size="icon"
                                       className="h-8 w-8"
                                       onClick={() => {
-                                        navigator.clipboard.writeText('104.19.169.112');
+                                        navigator.clipboard.writeText('216.24.57.1');
                                         toast.success('IP copiado!');
                                       }}
                                       title="Copiar IP"
@@ -1123,7 +1123,7 @@ export default function SiteCustomization() {
                                 </div>
                                 <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
                                   <span className="font-bold text-gray-700">Valor/Destino:</span>
-                                  <code className="bg-gray-100 px-2 py-1 rounded font-mono text-gray-700">domains.manus.space</code>
+                                  <code className="bg-gray-100 px-2 py-1 rounded font-mono text-gray-700">viabroker.onrender.com</code>
                                 </div>
                               </div>
                               

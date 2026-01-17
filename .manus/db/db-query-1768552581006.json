@@ -1,0 +1,21 @@
+{
+  "query": "SELECT * FROM master_admins;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT * FROM master_admins;",
+  "rows": [
+    {
+      "id": "1",
+      "username": "admin",
+      "passwordHash": "$2b$12$CLwphnuxSOc66NDgo66KweK9M.YhlQZsj2vz02BbVDldPMHU/2jrO",
+      "name": "Administrador",
+      "email": "admin@brokvia.com",
+      "isActive": "1",
+      "lastLoginAt": "2026-01-14 07:40:13",
+      "createdAt": "2026-01-12 07:51:45",
+      "updatedAt": "2026-01-14 07:40:13"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tpasswordHash\tname\temail\tisActive\tlastLoginAt\tcreatedAt\tupdatedAt\n1\tadmin\t$2b$12$CLwphnuxSOc66NDgo66KweK9M.YhlQZsj2vz02BbVDldPMHU/2jrO\tAdministrador\tadmin@brokvia.com\t1\t2026-01-14 07:40:13\t2026-01-12 07:51:45\t2026-01-14 07:40:13\n",
+  "stderr": "",
+  "execution_time_ms": 494
+}

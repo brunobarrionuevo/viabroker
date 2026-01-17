@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, username, passwordHash, name, isActive FROM master_admins WHERE username = 'admin';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, username, passwordHash, name, isActive FROM master_admins WHERE username = 'admin';",
+  "rows": [
+    {
+      "id": "1",
+      "username": "admin",
+      "passwordHash": "$2b$10$IepHuYi9v0maXOG0qkKvleizzcihObZ0RLslDU2lLW.PZ7lLhEO6G",
+      "name": "Administrador",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tpasswordHash\tname\tisActive\n1\tadmin\t$2b$10$IepHuYi9v0maXOG0qkKvleizzcihObZ0RLslDU2lLW.PZ7lLhEO6G\tAdministrador\t1\n",
+  "stderr": "",
+  "execution_time_ms": 369
+}

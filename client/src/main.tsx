@@ -8,6 +8,22 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
+// Declare global types for custom domain redirect
+declare global {
+  interface Window {
+    __CUSTOM_DOMAIN_SLUG__?: string;
+    __CUSTOM_DOMAIN_REDIRECT__?: string;
+  }
+}
+
+// Handle custom domain redirect BEFORE React renders
+// This ensures the URL is correct before the router initializes
+if (window.__CUSTOM_DOMAIN_REDIRECT__ && window.location.pathname === '/') {
+  console.log('[CustomDomain] Redirecting to:', window.__CUSTOM_DOMAIN_REDIRECT__);
+  // Use replaceState to change URL without reload, then React Router will handle it
+  window.history.replaceState(null, '', window.__CUSTOM_DOMAIN_REDIRECT__);
+}
+
 const queryClient = new QueryClient();
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
@@ -18,8 +34,15 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
-  window.location.href = getLoginUrl();
+  const loginUrl = getLoginUrl();
+  // Se OAuth não está configurado, não redireciona
+  if (loginUrl === '#oauth-not-configured') {
+    console.warn('[Auth] Cannot redirect to login - OAuth not configured');
+    return;
+  }
+  window.location.href = loginUrl;
 };
+
 
 queryClient.getQueryCache().subscribe(event => {
   if (event.type === "updated" && event.action.type === "error") {

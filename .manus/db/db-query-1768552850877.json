@@ -1,0 +1,13 @@
+{
+  "query": "SELECT passwordHash FROM master_admins WHERE username = 'admin';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT passwordHash FROM master_admins WHERE username = 'admin';",
+  "rows": [
+    {
+      "passwordHash": "$2b$10$IepHuYi9v0maXOG0qkKvleizzcihObZ0RLslDU2lLW.PZ7lLhEO6G"
+    }
+  ],
+  "messages": [],
+  "stdout": "passwordHash\n$2b$10$IepHuYi9v0maXOG0qkKvleizzcihObZ0RLslDU2lLW.PZ7lLhEO6G\n",
+  "stderr": "",
+  "execution_time_ms": 366
+}
