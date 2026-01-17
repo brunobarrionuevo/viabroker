@@ -39,8 +39,14 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx?v=${nanoid()}"`
       );
       
+      // Debug log
+      console.log(`[Vite] req.url: ${req.url}, req.originalUrl: ${req.originalUrl}`);
+      
       // Check if this is a custom domain redirect (url was rewritten by middleware)
-      if (req.url.startsWith('/site/') && req.originalUrl === '/') {
+      // The middleware sets req.url to /site/:slug/ but originalUrl stays as the browser URL
+      const isCustomDomainRewrite = req.url.startsWith('/site/') && !req.originalUrl.startsWith('/site/');
+      
+      if (isCustomDomainRewrite) {
         const match = req.url.match(/^\/site\/([^\/]+)/);
         if (match) {
           const slug = match[1];
@@ -77,8 +83,15 @@ export function serveStatic(app: Express) {
   app.use("*", (req, res) => {
     const indexPath = path.resolve(distPath, "index.html");
     
+    // Debug log
+    console.log(`[ServeStatic] req.url: ${req.url}, req.originalUrl: ${req.originalUrl}, req.baseUrl: ${req.baseUrl}`);
+    
     // Check if this is a custom domain redirect (url was rewritten by middleware)
-    if (req.url.startsWith('/site/') && req.originalUrl === '/') {
+    // The middleware sets req.url to /site/:slug/ but originalUrl stays as the browser URL
+    // We detect custom domain by checking if req.url starts with /site/ but originalUrl doesn't
+    const isCustomDomainRewrite = req.url.startsWith('/site/') && !req.originalUrl.startsWith('/site/');
+    
+    if (isCustomDomainRewrite) {
       // Extract slug from rewritten URL
       const match = req.url.match(/^\/site\/([^\/]+)/);
       if (match) {
