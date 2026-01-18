@@ -698,3 +698,4 @@
 - [x] Criar tabela de configurações de IA no banco de dados
 - [x] Adicionar interface de configuração de IA no dashboard admin master
 - [ ] Investigar e corrigir falha no deploy do Render (erro SQL syntax no schema ai_settings)
+- [x] Corrigir erro 400 Bad Request - remover parâmetro 'thinking' não reconhecido pela API OpenAI
