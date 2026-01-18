@@ -1,0 +1,164 @@
+{
+  "query": "SELECT u.id, u.name, u.email, u.companyId, c.name as companyName FROM users u LEFT JOIN companies c ON u.companyId = c.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT u.id, u.name, u.email, u.companyId, c.name as companyName FROM users u LEFT JOIN companies c ON u.companyId = c.id;",
+  "rows": [
+    {
+      "id": "360017",
+      "name": "Tiago",
+      "email": "tiagobarrionuevo@gmail.com",
+      "companyId": "30001",
+      "companyName": "Tiago B"
+    },
+    {
+      "id": "630100",
+      "name": "Bruno Barrionuevo",
+      "email": "brunobarrionuevo@gmail.com",
+      "companyId": "NULL",
+      "companyName": "NULL"
+    },
+    {
+      "id": "630103",
+      "name": "Bruno Barrionuevo",
+      "email": "busb@hotmail.com",
+      "companyId": "60001",
+      "companyName": "Bruno Barrionuevo"
+    },
+    {
+      "id": "780034",
+      "name": "Test User Password",
+      "email": "test-password-1768423347513@example.com",
+      "companyId": "90001",
+      "companyName": "Test Company Password"
+    },
+    {
+      "id": "780035",
+      "name": "Test User Password",
+      "email": "test-password-1768423400298@example.com",
+      "companyId": "90002",
+      "companyName": "Test Company Password"
+    },
+    {
+      "id": "780107",
+      "name": "Test User Reorder",
+      "email": "test-reorder@example.com",
+      "companyId": "90003",
+      "companyName": "Test Realty Reorder"
+    },
+    {
+      "id": "780108",
+      "name": "Other User",
+      "email": "other-reorder@example.com",
+      "companyId": "90004",
+      "companyName": "Other Company"
+    },
+    {
+      "id": "780109",
+      "name": "Test User Reorder",
+      "email": "test-reorder@example.com",
+      "companyId": "90005",
+      "companyName": "Test Realty Reorder"
+    },
+    {
+      "id": "780110",
+      "name": "Other User",
+      "email": "other-reorder@example.com",
+      "companyId": "90006",
+      "companyName": "Other Company"
+    },
+    {
+      "id": "930036",
+      "name": "Test User Reorder",
+      "email": "test-reorder@example.com",
+      "companyId": "120001",
+      "companyName": "Test Realty Reorder"
+    },
+    {
+      "id": "930037",
+      "name": "Other User",
+      "email": "other-reorder@example.com",
+      "companyId": "120002",
+      "companyName": "Other Company"
+    },
+    {
+      "id": "930054",
+      "name": "Test User Reorder",
+      "email": "test-reorder@example.com",
+      "companyId": "120003",
+      "companyName": "Test Realty Reorder"
+    },
+    {
+      "id": "930055",
+      "name": "Other User",
+      "email": "other-reorder@example.com",
+      "companyId": "120004",
+      "companyName": "Other Company"
+    },
+    {
+      "id": "930091",
+      "name": "Test Domain User",
+      "email": "domain@test.com",
+      "companyId": "120005",
+      "companyName": "Imobiliária Teste Domain"
+    },
+    {
+      "id": "930092",
+      "name": "Test Domain User",
+      "email": "domain-1768445939485@test.com",
+      "companyId": "120007",
+      "companyName": "Imobiliária Teste Domain"
+    },
+    {
+      "id": "930107",
+      "name": "Test User Reorder",
+      "email": "test-reorder@example.com",
+      "companyId": "120009",
+      "companyName": "Test Realty Reorder"
+    },
+    {
+      "id": "930108",
+      "name": "Other User",
+      "email": "other-reorder@example.com",
+      "companyId": "120010",
+      "companyName": "Other Company"
+    },
+    {
+      "id": "930109",
+      "name": "Test Domain User",
+      "email": "domain-1768446516894@test.com",
+      "companyId": "120011",
+      "companyName": "Imobiliária Teste Domain"
+    },
+    {
+      "id": "930110",
+      "name": "Test User Password",
+      "email": "test-password-1768446516961@example.com",
+      "companyId": "120008",
+      "companyName": "Test Company Password"
+    },
+    {
+      "id": "1260001",
+      "name": "Bruno Barrionuevo",
+      "email": "busb@hotmail.com",
+      "companyId": "NULL",
+      "companyName": "NULL"
+    },
+    {
+      "id": "1290001",
+      "name": "Bruno Busb",
+      "email": "busb@hotmail.com",
+      "companyId": "150001",
+      "companyName": "Bruno Busb"
+    },
+    {
+      "id": "1290002",
+      "name": "Bruno Busb",
+      "email": "busb@hotmail.com",
+      "companyId": "150001",
+      "companyName": "Bruno Busb"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tcompanyId\tcompanyName\n360017\tTiago\ttiagobarrionuevo@gmail.com\t30001\tTiago B\n630100\tBruno Barrionuevo\tbrunobarrionuevo@gmail.com\tNULL\tNULL\n630103\tBruno Barrionuevo\tbusb@hotmail.com\t60001\tBruno Barrionuevo\n780034\tTest User Password\ttest-password-1768423347513@example.com\t90001\tTest Company Password\n780035\tTest User Password\ttest-password-1768423400298@example.com\t90002\tTest Company Password\n780107\tTest User Reorder\ttest-reorder@example.com\t90003\tTest Realty Reorder\n780108\tOther User\tother-reorder@example.com\t90004\tOther Company\n780109\tTest User Reorder\ttest-reorder@example.com\t90005\tTest Realty Reorder\n780110\tOther User\tother-reorder@example.com\t90006\tOther Company\n930036\tTest User Reorder\ttest-reorder@example.com\t120001\tTest Realty Reorder\n930037\tOther User\tother-reorder@example.com\t120002\tOther Company\n930054\tTest User Reorder\ttest-reorder@example.com\t120003\tTest Realty Reorder\n930055\tOther User\tother-reorder@example.com\t120004\tOther Company\n930091\tTest Domain User\tdomain@test.com\t120005\tImobiliária Teste Domain\n930092\tTest Domain User\tdomain-1768445939485@test.com\t120007\tImobiliária Teste Domain\n930107\tTest User Reorder\ttest-reorder@example.com\t120009\tTest Realty Reorder\n930108\tOther User\tother-reorder@example.com\t120010\tOther Company\n930109\tTest Domain User\tdomain-1768446516894@test.com\t120011\tImobiliária Teste Domain\n930110\tTest User Password\ttest-password-1768446516961@example.com\t120008\tTest Company Password\n1260001\tBruno Barrionuevo\tbusb@hotmail.com\tNULL\tNULL\n1290001\tBruno Busb\tbusb@hotmail.com\t150001\tBruno Busb\n1290002\tBruno Busb\tbusb@hotmail.com\t150001\tBruno Busb\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

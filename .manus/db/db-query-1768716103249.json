@@ -1,0 +1,18 @@
+{
+  "query": "SELECT u.id, u.name, u.email, u.companyId, c.id as cId, c.name as companyName FROM users u LEFT JOIN companies c ON u.companyId = c.id WHERE u.email = 'brunobarrionuevo@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT u.id, u.name, u.email, u.companyId, c.id as cId, c.name as companyName FROM users u LEFT JOIN companies c ON u.companyId = c.id WHERE u.email = 'brunobarrionuevo@gmail.com';",
+  "rows": [
+    {
+      "id": "630100",
+      "name": "Bruno Barrionuevo",
+      "email": "brunobarrionuevo@gmail.com",
+      "companyId": "NULL",
+      "cId": "NULL",
+      "companyName": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tcompanyId\tcId\tcompanyName\n630100\tBruno Barrionuevo\tbrunobarrionuevo@gmail.com\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

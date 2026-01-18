@@ -105,10 +105,13 @@ export const appRouter = router({
   dashboard: router({
     stats: protectedProcedure.query(async ({ ctx }) => {
       const companyId = ctx.user.companyId;
+      console.log('[Dashboard Stats] User:', ctx.user.id, ctx.user.email, 'CompanyId:', companyId);
       if (!companyId) {
         return { totalProperties: 0, totalLeads: 0, pendingAppointments: 0, newLeads: 0 };
       }
-      return db.getDashboardStats(companyId);
+      const stats = await db.getDashboardStats(companyId);
+      console.log('[Dashboard Stats] Result:', JSON.stringify(stats));
+      return stats;
     }),
   }),
 

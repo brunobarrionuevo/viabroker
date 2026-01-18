@@ -709,3 +709,5 @@
 - [x] Implementar armazenamento de imagens diretamente no banco de dados TiDB
 - [x] Corrigir falha no deploy do Render (SSL config e snapshots conflitantes)
 - [ ] Corrigir erro de upload: imageData e mimeType não estão sendo salvos no banco
+- [ ] Corrigir problema: imóveis não aparecem na listagem e novos cadastros não são salvos
+- [ ] Corrigir inconsistência: dashboard mostra 2 imóveis mas listagem está vazia

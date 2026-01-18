@@ -1,0 +1,58 @@
+{
+  "query": "SELECT p.id, p.code, p.title, p.status, p.companyId, c.name as companyName FROM properties p LEFT JOIN companies c ON p.companyId = c.id ORDER BY p.createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT p.id, p.code, p.title, p.status, p.companyId, c.name as companyName FROM properties p LEFT JOIN companies c ON p.companyId = c.id ORDER BY p.createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "240003",
+      "code": "NULL",
+      "title": "Test Property for Reorder",
+      "status": "disponivel",
+      "companyId": "120009",
+      "companyName": "Test Realty Reorder"
+    },
+    {
+      "id": "240002",
+      "code": "NULL",
+      "title": "Test Property for Reorder",
+      "status": "disponivel",
+      "companyId": "120003",
+      "companyName": "Test Realty Reorder"
+    },
+    {
+      "id": "240001",
+      "code": "NULL",
+      "title": "Test Property for Reorder",
+      "status": "disponivel",
+      "companyId": "120001",
+      "companyName": "Test Realty Reorder"
+    },
+    {
+      "id": "210002",
+      "code": "NULL",
+      "title": "Test Property for Reorder",
+      "status": "disponivel",
+      "companyId": "90005",
+      "companyName": "Test Realty Reorder"
+    },
+    {
+      "id": "180001",
+      "code": "IMV600010001",
+      "title": "Edf. Chateau Lafite",
+      "status": "disponivel",
+      "companyId": "60001",
+      "companyName": "Bruno Barrionuevo"
+    },
+    {
+      "id": "90001",
+      "code": "1001",
+      "title": "Apt 3 quartos",
+      "status": "disponivel",
+      "companyId": "30001",
+      "companyName": "Tiago B"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcode\ttitle\tstatus\tcompanyId\tcompanyName\n240003\tNULL\tTest Property for Reorder\tdisponivel\t120009\tTest Realty Reorder\n240002\tNULL\tTest Property for Reorder\tdisponivel\t120003\tTest Realty Reorder\n240001\tNULL\tTest Property for Reorder\tdisponivel\t120001\tTest Realty Reorder\n210002\tNULL\tTest Property for Reorder\tdisponivel\t90005\tTest Realty Reorder\n180001\tIMV600010001\tEdf. Chateau Lafite\tdisponivel\t60001\tBruno Barrionuevo\n90001\t1001\tApt 3 quartos\tdisponivel\t30001\tTiago B\n",
+  "stderr": "",
+  "execution_time_ms": 204
+}
