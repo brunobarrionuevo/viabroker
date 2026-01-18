@@ -26,6 +26,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { X, ImagePlus } from "lucide-react";
+import { DNSPropagationStatus } from "@/components/DNSPropagationStatus";
 
 const fontOptions = [
   { value: "Inter", label: "Inter" },
@@ -1131,8 +1132,20 @@ export default function SiteCustomization() {
                       </div>
                     )}
 
-                    {/* Domínio configurado mas não verificado */}
-                    {siteSettings?.customDomain && !siteSettings?.domainVerified && (
+                    {/* Indicador de Propagação DNS - Mostra quando há domínio configurado e automação ativa */}
+                    {siteSettings?.customDomain && cloudflareStatus?.configured && (
+                      <DNSPropagationStatus 
+                        domain={siteSettings.customDomain}
+                        onStatusChange={(status) => {
+                          if (status === 'active') {
+                            refetch();
+                          }
+                        }}
+                      />
+                    )}
+
+                    {/* Domínio configurado mas não verificado (sem automação) */}
+                    {siteSettings?.customDomain && !siteSettings?.domainVerified && !cloudflareStatus?.configured && (
                       <div className="p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
                         <h4 className="font-semibold text-yellow-800 mb-2 flex items-center gap-2">
                           <Loader2 className="w-5 h-5 animate-spin" />

@@ -503,3 +503,163 @@ export async function removeCustomDomain(domain: string): Promise<{
     };
   }
 }
+
+
+/**
+ * Verifica a propagação DNS do domínio
+ * Retorna o status detalhado de cada etapa da configuração
+ */
+export async function checkDNSPropagation(domain: string): Promise<{
+  success: boolean;
+  status: "not_configured" | "configuring" | "propagating" | "active" | "error";
+  steps: {
+    zoneCreated: boolean;
+    nameserversConfigured: boolean;
+    dnsRecordsCreated: boolean;
+    workerRouteActive: boolean;
+    sslActive: boolean;
+    domainReachable: boolean;
+  };
+  message: string;
+  nameServers?: string[];
+  estimatedTime?: string;
+}> {
+  try {
+    const rootDomain = domain.replace(/^www\./, "");
+    
+    // Inicializar status das etapas
+    const steps = {
+      zoneCreated: false,
+      nameserversConfigured: false,
+      dnsRecordsCreated: false,
+      workerRouteActive: false,
+      sslActive: false,
+      domainReachable: false,
+    };
+
+    // 1. Verificar se a zona existe
+    const zone = await getZoneByDomain(domain);
+    if (!zone.success || !zone.zone) {
+      return {
+        success: false,
+        status: "not_configured",
+        steps,
+        message: "Domínio não configurado no Cloudflare. Clique em 'Configurar Domínio' para iniciar.",
+      };
+    }
+
+    steps.zoneCreated = true;
+    const zoneId = zone.zone.id;
+    const nameServers = zone.zone.nameServers;
+
+    // 2. Verificar status da zona (nameservers configurados)
+    if (zone.zone.status === "active") {
+      steps.nameserversConfigured = true;
+    }
+
+    // 3. Verificar registros DNS
+    const dnsResponse = await cloudflareRequest<Array<{
+      id: string;
+      name: string;
+      type: string;
+      content: string;
+    }>>(`/zones/${zoneId}/dns_records?type=CNAME`);
+
+    if (dnsResponse.success && dnsResponse.result) {
+      const hasWwwRecord = dnsResponse.result.some(r => 
+        r.name === `www.${rootDomain}` || r.name === "www"
+      );
+      const hasRootRecord = dnsResponse.result.some(r => 
+        r.name === rootDomain || r.name === "@"
+      );
+      steps.dnsRecordsCreated = hasWwwRecord || hasRootRecord;
+    }
+
+    // 4. Verificar rotas do Worker
+    const routesResponse = await cloudflareRequest<Array<{
+      id: string;
+      pattern: string;
+      script: string;
+    }>>(`/zones/${zoneId}/workers/routes`);
+
+    if (routesResponse.success && routesResponse.result) {
+      steps.workerRouteActive = routesResponse.result.some(r => 
+        r.pattern.includes(rootDomain)
+      );
+    }
+
+    // 5. Verificar SSL
+    const sslResponse = await cloudflareRequest<{
+      status: string;
+      certificate_status: string;
+    }>(`/zones/${zoneId}/ssl/verification`);
+
+    if (sslResponse.success && sslResponse.result) {
+      steps.sslActive = sslResponse.result.status === "active" || 
+                        sslResponse.result.certificate_status === "active";
+    }
+
+    // 6. Verificar se o domínio está acessível (fazer uma requisição HTTP)
+    try {
+      const testUrl = `https://www.${rootDomain}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch(testUrl, {
+        method: "HEAD",
+        signal: controller.signal,
+        redirect: "follow",
+      });
+      
+      clearTimeout(timeoutId);
+      steps.domainReachable = response.ok || response.status < 500;
+    } catch (e) {
+      // Domínio não acessível ainda
+      steps.domainReachable = false;
+    }
+
+    // Determinar status geral
+    let status: "not_configured" | "configuring" | "propagating" | "active" | "error";
+    let message: string;
+    let estimatedTime: string | undefined;
+
+    if (steps.domainReachable && steps.sslActive && steps.nameserversConfigured) {
+      status = "active";
+      message = "Domínio totalmente configurado e funcionando!";
+    } else if (!steps.nameserversConfigured) {
+      status = "configuring";
+      message = "Aguardando configuração dos nameservers no registrador do domínio.";
+      estimatedTime = "Pode levar até 48 horas após a configuração";
+    } else if (!steps.sslActive || !steps.domainReachable) {
+      status = "propagating";
+      message = "DNS propagando. O domínio estará disponível em breve.";
+      estimatedTime = "Geralmente entre 5 minutos e 24 horas";
+    } else {
+      status = "configuring";
+      message = "Configuração em andamento...";
+    }
+
+    return {
+      success: true,
+      status,
+      steps,
+      message,
+      nameServers,
+      estimatedTime,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      status: "error",
+      steps: {
+        zoneCreated: false,
+        nameserversConfigured: false,
+        dnsRecordsCreated: false,
+        workerRouteActive: false,
+        sslActive: false,
+        domainReachable: false,
+      },
+      message: error instanceof Error ? error.message : "Erro ao verificar propagação DNS",
+    };
+  }
+}

@@ -659,3 +659,11 @@
 - [x] Solicitar e configurar credenciais Cloudflare (API Token, Account ID, Worker ID)
 - [x] Testar fluxo completo com novo domínio
 - [x] Fazer deploy e documentar
+
+
+## Indicador de Propagação DNS (17/01/2026)
+- [x] Implementar verificação de propagação DNS no backend (resolver DNS e verificar CNAME)
+- [x] Criar endpoint para verificar status de propagação do domínio
+- [x] Criar componente visual de status de propagação (etapas: Configurando → Propagando → Ativo)
+- [x] Integrar indicador na página de configuração de domínio
+- [x] Testar e fazer deploy

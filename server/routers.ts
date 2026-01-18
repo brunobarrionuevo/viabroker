@@ -1330,6 +1330,65 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
           sslStatus: status.sslStatus,
         };
       }),
+    
+    // Verificar propagação DNS detalhada
+    checkDNSPropagation: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const settings = await db.getSiteSettings(ctx.user.companyId);
+        
+        if (!settings?.customDomain) {
+          return {
+            success: false,
+            status: 'not_configured' as const,
+            steps: {
+              zoneCreated: false,
+              nameserversConfigured: false,
+              dnsRecordsCreated: false,
+              workerRouteActive: false,
+              sslActive: false,
+              domainReachable: false,
+            },
+            message: 'Nenhum domínio configurado',
+          };
+        }
+        
+        const cloudflare = await import('./cloudflareService');
+        
+        if (!cloudflare.isCloudflareConfigured()) {
+          return {
+            success: false,
+            status: 'error' as const,
+            steps: {
+              zoneCreated: false,
+              nameserversConfigured: false,
+              dnsRecordsCreated: false,
+              workerRouteActive: false,
+              sslActive: false,
+              domainReachable: false,
+            },
+            message: 'Automação não configurada',
+          };
+        }
+        
+        const propagation = await cloudflare.checkDNSPropagation(settings.customDomain);
+        
+        // Se domínio está ativo, marcar como verificado
+        if (propagation.status === 'active') {
+          await db.upsertSiteSettings(ctx.user.companyId, {
+            domainVerified: true,
+          });
+          
+          // Limpar cache
+          const { clearDomainCache } = await import('./_core/customDomainMiddleware');
+          clearDomainCache(settings.customDomain);
+        }
+        
+        return propagation;
+      }),
   }),
 
   // Geração de XML para portais imobiliários
