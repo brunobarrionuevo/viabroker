@@ -699,3 +699,7 @@
 - [x] Adicionar interface de configuração de IA no dashboard admin master
 - [ ] Investigar e corrigir falha no deploy do Render (erro SQL syntax no schema ai_settings)
 - [x] Corrigir erro 400 Bad Request - remover parâmetro 'thinking' não reconhecido pela API OpenAI
+- [ ] Mover campo Descrição para o final do formulário de cadastro de imóveis
+
+## Reorganização do Formulário de Imóveis (18/01/2026)
+- [x] Mover campo Descrição para o final do formulário de cadastro de imóveis

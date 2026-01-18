@@ -656,36 +656,6 @@ export default function PropertyForm() {
                     </Select>
                   </div>
                 </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <Label htmlFor="description">Descrição</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleGenerateDescription}
-                      disabled={generateDescriptionMutation.isPending}
-                    >
-                      {generateDescriptionMutation.isPending ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      ) : (
-                        <Sparkles className="w-4 h-4 mr-2" />
-                      )}
-                      Gerar com IA
-                    </Button>
-                  </div>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Descreva o imóvel..."
-                    rows={5}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    💡 Para gerar uma descrição mais completa com IA, recomendamos preencher todos os campos do cadastro antes.
-                  </p>
-                </div>
               </CardContent>
             </Card>
 
@@ -942,6 +912,47 @@ export default function PropertyForm() {
                     />
                     <Label htmlFor="hasLaundry" className="cursor-pointer">Lavanderia</Label>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Descrição */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Descrição do Imóvel</CardTitle>
+                <CardDescription>
+                  Descreva os principais detalhes e diferenciais do imóvel
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor="description">Descrição</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateDescription}
+                      disabled={generateDescriptionMutation.isPending}
+                    >
+                      {generateDescriptionMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Sparkles className="w-4 h-4 mr-2" />
+                      )}
+                      Gerar com IA
+                    </Button>
+                  </div>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Descreva o imóvel..."
+                    rows={6}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    💡 Para gerar uma descrição mais completa com IA, recomendamos preencher todos os campos do cadastro antes.
+                  </p>
                 </div>
               </CardContent>
             </Card>
