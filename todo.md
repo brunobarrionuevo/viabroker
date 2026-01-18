@@ -711,3 +711,4 @@
 - [ ] Corrigir erro de upload: imageData e mimeType não estão sendo salvos no banco
 - [ ] Corrigir problema: imóveis não aparecem na listagem e novos cadastros não são salvos
 - [ ] Corrigir inconsistência: dashboard mostra 2 imóveis mas listagem está vazia
+- [ ] Corrigir imóveis que não aparecem na listagem de cadastro
