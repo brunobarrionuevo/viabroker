@@ -1198,16 +1198,21 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
     // Verificar se automação Cloudflare está disponível
     checkCloudflareStatus: protectedProcedure
       .query(async () => {
+        console.log('[Cloudflare] checkCloudflareStatus called');
         const cloudflare = await import('./cloudflareService');
         
         if (!cloudflare.isCloudflareConfigured()) {
+          console.log('[Cloudflare] Not configured');
           return {
             configured: false,
             message: 'Automação de domínios não configurada. Configure as credenciais do Cloudflare.',
           };
         }
         
+        console.log('[Cloudflare] Verifying connection...');
         const status = await cloudflare.verifyCloudflareConnection();
+        console.log('[Cloudflare] Connection status:', JSON.stringify(status));
+        
         return {
           configured: true,
           connected: status.success,
