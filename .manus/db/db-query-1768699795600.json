@@ -1,0 +1,58 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "activity_logs"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "appointments"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "companies"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "interactions"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "leads"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "master_admins"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "partnerships"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "payments"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "plans"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "properties"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "propertyShares"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "property_images"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "site_settings"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "subscriptions"
+    },
+    {
+      "Tables_in_2BVimoerGJ5AEbhy4VpTbU": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_2BVimoerGJ5AEbhy4VpTbU\n__drizzle_migrations\nactivity_logs\nappointments\ncompanies\ninteractions\nleads\nmaster_admins\npartnerships\npayments\nplans\nproperties\npropertyShares\nproperty_images\nsite_settings\nsubscriptions\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 458
+}

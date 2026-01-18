@@ -8,7 +8,7 @@
  * 4. Verifica status de propagação DNS
  */
 
-import { env } from "./_core/env";
+import { ENV } from "./_core/env";
 
 // Configurações do Cloudflare (serão adicionadas como variáveis de ambiente)
 const CLOUDFLARE_API_URL = "https://api.cloudflare.com/client/v4";

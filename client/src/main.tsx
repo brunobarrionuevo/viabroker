@@ -5,7 +5,6 @@ import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
-import { getLoginUrl } from "./const";
 import "./index.css";
 
 // Declare global types for custom domain redirect
@@ -34,13 +33,8 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
-  const loginUrl = getLoginUrl();
-  // Se OAuth não está configurado, não redireciona
-  if (loginUrl === '#oauth-not-configured') {
-    console.warn('[Auth] Cannot redirect to login - OAuth not configured');
-    return;
-  }
-  window.location.href = loginUrl;
+  // Redirecionar para página de login própria
+  window.location.href = "/login";
 };
 
 

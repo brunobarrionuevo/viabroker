@@ -12,7 +12,7 @@ import {
 } from "./email";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
-import { sdk } from "./_core/sdk";
+// Sistema de autenticação próprio - não usa mais SDK do Manus
 
 const JWT_SECRET = process.env.JWT_SECRET || "viabroker-secret-key-change-in-production";
 const TRIAL_DAYS = 7;
@@ -219,7 +219,9 @@ export const authRouter = router({
       password: z.string().min(1, "Senha é obrigatória"),
     }))
     .mutation(async ({ input, ctx }) => {
+      console.log("[Login] Tentativa de login para:", input.email);
       const user = await db.getUserByEmail(input.email);
+      console.log("[Login] Usuário encontrado:", user ? { id: user.id, email: user.email, hasPassword: !!user.passwordHash, emailVerified: user.emailVerified } : null);
       
       if (!user || !user.passwordHash) {
         throw new TRPCError({ 
@@ -270,13 +272,9 @@ export const authRouter = router({
         { expiresIn: "7d" }
       );
 
-      // Criar cookie de sessão para integrar com o sistema de autenticação existente
-      const sessionToken = await sdk.createSessionToken(user.openId, {
-        name: user.name || "",
-        expiresInMs: ONE_YEAR_MS,
-      });
+      // Criar cookie de sessão com JWT próprio
       const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+      ctx.res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
       // Verificar status do trial
       const now = new Date();

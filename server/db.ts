@@ -136,9 +136,14 @@ export async function createUser(data: InsertUser) {
 }
 
 export async function getUserByEmail(email: string) {
+  console.log("[DB] getUserByEmail called with:", email);
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) {
+    console.log("[DB] No database connection");
+    return undefined;
+  }
   const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  console.log("[DB] getUserByEmail result:", result.length > 0 ? "found" : "not found");
   return result.length > 0 ? result[0] : undefined;
 }
 

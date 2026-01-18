@@ -673,3 +673,16 @@
 - [x] Criar endpoint para remover domínio personalizado do banco e Cloudflare
 - [x] Adicionar botão de exclusão na interface com confirmação
 - [x] Testar e fazer deploy
+
+
+## Sistema de Autenticação Próprio (17/01/2026)
+- [ ] Adicionar coluna password_hash na tabela users
+- [ ] Criar endpoint de login com email/senha
+- [ ] Criar endpoint de registro de novos usuários
+- [ ] Criar endpoint de recuperação de senha por email
+- [ ] Criar página de login
+- [ ] Criar página de registro
+- [ ] Criar página de recuperação de senha
+- [ ] Remover dependências do Manus OAuth
+- [ ] Testar fluxo completo de autenticação
+- [ ] Fazer deploy

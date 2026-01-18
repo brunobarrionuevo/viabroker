@@ -15,7 +15,7 @@ import {
   Star
 } from "lucide-react";
 import { Link } from "wouter";
-import { getLoginUrl } from "@/const";
+
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
