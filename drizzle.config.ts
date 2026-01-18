@@ -5,15 +5,22 @@ if (!connectionString) {
   throw new Error("DATABASE_URL is required to run drizzle commands");
 }
 
-// Verificar se já tem parâmetros SSL na URL
-const hasSSL = connectionString.includes('ssl=') || connectionString.includes('sslmode=');
-const connectionStringWithSSL = hasSSL ? connectionString : connectionString + '?ssl=true';
+// Remover parâmetros SSL existentes para evitar conflitos
+let cleanUrl = connectionString;
+// Remover parâmetros ssl existentes
+cleanUrl = cleanUrl.replace(/[?&]ssl=[^&]*/gi, '');
+cleanUrl = cleanUrl.replace(/[?&]sslmode=[^&]*/gi, '');
+// Limpar ? ou & soltos no final
+cleanUrl = cleanUrl.replace(/[?&]$/, '');
 
 export default defineConfig({
   schema: "./drizzle/schema.ts",
   out: "./drizzle",
   dialect: "mysql",
   dbCredentials: {
-    url: connectionStringWithSSL
+    url: cleanUrl,
+    ssl: {
+      rejectUnauthorized: true
+    }
   },
 });
