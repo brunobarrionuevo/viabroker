@@ -311,6 +311,7 @@ export default function PropertyForm() {
 
   const handleGenerateDescription = () => {
     generateDescriptionMutation.mutate({
+      code: formData.code,
       title: formData.title,
       type: formData.type,
       purpose: formData.purpose,
@@ -606,9 +607,14 @@ export default function PropertyForm() {
                     <Input
                       id="code"
                       value={formData.code}
-                      onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
-                      placeholder="Ex: APT-001"
+                      readOnly
+                      disabled
+                      className="bg-muted cursor-not-allowed"
+                      placeholder="Gerado automaticamente"
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Código gerado automaticamente pela plataforma
+                    </p>
                   </div>
                   <div>
                     <Label htmlFor="type">Tipo *</Label>

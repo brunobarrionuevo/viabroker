@@ -703,3 +703,4 @@
 
 ## Reorganização do Formulário de Imóveis (18/01/2026)
 - [x] Mover campo Descrição para o final do formulário de cadastro de imóveis
+- [x] Tornar campo Código fixo e não editável, gerado automaticamente pela plataforma

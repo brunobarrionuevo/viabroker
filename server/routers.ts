@@ -356,7 +356,6 @@ export const appRouter = router({
       .input(z.object({
         id: z.number(),
         title: z.string().min(5).optional(),
-        code: z.string().optional(),
         description: z.string().optional(),
         type: propertyTypeEnum.optional(),
         purpose: purposeEnum.optional(),
@@ -417,7 +416,7 @@ export const appRouter = router({
         }
         // Limpar campos opcionais vazios
         const cleanedData: Record<string, any> = {};
-        const optionalStringFields = ['code', 'complement', 'zipCode', 'videoUrl', 'metaTitle', 'metaDescription', 'builtArea', 'address', 'number', 'neighborhood'];
+        const optionalStringFields = ['complement', 'zipCode', 'videoUrl', 'metaTitle', 'metaDescription', 'builtArea', 'address', 'number', 'neighborhood'];
         const optionalDecimalFields = ['salePrice', 'rentPrice', 'condoFee', 'iptuAnnual', 'totalArea', 'builtArea'];
         
         for (const [key, value] of Object.entries(data)) {
@@ -677,6 +676,7 @@ export const appRouter = router({
 
     generateDescription: protectedProcedure
       .input(z.object({
+        code: z.string().optional(),
         title: z.string(),
         type: z.string(),
         purpose: z.string(),
@@ -694,6 +694,7 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         // Construir informações do imóvel de forma estruturada
         const propertyInfo = [
+          input.code ? `Código: ${input.code}` : null,
           `Título: ${input.title}`,
           `Tipo: ${input.type}`,
           `Finalidade: ${input.purpose}`,
