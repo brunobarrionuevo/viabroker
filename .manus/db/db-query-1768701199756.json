@@ -1,0 +1,16 @@
+{
+  "query": "SELECT email, passwordHash, passwordResetToken, passwordResetExpires FROM users WHERE email = 'busb@hotmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT email, passwordHash, passwordResetToken, passwordResetExpires FROM users WHERE email = 'busb@hotmail.com';",
+  "rows": [
+    {
+      "email": "busb@hotmail.com",
+      "passwordHash": "$2b$10$pbMlGgP9q713kjZKakYfpe55xQivrfge7an5Al4TAuH4Wofxdjq4G",
+      "passwordResetToken": "NULL",
+      "passwordResetExpires": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "email\tpasswordHash\tpasswordResetToken\tpasswordResetExpires\nbusb@hotmail.com\t$2b$10$pbMlGgP9q713kjZKakYfpe55xQivrfge7an5Al4TAuH4Wofxdjq4G\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 425
+}

@@ -1,0 +1,14 @@
+{
+  "query": "SELECT email, CASE WHEN passwordHash IS NULL THEN 'NULL' WHEN passwordHash = '' THEN 'EMPTY' ELSE 'HAS_VALUE' END as hash_status FROM users WHERE email = 'busb@hotmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT email, CASE WHEN passwordHash IS NULL THEN 'NULL' WHEN passwordHash = '' THEN 'EMPTY' ELSE 'HAS_VALUE' END as hash_status FROM users WHERE email = 'busb@hotmail.com';",
+  "rows": [
+    {
+      "email": "busb@hotmail.com",
+      "hash_status": "HAS_VALUE"
+    }
+  ],
+  "messages": [],
+  "stdout": "email\thash_status\nbusb@hotmail.com\tHAS_VALUE\n",
+  "stderr": "",
+  "execution_time_ms": 375
+}

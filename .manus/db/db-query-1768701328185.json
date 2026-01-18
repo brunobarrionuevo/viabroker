@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, email, LOWER(email) as lower_email FROM users WHERE LOWER(email) = 'busb@hotmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, email, LOWER(email) as lower_email FROM users WHERE LOWER(email) = 'busb@hotmail.com';",
+  "rows": [
+    {
+      "id": "630103",
+      "email": "busb@hotmail.com",
+      "lower_email": "busb@hotmail.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tlower_email\n630103\tbusb@hotmail.com\tbusb@hotmail.com\n",
+  "stderr": "",
+  "execution_time_ms": 373
+}

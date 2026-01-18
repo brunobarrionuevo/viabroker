@@ -142,9 +142,20 @@ export async function getUserByEmail(email: string) {
     console.log("[DB] No database connection");
     return undefined;
   }
-  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
-  console.log("[DB] getUserByEmail result:", result.length > 0 ? "found" : "not found");
-  return result.length > 0 ? result[0] : undefined;
+  try {
+    // Buscar com LOWER para evitar problemas de case sensitivity
+    const result = await db.select().from(users).where(eq(users.email, email.toLowerCase().trim())).limit(1);
+    console.log("[DB] getUserByEmail result:", result.length > 0 ? "found" : "not found", "email searched:", email.toLowerCase().trim());
+    if (result.length === 0) {
+      // Tentar busca sem case sensitivity
+      const allUsers = await db.select({ email: users.email }).from(users).limit(10);
+      console.log("[DB] Sample emails in database:", allUsers.map((u: any) => u.email));
+    }
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[DB] getUserByEmail error:", error);
+    return undefined;
+  }
 }
 
 export async function getUserByGoogleId(googleId: string) {
