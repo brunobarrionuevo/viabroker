@@ -529,6 +529,72 @@ export const authRouter = router({
       }
     }),
 
+  // Seed de usuário admin (TEMPORÁRIO - remover após uso)
+  seedAdminUser: publicProcedure
+    .input(z.object({
+      secretKey: z.string(),
+      email: z.string().email(),
+      password: z.string().min(6),
+      name: z.string(),
+    }))
+    .mutation(async ({ input }) => {
+      // Verificar chave secreta
+      if (input.secretKey !== "viabroker-seed-2026-secret") {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Chave inválida" });
+      }
+
+      // Verificar se email já existe
+      const existingUser = await db.getUserByEmail(input.email);
+      if (existingUser) {
+        throw new TRPCError({ code: "CONFLICT", message: "Email já cadastrado" });
+      }
+
+      // Hash da senha
+      const passwordHash = await bcrypt.hash(input.password, 12);
+      const openId = generateOpenId();
+      const trialStartDate = new Date();
+      const trialEndDate = calculateTrialEndDate();
+
+      // Criar empresa
+      const slug = generateSlug(input.name);
+      let finalSlug = slug;
+      let counter = 1;
+      while (await db.getCompanyBySlug(finalSlug)) {
+        finalSlug = `${slug}-${counter}`;
+        counter++;
+      }
+
+      const company = await db.createCompany({
+        name: input.name,
+        slug: finalSlug,
+        personType: "fisica",
+        email: input.email,
+        isActive: true,
+      });
+
+      // Criar usuário admin
+      const user = await db.createUser({
+        openId,
+        name: input.name,
+        email: input.email,
+        loginMethod: "email",
+        role: "admin",
+        companyId: company.id,
+        passwordHash,
+        emailVerified: true,
+        trialStartDate,
+        trialEndDate,
+        isTrialExpired: false,
+      });
+
+      return {
+        success: true,
+        message: "Usuário admin criado com sucesso",
+        userId: user.id,
+        companyId: company.id,
+      };
+    }),
+
   // Obter status do trial
   getTrialStatus: protectedProcedure
     .query(async ({ ctx }) => {
