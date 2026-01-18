@@ -692,21 +692,38 @@ export const appRouter = router({
         amenities: z.array(z.string()).optional(),
       }))
       .mutation(async ({ input }) => {
-        const prompt = `Você é um especialista em marketing imobiliário. Crie uma descrição atraente e profissional para o seguinte imóvel:
+        // Construir informações do imóvel de forma estruturada
+        const propertyInfo = [
+          `Título: ${input.title}`,
+          `Tipo: ${input.type}`,
+          `Finalidade: ${input.purpose}`,
+          `Localização: ${input.neighborhood ? `${input.neighborhood}, ` : ''}${input.city} - ${input.state}`,
+          input.bedrooms ? `Quartos: ${input.bedrooms}` : null,
+          input.suites ? `Suítes: ${input.suites}` : null,
+          input.bathrooms ? `Banheiros: ${input.bathrooms}` : null,
+          input.parkingSpaces ? `Vagas de garagem: ${input.parkingSpaces}` : null,
+          input.totalArea ? `Área total: ${input.totalArea}m²` : null,
+          input.builtArea ? `Área construída: ${input.builtArea}m²` : null,
+          input.amenities?.length ? `Diferenciais: ${input.amenities.join(', ')}` : null,
+        ].filter(Boolean).join('\n');
 
-Título: ${input.title}
-Tipo: ${input.type}
-Finalidade: ${input.purpose}
-Localização: ${input.neighborhood ? `${input.neighborhood}, ` : ''}${input.city} - ${input.state}
-${input.bedrooms ? `Quartos: ${input.bedrooms}` : ''}
-${input.suites ? `Suítes: ${input.suites}` : ''}
-${input.bathrooms ? `Banheiros: ${input.bathrooms}` : ''}
-${input.parkingSpaces ? `Vagas: ${input.parkingSpaces}` : ''}
-${input.totalArea ? `Área total: ${input.totalArea}m²` : ''}
-${input.builtArea ? `Área construída: ${input.builtArea}m²` : ''}
-${input.amenities?.length ? `Diferenciais: ${input.amenities.join(', ')}` : ''}
+        const prompt = `Crie uma descrição imobiliária profissional e persuasiva para o seguinte imóvel:
 
-Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imóvel, seja persuasiva e profissional. Use linguagem que transmita exclusividade e qualidade. Não use emojis.`;
+${propertyInfo}
+
+Diretrizes para a descrição:
+1. Escreva 2-3 parágrafos fluidos e bem conectados
+2. Comece destacando o principal diferencial do imóvel
+3. Descreva a localização e suas vantagens (comércio, transporte, segurança)
+4. Destaque os ambientes e suas características (iluminação, ventilação, acabamento)
+5. Mencione os diferenciais e comodidades de forma natural
+6. Use linguagem persuasiva mas honesta, sem exageros
+7. Transmita exclusividade e qualidade
+8. Finalize com um convite à visita
+9. Não use emojis
+10. Não invente informações que não foram fornecidas
+
+Tom: Profissional, sofisticado e acolhedor`;
 
         const response = await invokeLLM({
           messages: [
