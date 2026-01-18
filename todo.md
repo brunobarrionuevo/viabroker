@@ -693,3 +693,4 @@
 - [x] Implementar botão "Gerar com IA" funcional no campo de descrição do imóvel
 - [x] Configurar API OpenAI para funcionar a geração de descrição com IA
 - [x] Corrigir geração de descrição com IA no site de produção e melhorar o prompt
+- [ ] Configurar deploy automático do Manus para o Render via GitHub
