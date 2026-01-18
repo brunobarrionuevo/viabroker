@@ -636,3 +636,26 @@
 - [ ] Testar com domínio brunobarrionuevo.com.br
 - [ ] Implementar integração automática na plataforma
 - [ ] Fazer deploy e documentar
+
+
+## Correção Domínio Personalizado via Cloudflare Worker (17/01/2026)
+- [x] Criar Cloudflare Worker para proxy reverso de domínios personalizados
+- [x] Configurar Worker para enviar header X-Original-Host
+- [x] Atualizar middleware do servidor para ler X-Original-Host
+- [x] Corrigir busca de domínio com e sem prefixo www
+- [x] Corrigir detecção de rewrite usando req.baseUrl (Express app.use("*") define req.url como "/" e move path para req.baseUrl)
+- [x] Injetar script de redirect no HTML para sincronizar URL do navegador com rota do React
+- [x] Testar domínio personalizado www.brunobarrionuevo.com.br funcionando corretamente
+
+
+## Automação Completa de Domínios via API Cloudflare (17/01/2026)
+- [ ] Criar serviço de integração com API Cloudflare (cloudflareService.ts)
+- [ ] Implementar função para criar zona DNS
+- [ ] Implementar função para configurar registros DNS (CNAME)
+- [ ] Implementar função para adicionar rota do Worker
+- [ ] Implementar função para verificar status do domínio
+- [ ] Criar endpoints de gerenciamento de domínios no backend
+- [ ] Atualizar interface do dashboard para fluxo automatizado
+- [ ] Solicitar e configurar credenciais Cloudflare (API Token, Account ID, Worker ID)
+- [ ] Testar fluxo completo com novo domínio
+- [ ] Fazer deploy e documentar

@@ -124,6 +124,44 @@ export default function SiteCustomization() {
       toast.error(error.message || "Erro ao remover domínio");
     },
   });
+  
+  // Hooks para automação de domínio via Cloudflare
+  const { data: cloudflareStatus } = trpc.siteSettings.checkCloudflareStatus.useQuery();
+  
+  const setupDomainMutation = trpc.siteSettings.setupDomain.useMutation({
+    onSuccess: (data) => {
+      if (data.success) {
+        if (data.automated && data.nameServers) {
+          toast.success(
+            `Domínio configurado automaticamente! Configure os nameservers no seu registrador: ${data.nameServers.join(", ")}`,
+            { duration: 10000 }
+          );
+        } else {
+          toast.success(data.message);
+        }
+        refetch();
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao configurar domínio");
+    },
+  });
+  
+  const checkDomainCloudflareMutation = trpc.siteSettings.checkDomainCloudflare.useMutation({
+    onSuccess: (data) => {
+      if (data.status === 'active') {
+        toast.success('Domínio ativo e funcionando!');
+        refetch();
+      } else if (data.status === 'pending') {
+        toast.warning(`Aguardando ativação. Configure os nameservers: ${data.nameServers?.join(", ") || "Verifique no Cloudflare"}`);
+      } else {
+        toast.info(data.message);
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao verificar domínio");
+    },
+  });
 
   useEffect(() => {
     if (siteSettings) {
@@ -979,6 +1017,21 @@ export default function SiteCustomization() {
                   <CardDescription>Configure um domínio próprio para seu site imobiliário</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Status da Automação Cloudflare */}
+                  {cloudflareStatus?.configured && (
+                    <div className={`p-3 rounded-lg border ${cloudflareStatus.connected ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${cloudflareStatus.connected ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                        <span className={`text-sm font-medium ${cloudflareStatus.connected ? 'text-green-800' : 'text-yellow-800'}`}>
+                          {cloudflareStatus.connected ? '✨ Automação de domínios ativa' : '⚠️ Automação com problema'}
+                        </span>
+                      </div>
+                      {cloudflareStatus.accountName && (
+                        <p className="text-xs text-green-700 mt-1 ml-4">Conta: {cloudflareStatus.accountName}</p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Free Domain */}
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                     <h3 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
@@ -1014,18 +1067,111 @@ export default function SiteCustomization() {
                       <Label htmlFor="customDomain" className="text-base font-semibold">Domínio Próprio (Opcional)</Label>
                       <p className="text-sm text-muted-foreground">
                         Conecte seu próprio domínio para profissionalizar ainda mais seu site. 
-                        Exemplos: <code className="text-xs">www.suaimobiliaria.com.br</code> ou <code className="text-xs">suaimobiliaria.com.br</code>
+                        {cloudflareStatus?.configured && cloudflareStatus?.connected && (
+                          <span className="text-green-600 font-medium"> A configuração será feita automaticamente!</span>
+                        )}
                       </p>
-                      <Input
-                        id="customDomain"
-                        value={settingsData.customDomain}
-                        onChange={(e) => setSettingsData(prev => ({ ...prev, customDomain: e.target.value.toLowerCase().trim() }))}
-                        placeholder="www.suaimobiliaria.com.br"
-                        className="font-mono"
-                      />
+                      <div className="flex gap-2">
+                        <Input
+                          id="customDomain"
+                          value={settingsData.customDomain}
+                          onChange={(e) => setSettingsData(prev => ({ ...prev, customDomain: e.target.value.toLowerCase().trim() }))}
+                          placeholder="www.suaimobiliaria.com.br"
+                          className="font-mono flex-1"
+                        />
+                        {cloudflareStatus?.configured && cloudflareStatus?.connected && settingsData.customDomain && !siteSettings?.domainVerified && (
+                          <Button
+                            type="button"
+                            variant="default"
+                            disabled={setupDomainMutation.isPending}
+                            onClick={() => {
+                              setupDomainMutation.mutate({ domain: settingsData.customDomain });
+                            }}
+                          >
+                            {setupDomainMutation.isPending ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Configurando...
+                              </>
+                            ) : (
+                              <>
+                                <Globe className="w-4 h-4 mr-2" />
+                                Configurar Automaticamente
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
                     </div>
 
-                    {settingsData.customDomain && (
+                    {/* Domínio já configurado e verificado */}
+                    {siteSettings?.customDomain && siteSettings?.domainVerified && (
+                      <div className="p-4 bg-green-50 border-2 border-green-300 rounded-lg">
+                        <h4 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
+                          <Check className="w-5 h-5" />
+                          Domínio Personalizado Ativo
+                        </h4>
+                        <p className="text-sm text-green-700 mb-3">
+                          Seu site está disponível em:
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <code className="bg-white px-3 py-2 rounded border text-green-800 font-mono flex-1">
+                            https://{siteSettings.customDomain}
+                          </code>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => window.open(`https://${siteSettings.customDomain}`, '_blank')}
+                            title="Abrir site"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Domínio configurado mas não verificado */}
+                    {siteSettings?.customDomain && !siteSettings?.domainVerified && (
+                      <div className="p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+                        <h4 className="font-semibold text-yellow-800 mb-2 flex items-center gap-2">
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Aguardando Ativação
+                        </h4>
+                        <p className="text-sm text-yellow-700 mb-3">
+                          O domínio <strong>{siteSettings.customDomain}</strong> foi configurado, mas ainda está aguardando ativação.
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={checkDomainCloudflareMutation.isPending || verifyDomainMutation.isPending}
+                            onClick={() => {
+                              if (cloudflareStatus?.configured) {
+                                checkDomainCloudflareMutation.mutate();
+                              } else {
+                                verifyDomainMutation.mutate();
+                              }
+                            }}
+                          >
+                            {(checkDomainCloudflareMutation.isPending || verifyDomainMutation.isPending) ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Verificando...
+                              </>
+                            ) : (
+                              <>
+                                <Globe className="w-4 h-4 mr-2" />
+                                Verificar Status
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Instruções manuais (mostrar apenas se automação não estiver configurada) */}
+                    {settingsData.customDomain && !cloudflareStatus?.configured && (
                       <div className="space-y-4">
                         {/* Instruções Detalhadas */}
                         <div className="p-5 bg-blue-50 border-2 border-blue-200 rounded-lg space-y-4">

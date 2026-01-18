@@ -1165,7 +1165,19 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
         const settings = await db.getSiteSettings(ctx.user.companyId);
         const oldDomain = settings?.customDomain;
         
-        // Remover domínio
+        // Remover domínio do Cloudflare (se automação estiver habilitada)
+        if (oldDomain) {
+          try {
+            const cloudflare = await import('./cloudflareService');
+            if (cloudflare.isCloudflareConfigured()) {
+              await cloudflare.removeCustomDomain(oldDomain);
+            }
+          } catch (error) {
+            console.warn('[Domain] Erro ao remover do Cloudflare:', error);
+          }
+        }
+        
+        // Remover domínio do banco
         await db.upsertSiteSettings(ctx.user.companyId, {
           customDomain: null,
           domainVerified: false,
@@ -1180,6 +1192,137 @@ Escreva uma descrição de 2-3 parágrafos que destaque os pontos fortes do imó
         return {
           success: true,
           message: 'Domínio personalizado removido com sucesso.',
+        };
+      }),
+    
+    // Verificar se automação Cloudflare está disponível
+    checkCloudflareStatus: protectedProcedure
+      .query(async () => {
+        const cloudflare = await import('./cloudflareService');
+        
+        if (!cloudflare.isCloudflareConfigured()) {
+          return {
+            configured: false,
+            message: 'Automação de domínios não configurada. Configure as credenciais do Cloudflare.',
+          };
+        }
+        
+        const status = await cloudflare.verifyCloudflareConnection();
+        return {
+          configured: true,
+          connected: status.success,
+          message: status.message,
+          accountName: status.accountName,
+        };
+      }),
+    
+    // Configurar domínio automaticamente via Cloudflare
+    setupDomain: protectedProcedure
+      .input(z.object({
+        domain: z.string().min(3, "Domínio inválido"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const domain = input.domain.toLowerCase().trim();
+        
+        // Validar formato do domínio
+        const domainRegex = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/;
+        if (!domainRegex.test(domain.replace(/^www\./, ''))) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Formato de domínio inválido" });
+        }
+        
+        const cloudflare = await import('./cloudflareService');
+        
+        // Verificar se Cloudflare está configurado
+        if (!cloudflare.isCloudflareConfigured()) {
+          // Salvar domínio no banco sem automação (modo manual)
+          await db.upsertSiteSettings(ctx.user.companyId, {
+            customDomain: domain,
+            domainVerified: false,
+          });
+          
+          return {
+            success: true,
+            automated: false,
+            message: 'Domínio salvo. Configure manualmente no Cloudflare ou aguarde a configuração automática.',
+            step: 'manual',
+          };
+        }
+        
+        // Configurar domínio automaticamente
+        const result = await cloudflare.setupCustomDomain(domain);
+        
+        if (result.success) {
+          // Salvar domínio no banco
+          await db.upsertSiteSettings(ctx.user.companyId, {
+            customDomain: domain,
+            domainVerified: false, // Será verificado quando nameservers forem configurados
+          });
+          
+          return {
+            success: true,
+            automated: true,
+            message: result.message,
+            step: result.step,
+            nameServers: result.nameServers,
+          };
+        }
+        
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: result.error || 'Erro ao configurar domínio',
+        });
+      }),
+    
+    // Verificar status do domínio no Cloudflare
+    checkDomainCloudflare: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+        
+        const settings = await db.getSiteSettings(ctx.user.companyId);
+        
+        if (!settings?.customDomain) {
+          return {
+            success: false,
+            status: 'not_configured',
+            message: 'Nenhum domínio configurado',
+          };
+        }
+        
+        const cloudflare = await import('./cloudflareService');
+        
+        if (!cloudflare.isCloudflareConfigured()) {
+          return {
+            success: false,
+            status: 'manual',
+            message: 'Automação não configurada. Verifique manualmente.',
+          };
+        }
+        
+        const status = await cloudflare.checkDomainStatus(settings.customDomain);
+        
+        // Se domínio está ativo, marcar como verificado
+        if (status.status === 'active') {
+          await db.upsertSiteSettings(ctx.user.companyId, {
+            domainVerified: true,
+          });
+          
+          // Limpar cache
+          const { clearDomainCache } = await import('./_core/customDomainMiddleware');
+          clearDomainCache(settings.customDomain);
+        }
+        
+        return {
+          success: status.success,
+          status: status.status,
+          message: status.message,
+          nameServers: status.nameServers,
+          sslStatus: status.sslStatus,
         };
       }),
   }),
