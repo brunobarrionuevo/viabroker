@@ -705,3 +705,4 @@
 - [x] Mover campo Descrição para o final do formulário de cadastro de imóveis
 - [x] Tornar campo Código fixo e não editável, gerado automaticamente pela plataforma
 - [x] Melhorar mensagem de erro quando credenciais do storage não estão disponíveis
+- [x] Implementar upload de imagens usando AWS S3 direto para funcionar no Render
