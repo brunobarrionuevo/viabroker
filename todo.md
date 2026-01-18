@@ -649,13 +649,13 @@
 
 
 ## Automação Completa de Domínios via API Cloudflare (17/01/2026)
-- [ ] Criar serviço de integração com API Cloudflare (cloudflareService.ts)
-- [ ] Implementar função para criar zona DNS
-- [ ] Implementar função para configurar registros DNS (CNAME)
-- [ ] Implementar função para adicionar rota do Worker
-- [ ] Implementar função para verificar status do domínio
-- [ ] Criar endpoints de gerenciamento de domínios no backend
-- [ ] Atualizar interface do dashboard para fluxo automatizado
-- [ ] Solicitar e configurar credenciais Cloudflare (API Token, Account ID, Worker ID)
-- [ ] Testar fluxo completo com novo domínio
-- [ ] Fazer deploy e documentar
+- [x] Criar serviço de integração com API Cloudflare (cloudflareService.ts)
+- [x] Implementar função para criar zona DNS
+- [x] Implementar função para configurar registros DNS (CNAME)
+- [x] Implementar função para adicionar rota do Worker
+- [x] Implementar função para verificar status do domínio
+- [x] Criar endpoints de gerenciamento de domínios no backend
+- [x] Atualizar interface do dashboard para fluxo automatizado
+- [x] Solicitar e configurar credenciais Cloudflare (API Token, Account ID, Worker ID)
+- [x] Testar fluxo completo com novo domínio
+- [x] Fazer deploy e documentar
