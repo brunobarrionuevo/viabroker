@@ -712,3 +712,7 @@
 - [ ] Corrigir problema: imóveis não aparecem na listagem e novos cadastros não são salvos
 - [ ] Corrigir inconsistência: dashboard mostra 2 imóveis mas listagem está vazia
 - [ ] Corrigir imóveis que não aparecem na listagem de cadastro
+
+
+## Correção Dashboard - Inconsistência de Dados (18/01/2026)
+- [x] Corrigir dashboard mostrando 2 imóveis quando deveria mostrar 0 (usuário antigo com ID 1 e companyId 1 foi deletado, nova conta criada com dados corretos)
