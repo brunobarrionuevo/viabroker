@@ -113,6 +113,13 @@
       "when": 1768706945776,
       "tag": "0015_opposite_starbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1768707347240,
+      "tag": "0016_typical_mandrill",
+      "breakpoints": true
     }
   ]
 }
