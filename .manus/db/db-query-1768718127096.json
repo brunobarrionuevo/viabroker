@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, email, name, companyId, role FROM users WHERE email = 'brunobarrionuevo@gmail.com' ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, email, name, companyId, role FROM users WHERE email = 'brunobarrionuevo@gmail.com' ORDER BY id;",
+  "rows": [
+    {
+      "id": "630100",
+      "email": "brunobarrionuevo@gmail.com",
+      "name": "Bruno Barrionuevo",
+      "companyId": "180001",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tcompanyId\trole\n630100\tbrunobarrionuevo@gmail.com\tBruno Barrionuevo\t180001\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 184
+}
