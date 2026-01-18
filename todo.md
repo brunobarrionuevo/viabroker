@@ -667,3 +667,9 @@
 - [x] Criar componente visual de status de propagação (etapas: Configurando → Propagando → Ativo)
 - [x] Integrar indicador na página de configuração de domínio
 - [x] Testar e fazer deploy
+
+
+## Exclusão de Domínio Personalizado (17/01/2026)
+- [x] Criar endpoint para remover domínio personalizado do banco e Cloudflare
+- [x] Adicionar botão de exclusão na interface com confirmação
+- [x] Testar e fazer deploy

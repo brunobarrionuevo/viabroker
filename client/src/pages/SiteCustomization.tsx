@@ -1115,7 +1115,7 @@ export default function SiteCustomization() {
                         <p className="text-sm text-green-700 mb-3">
                           Seu site está disponível em:
                         </p>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 mb-4">
                           <code className="bg-white px-3 py-2 rounded border text-green-800 font-mono flex-1">
                             https://{siteSettings.customDomain}
                           </code>
@@ -1129,19 +1129,86 @@ export default function SiteCustomization() {
                             <ExternalLink className="w-4 h-4" />
                           </Button>
                         </div>
+                        <div className="flex items-center justify-between pt-3 border-t border-green-200">
+                          <p className="text-xs text-green-600">
+                            Também disponível em: viabroker.app/site/{company?.slug}
+                          </p>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            disabled={removeDomainMutation.isPending}
+                            onClick={() => {
+                              if (confirm('Tem certeza que deseja remover o domínio personalizado? Seu site continuará disponível em viabroker.app.')) {
+                                removeDomainMutation.mutate();
+                              }
+                            }}
+                          >
+                            {removeDomainMutation.isPending ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                Removendo...
+                              </>
+                            ) : (
+                              <>
+                                <X className="w-4 h-4 mr-1" />
+                                Remover Domínio
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     )}
 
                     {/* Indicador de Propagação DNS - Mostra quando há domínio configurado e automação ativa */}
                     {siteSettings?.customDomain && cloudflareStatus?.configured && (
-                      <DNSPropagationStatus 
-                        domain={siteSettings.customDomain}
-                        onStatusChange={(status) => {
-                          if (status === 'active') {
-                            refetch();
-                          }
-                        }}
-                      />
+                      <div className="space-y-3">
+                        <DNSPropagationStatus 
+                          domain={siteSettings.customDomain}
+                          onStatusChange={(status) => {
+                            if (status === 'active') {
+                              refetch();
+                            }
+                          }}
+                        />
+                        
+                        {/* Botão para remover domínio */}
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                          <div>
+                            <p className="text-sm text-gray-600">
+                              Deseja voltar para o domínio padrão da plataforma?
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Seu site continuará disponível em: viabroker.app/site/{company?.slug}
+                            </p>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                            disabled={removeDomainMutation.isPending}
+                            onClick={() => {
+                              if (confirm('Tem certeza que deseja remover o domínio personalizado? Seu site continuará disponível em viabroker.app.')) {
+                                removeDomainMutation.mutate();
+                              }
+                            }}
+                          >
+                            {removeDomainMutation.isPending ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                Removendo...
+                              </>
+                            ) : (
+                              <>
+                                <X className="w-4 h-4 mr-1" />
+                                Remover Domínio
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
                     )}
 
                     {/* Domínio configurado mas não verificado (sem automação) */}
