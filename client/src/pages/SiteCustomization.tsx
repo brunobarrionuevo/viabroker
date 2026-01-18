@@ -40,12 +40,14 @@ const fontOptions = [
 ];
 
 export default function SiteCustomization() {
-  const { data: company, isLoading: loadingCompany } = trpc.company.get.useQuery();
+  const { data: company, isLoading: loadingCompany, refetch: refetchCompany } = trpc.company.get.useQuery();
   const { data: siteSettings, isLoading: loadingSettings, refetch } = trpc.siteSettings.get.useQuery();
   const [copied, setCopied] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFavicon, setUploadingFavicon] = useState(false);
   const [uploadingHero, setUploadingHero] = useState(false);
+  const [slugInput, setSlugInput] = useState('');
+  const [updatingSlug, setUpdatingSlug] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const faviconInputRef = useRef<HTMLInputElement>(null);
   const heroInputRef = useRef<HTMLInputElement>(null);
@@ -163,6 +165,31 @@ export default function SiteCustomization() {
       toast.error(error.message || "Erro ao verificar domínio");
     },
   });
+  
+  const updateCompanyMutation = trpc.company.update.useMutation({
+    onSuccess: () => {
+      toast.success("URL do site atualizada com sucesso!");
+      refetchCompany();
+      setUpdatingSlug(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao atualizar URL do site");
+      setUpdatingSlug(false);
+    },
+  });
+  
+  const handleUpdateSlug = () => {
+    if (!slugInput || slugInput === company?.slug) return;
+    setUpdatingSlug(true);
+    updateCompanyMutation.mutate({ slug: slugInput });
+  };
+  
+  // Inicializar slug quando company carregar
+  useEffect(() => {
+    if (company?.slug) {
+      setSlugInput(company.slug);
+    }
+  }, [company?.slug]);
 
   useEffect(() => {
     if (siteSettings) {
@@ -1059,6 +1086,43 @@ export default function SiteCustomization() {
                       >
                         <ExternalLink className="w-4 h-4" />
                       </Button>
+                    </div>
+                    
+                    {/* Edição do Slug */}
+                    <div className="mt-4 pt-4 border-t border-green-200">
+                      <Label htmlFor="slug" className="text-sm font-medium text-green-800">Personalizar URL do site</Label>
+                      <p className="text-xs text-green-600 mb-2">
+                        Escolha um nome único para a URL do seu site (apenas letras minúsculas, números e hífens)
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-green-700 font-mono whitespace-nowrap">{window.location.origin}/site/</span>
+                        <Input
+                          id="slug"
+                          value={slugInput}
+                          onChange={(e) => setSlugInput(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                          placeholder="sua-imobiliaria"
+                          className="flex-1 font-mono bg-white"
+                          maxLength={100}
+                        />
+                        <Button
+                          type="button"
+                          variant="default"
+                          size="sm"
+                          disabled={!slugInput || slugInput === company?.slug || updatingSlug}
+                          onClick={handleUpdateSlug}
+                        >
+                          {updatingSlug ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "Salvar"
+                          )}
+                        </Button>
+                      </div>
+                      {slugInput && slugInput !== company?.slug && (
+                        <p className="text-xs text-green-600 mt-1">
+                          Nova URL: {window.location.origin}/site/{slugInput}
+                        </p>
+                      )}
                     </div>
                   </div>
 

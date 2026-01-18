@@ -166,6 +166,7 @@ export const appRouter = router({
     update: protectedProcedure
       .input(z.object({
         name: z.string().min(2).optional(),
+        slug: z.string().min(3).max(100).optional(),
         personType: z.enum(["fisica", "juridica"]).optional(),
         cpf: z.string().optional(),
         cnpj: z.string().optional(),
@@ -185,6 +186,24 @@ export const appRouter = router({
         if (!ctx.user.companyId) {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
         }
+        
+        // Se está atualizando o slug, validar que é único
+        if (input.slug) {
+          // Normalizar slug: lowercase, apenas letras, números e hífens
+          const normalizedSlug = input.slug.toLowerCase().replace(/[^a-z0-9-]/g, '');
+          if (normalizedSlug.length < 3) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "O slug deve ter pelo menos 3 caracteres" });
+          }
+          
+          // Verificar se slug já existe em outra empresa
+          const existingCompany = await db.getCompanyBySlug(normalizedSlug);
+          if (existingCompany && existingCompany.id !== ctx.user.companyId) {
+            throw new TRPCError({ code: "CONFLICT", message: "Este slug já está em uso por outra empresa" });
+          }
+          
+          input.slug = normalizedSlug;
+        }
+        
         return db.updateCompany(ctx.user.companyId, input);
       }),
   }),

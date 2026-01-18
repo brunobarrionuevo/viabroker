@@ -1,0 +1,46 @@
+{
+  "query": "SELECT id, title, status, companyId FROM properties ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, title, status, companyId FROM properties ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "240003",
+      "title": "Test Property for Reorder",
+      "status": "disponivel",
+      "companyId": "120009"
+    },
+    {
+      "id": "240002",
+      "title": "Test Property for Reorder",
+      "status": "disponivel",
+      "companyId": "120003"
+    },
+    {
+      "id": "240001",
+      "title": "Test Property for Reorder",
+      "status": "disponivel",
+      "companyId": "120001"
+    },
+    {
+      "id": "210002",
+      "title": "Test Property for Reorder",
+      "status": "disponivel",
+      "companyId": "90005"
+    },
+    {
+      "id": "180001",
+      "title": "Edf. Chateau Lafite",
+      "status": "disponivel",
+      "companyId": "60001"
+    },
+    {
+      "id": "90001",
+      "title": "Apt 3 quartos",
+      "status": "disponivel",
+      "companyId": "30001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tstatus\tcompanyId\n240003\tTest Property for Reorder\tdisponivel\t120009\n240002\tTest Property for Reorder\tdisponivel\t120003\n240001\tTest Property for Reorder\tdisponivel\t120001\n210002\tTest Property for Reorder\tdisponivel\t90005\n180001\tEdf. Chateau Lafite\tdisponivel\t60001\n90001\tApt 3 quartos\tdisponivel\t30001\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

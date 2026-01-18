@@ -716,3 +716,16 @@
 
 ## Correção Dashboard - Inconsistência de Dados (18/01/2026)
 - [x] Corrigir dashboard mostrando 2 imóveis quando deveria mostrar 0 (usuário antigo com ID 1 e companyId 1 foi deletado, nova conta criada com dados corretos)
+
+## Bug - Imóvel Cadastrado Não Aparece (18/01/2026)
+- [ ] Corrigir: imóvel cadastrado não aparece na listagem de imóveis
+
+
+## Correção DATABASE_URL no Render (18/01/2026)
+- [x] Corrigir: imóvel cadastrado não aparece na listagem (DATABASE_URL no Render estava apontando para banco diferente do TiDB Cloud)
+- [x] Atualizar DATABASE_URL no Render para apontar para o banco correto
+- [x] Atualizar senha do usuário no banco TiDB Cloud
+
+
+## Edição de Slug do Site (18/01/2026)
+- [x] Permitir edição do slug do site na página de configurações do cliente
