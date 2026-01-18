@@ -1,0 +1,36 @@
+{
+  "query": "SELECT * FROM companies WHERE slug = 'bruno-busb';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT * FROM companies WHERE slug = 'bruno-busb';",
+  "rows": [
+    {
+      "id": "150001",
+      "name": "Bruno Busb",
+      "slug": "bruno-busb",
+      "cnpj": "NULL",
+      "creci": "NULL",
+      "email": "busb@hotmail.com",
+      "phone": "NULL",
+      "whatsapp": "NULL",
+      "address": "NULL",
+      "city": "NULL",
+      "state": "NULL",
+      "zipCode": "NULL",
+      "logoUrl": "NULL",
+      "bannerUrl": "NULL",
+      "description": "NULL",
+      "planId": "NULL",
+      "planExpiresAt": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-01-18 02:14:21",
+      "updatedAt": "2026-01-18 02:14:21",
+      "personType": "fisica",
+      "cpf": "NULL",
+      "stripeCustomerId": "NULL",
+      "partnerCode": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tslug\tcnpj\tcreci\temail\tphone\twhatsapp\taddress\tcity\tstate\tzipCode\tlogoUrl\tbannerUrl\tdescription\tplanId\tplanExpiresAt\tisActive\tcreatedAt\tupdatedAt\tpersonType\tcpf\tstripeCustomerId\tpartnerCode\n150001\tBruno Busb\tbruno-busb\tNULL\tNULL\tbusb@hotmail.com\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\t1\t2026-01-18 02:14:21\t2026-01-18 02:14:21\tfisica\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 366
+}

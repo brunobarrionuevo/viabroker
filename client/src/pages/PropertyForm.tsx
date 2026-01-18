@@ -665,7 +665,7 @@ export default function PropertyForm() {
                       variant="outline"
                       size="sm"
                       onClick={handleGenerateDescription}
-                      disabled={generateDescriptionMutation.isPending || !formData.title || !formData.city}
+                      disabled={generateDescriptionMutation.isPending}
                     >
                       {generateDescriptionMutation.isPending ? (
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />

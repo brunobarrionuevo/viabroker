@@ -686,3 +686,8 @@
 - [ ] Remover dependências do Manus OAuth
 - [ ] Testar fluxo completo de autenticação
 - [ ] Fazer deploy
+
+## Correção Link de Verificação de Email (18/01/2026)
+- [ ] Corrigir erro no link de verificação de email para novos usuários
+- [x] Corrigir exibição do código de parceiro que está mostrando "Carregando..." ao invés do código real
+- [x] Implementar botão "Gerar com IA" funcional no campo de descrição do imóvel

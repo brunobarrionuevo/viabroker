@@ -1,0 +1,13 @@
+{
+  "query": "SELECT id FROM companies WHERE slug = 'bruno-busb';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id FROM companies WHERE slug = 'bruno-busb';",
+  "rows": [
+    {
+      "id": "150001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\n150001\n",
+  "stderr": "",
+  "execution_time_ms": 366
+}

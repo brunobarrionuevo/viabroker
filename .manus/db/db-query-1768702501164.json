@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, name, slug FROM companies ORDER BY id DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Fmyq5DhyXRREKB.root --database 2BVimoerGJ5AEbhy4VpTbU --execute SELECT id, name, slug FROM companies ORDER BY id DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "150001",
+      "name": "Bruno Busb",
+      "slug": "bruno-busb"
+    },
+    {
+      "id": "120011",
+      "name": "Imobiliária Teste Domain",
+      "slug": "test-domain-company-1768446516764"
+    },
+    {
+      "id": "120010",
+      "name": "Other Company",
+      "slug": "other-reorder-1768446516802"
+    },
+    {
+      "id": "120009",
+      "name": "Test Realty Reorder",
+      "slug": "test-reorder-1768446516538"
+    },
+    {
+      "id": "120008",
+      "name": "Test Company Password",
+      "slug": "test-company-password-1768446516453"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tslug\n150001\tBruno Busb\tbruno-busb\n120011\tImobiliária Teste Domain\ttest-domain-company-1768446516764\n120010\tOther Company\tother-reorder-1768446516802\n120009\tTest Realty Reorder\ttest-reorder-1768446516538\n120008\tTest Company Password\ttest-company-password-1768446516453\n",
+  "stderr": "",
+  "execution_time_ms": 380
+}
