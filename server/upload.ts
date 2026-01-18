@@ -47,7 +47,8 @@ uploadRouter.post("/upload", upload.single("file"), async (req: MulterRequest, r
     return res.json({ url, key });
   } catch (error) {
     console.error("Erro no upload:", error);
-    return res.status(500).json({ error: "Erro interno no upload" });
+    const errorMessage = error instanceof Error ? error.message : "Erro interno no upload";
+    return res.status(500).json({ error: errorMessage });
   }
 });
 
@@ -141,6 +142,7 @@ uploadRouter.post("/upload/multiple", upload.array("files", 20), async (req: Mul
     return res.json({ files: results });
   } catch (error) {
     console.error("Erro no upload:", error);
-    return res.status(500).json({ error: "Erro interno no upload" });
+    const errorMessage = error instanceof Error ? error.message : "Erro interno no upload";
+    return res.status(500).json({ error: errorMessage });
   }
 });
