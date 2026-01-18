@@ -469,8 +469,38 @@ export const appRouter = router({
         if (!property || property.companyId !== ctx.user.companyId) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Imóvel não encontrado" });
         }
+        
+        // Log para debug
+        console.log("[addImage] Input recebido:", {
+          propertyId: input.propertyId,
+          url: input.url,
+          fileKey: input.fileKey,
+          hasImageData: !!input.imageData,
+          imageDataLength: input.imageData?.length || 0,
+          mimeType: input.mimeType,
+          order: input.order,
+          isMain: input.isMain
+        });
+        
+        // Construir objeto para inserção explicitamente
+        const imageToInsert = {
+          propertyId: input.propertyId,
+          url: input.url || null,
+          fileKey: input.fileKey || null,
+          imageData: input.imageData || null,
+          mimeType: input.mimeType || null,
+          caption: input.caption || null,
+          order: input.order,
+          isMain: input.isMain,
+        };
+        
+        console.log("[addImage] Objeto para inserção:", {
+          ...imageToInsert,
+          imageData: imageToInsert.imageData ? `[${imageToInsert.imageData.length} chars]` : null
+        });
+        
         // Salvar imagem no banco
-        const savedImage = await db.addPropertyImage(input);
+        const savedImage = await db.addPropertyImage(imageToInsert);
         // Atualizar URL para apontar para o endpoint de imagens usando o ID
         if (savedImage.imageData) {
           await db.updatePropertyImageUrl(savedImage.id, `/api/images/${savedImage.id}`);

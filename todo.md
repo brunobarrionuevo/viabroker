@@ -708,3 +708,4 @@
 - [x] Implementar upload de imagens usando AWS S3 direto para funcionar no Render
 - [x] Implementar armazenamento de imagens diretamente no banco de dados TiDB
 - [x] Corrigir falha no deploy do Render (SSL config e snapshots conflitantes)
+- [ ] Corrigir erro de upload: imageData e mimeType não estão sendo salvos no banco

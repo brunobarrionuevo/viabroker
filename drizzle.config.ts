@@ -5,19 +5,20 @@ if (!connectionString) {
   throw new Error("DATABASE_URL is required to run drizzle commands");
 }
 
-// Garantir que SSL está habilitado na URL para TiDB
-let urlWithSSL = connectionString;
-// Se não tem parâmetro ssl, adicionar
-if (!urlWithSSL.includes('ssl=')) {
-  const separator = urlWithSSL.includes('?') ? '&' : '?';
-  urlWithSSL = urlWithSSL + separator + 'ssl=true';
-}
+// Remover parâmetros SSL existentes da URL para evitar conflitos
+let cleanUrl = connectionString;
+cleanUrl = cleanUrl.replace(/[?&]ssl=[^&]*/gi, '');
+cleanUrl = cleanUrl.replace(/[?&]sslmode=[^&]*/gi, '');
+cleanUrl = cleanUrl.replace(/[?&]$/, '');
 
 export default defineConfig({
   schema: "./drizzle/schema.ts",
   out: "./drizzle",
   dialect: "mysql",
   dbCredentials: {
-    url: urlWithSSL
+    url: cleanUrl,
+    ssl: {
+      rejectUnauthorized: true
+    }
   },
 });
