@@ -461,27 +461,3 @@ export const propertyShares = mysqlTable("propertyShares", {
 export type PropertyShare = typeof propertyShares.$inferSelect;
 export type InsertPropertyShare = typeof propertyShares.$inferInsert;
 
-// ==========================================
-// CONFIGURAÇÕES DE IA
-// ==========================================
-
-export const aiSettings = mysqlTable("ai_settings", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Configurações do modelo
-  model: varchar("model", { length: 50 }).default("gpt-4o-mini").notNull(),
-  temperature: decimal("temperature", { precision: 3, scale: 2 }).default("0.7"),
-  maxTokens: int("maxTokens").default(1000),
-  
-  // Prompt para geração de descrição de imóveis
-  descriptionPrompt: text("descriptionPrompt").notNull(),
-  
-  // Prompt do sistema
-  systemPrompt: text("systemPrompt").notNull(),
-  
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type AiSettings = typeof aiSettings.$inferSelect;
-export type InsertAiSettings = typeof aiSettings.$inferInsert;
