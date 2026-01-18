@@ -697,3 +697,4 @@
 - [x] Corrigir modelo de IA para usar modelo válido da OpenAI (gpt-4o-mini)
 - [x] Criar tabela de configurações de IA no banco de dados
 - [x] Adicionar interface de configuração de IA no dashboard admin master
+- [ ] Investigar e corrigir falha no deploy do Render (erro SQL syntax no schema ai_settings)
