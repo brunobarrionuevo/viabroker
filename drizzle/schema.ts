@@ -460,3 +460,44 @@ export const propertyShares = mysqlTable("propertyShares", {
 
 export type PropertyShare = typeof propertyShares.$inferSelect;
 export type InsertPropertyShare = typeof propertyShares.$inferInsert;
+
+// ==========================================
+// CONFIGURAÇÕES DE IA
+// ==========================================
+
+export const aiSettings = mysqlTable("ai_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Configurações do modelo
+  model: varchar("model", { length: 50 }).default("gpt-4o-mini").notNull(),
+  temperature: decimal("temperature", { precision: 3, scale: 2 }).default("0.7"),
+  maxTokens: int("maxTokens").default(1000),
+  
+  // Prompt para geração de descrição de imóveis
+  descriptionPrompt: text("descriptionPrompt").default(`Crie uma descrição imobiliária profissional e persuasiva para o seguinte imóvel:
+
+{propertyInfo}
+
+Diretrizes para a descrição:
+1. Escreva 2-3 parágrafos fluidos e bem conectados
+2. Comece destacando o principal diferencial do imóvel
+3. Descreva a localização e suas vantagens (comércio, transporte, segurança)
+4. Destaque os ambientes e suas características (iluminação, ventilação, acabamento)
+5. Mencione os diferenciais e comodidades de forma natural
+6. Use linguagem persuasiva mas honesta, sem exageros
+7. Transmita exclusividade e qualidade
+8. Finalize com um convite à visita
+9. Não use emojis
+10. Não invente informações que não foram fornecidas
+
+Tom: Profissional, sofisticado e acolhedor`).notNull(),
+  
+  // Prompt do sistema
+  systemPrompt: text("systemPrompt").default("Você é um copywriter especializado em imóveis de alto padrão.").notNull(),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AiSettings = typeof aiSettings.$inferSelect;
+export type InsertAiSettings = typeof aiSettings.$inferInsert;

@@ -679,6 +679,55 @@ export default function MasterDashboard() {
                     </Button>
                   </div>
                 </div>
+
+                {/* Configurações de IA */}
+                <div className="border rounded-lg p-4 bg-gray-50">
+                  <h3 className="font-semibold text-gray-900 mb-4">Configurações de IA</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Configure o modelo e prompts usados para geração de descrições de imóveis com IA
+                  </p>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="aiModel" className="text-gray-700">Modelo de IA</Label>
+                      <Input
+                        id="aiModel"
+                        type="text"
+                        placeholder="gpt-4o-mini"
+                        className="border-gray-300 text-gray-900"
+                        defaultValue="gpt-4o-mini"
+                        disabled
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Modelo OpenAI usado para geração de texto</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="systemPrompt" className="text-gray-700">Prompt do Sistema</Label>
+                      <Input
+                        id="systemPrompt"
+                        type="text"
+                        placeholder="Você é um copywriter especializado em imóveis..."
+                        className="border-gray-300 text-gray-900"
+                        defaultValue="Você é um copywriter especializado em imóveis de alto padrão."
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Define o papel da IA na conversa</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="descriptionPrompt" className="text-gray-700">Prompt de Descrição</Label>
+                      <textarea
+                        id="descriptionPrompt"
+                        rows={8}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 text-sm"
+                        defaultValue={`Crie uma descrição imobiliária profissional e persuasiva para o seguinte imóvel:\n\n{propertyInfo}\n\nDiretrizes para a descrição:\n1. Escreva 2-3 parágrafos fluidos e bem conectados\n2. Comece destacando o principal diferencial do imóvel\n3. Descreva a localização e suas vantagens\n4. Destaque os ambientes e características\n5. Mencione diferenciais de forma natural\n6. Use linguagem persuasiva mas honesta\n7. Transmita exclusividade e qualidade\n8. Finalize com convite à visita\n9. Não use emojis\n10. Não invente informações`}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Template usado para gerar descrições. Use {'{propertyInfo}'} onde as informações do imóvel serão inseridas</p>
+                    </div>
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      onClick={() => toast.info("Funcionalidade em desenvolvimento")}
+                    >
+                      Salvar Configurações de IA
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
