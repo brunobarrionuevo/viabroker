@@ -69,6 +69,7 @@ export function isCloudflareConfigured(): boolean {
 
 /**
  * Verifica se a API do Cloudflare está funcionando
+ * Usa o endpoint /zones que funciona com permissão Zone → Zone → Read
  */
 export async function verifyCloudflareConnection(): Promise<{
   success: boolean;
@@ -81,15 +82,17 @@ export async function verifyCloudflareConnection(): Promise<{
       return { success: false, message: "Credenciais do Cloudflare não configuradas" };
     }
 
-    const response = await cloudflareRequest<{ id: string; name: string }>(
-      `/accounts/${config.accountId}`
+    // Usa o endpoint /zones que funciona com permissão Zone → Zone → Read
+    // O token "Edit zone DNS" tem essa permissão
+    const response = await cloudflareRequest<any[]>(
+      `/zones?account.id=${config.accountId}&per_page=1`
     );
 
-    if (response.success && response.result) {
+    if (response.success) {
       return {
         success: true,
         message: "Conexão com Cloudflare estabelecida",
-        accountName: response.result.name,
+        accountName: config.accountId,
       };
     }
 
