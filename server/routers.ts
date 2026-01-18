@@ -456,8 +456,10 @@ export const appRouter = router({
     addImage: protectedProcedure
       .input(z.object({
         propertyId: z.number(),
-        url: z.string().url(),
+        url: z.string().optional(),
         fileKey: z.string().optional(),
+        imageData: z.string().optional(), // Base64 da imagem
+        mimeType: z.string().optional(), // Tipo MIME da imagem
         caption: z.string().optional(),
         order: z.number().default(0),
         isMain: z.boolean().default(false),
@@ -467,7 +469,14 @@ export const appRouter = router({
         if (!property || property.companyId !== ctx.user.companyId) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Imóvel não encontrado" });
         }
-        return db.addPropertyImage(input);
+        // Salvar imagem no banco
+        const savedImage = await db.addPropertyImage(input);
+        // Atualizar URL para apontar para o endpoint de imagens usando o ID
+        if (savedImage.imageData) {
+          await db.updatePropertyImageUrl(savedImage.id, `/api/images/${savedImage.id}`);
+          return { ...savedImage, url: `/api/images/${savedImage.id}` };
+        }
+        return savedImage;
       }),
     
     deleteImage: protectedProcedure

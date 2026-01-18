@@ -5,8 +5,9 @@ if (!connectionString) {
   throw new Error("DATABASE_URL is required to run drizzle commands");
 }
 
-// Add SSL parameters directly to connection string for TiDB compatibility
-const connectionStringWithSSL = connectionString + '?ssl={"rejectUnauthorized":true}';
+// Verificar se já tem parâmetros SSL na URL
+const hasSSL = connectionString.includes('ssl=') || connectionString.includes('sslmode=');
+const connectionStringWithSSL = hasSSL ? connectionString : connectionString + '?ssl=true';
 
 export default defineConfig({
   schema: "./drizzle/schema.ts",

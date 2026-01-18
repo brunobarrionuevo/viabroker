@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, json, longtext } from "drizzle-orm/mysql-core";
 
 // ==========================================
 // USUÁRIOS E AUTENTICAÇÃO
@@ -180,8 +180,10 @@ export type InsertProperty = typeof properties.$inferInsert;
 export const propertyImages = mysqlTable("property_images", {
   id: int("id").autoincrement().primaryKey(),
   propertyId: int("propertyId").notNull(),
-  url: text("url").notNull(),
+  url: text("url"),
   fileKey: varchar("fileKey", { length: 255 }),
+  imageData: longtext("imageData"), // Armazena imagem em Base64
+  mimeType: varchar("mimeType", { length: 50 }), // Tipo da imagem (image/jpeg, image/png, etc)
   caption: varchar("caption", { length: 255 }),
   order: int("order").default(0).notNull(),
   isMain: boolean("isMain").default(false).notNull(),

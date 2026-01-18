@@ -495,13 +495,15 @@ export default function PropertyImages() {
           throw new Error(errorData.error || "Erro no upload");
         }
 
-        const { url, key } = await response.json();
+        const { url, key, imageData, mimeType } = await response.json();
 
-        // Salvar referência no banco
+        // Salvar imagem no banco de dados
         await addImageMutation.mutateAsync({
           propertyId,
           url,
           fileKey: key,
+          imageData, // Base64 da imagem
+          mimeType, // Tipo MIME
           order: currentCount + i,
           isMain: currentCount === 0 && i === 0, // Primeira imagem é a principal
         });

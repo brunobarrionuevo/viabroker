@@ -472,6 +472,27 @@ export async function getPropertyImages(propertyId: number): Promise<PropertyIma
     .orderBy(asc(propertyImages.order));
 }
 
+export async function getPropertyImageById(id: number): Promise<PropertyImage | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(propertyImages).where(eq(propertyImages.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getPropertyImageByKey(fileKey: string): Promise<PropertyImage | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(propertyImages).where(eq(propertyImages.fileKey, fileKey)).limit(1);
+  return result[0];
+}
+
+export async function updatePropertyImageUrl(id: number, url: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  await db.update(propertyImages).set({ url }).where(eq(propertyImages.id, id));
+  return true;
+}
+
 export async function addPropertyImage(data: InsertPropertyImage): Promise<PropertyImage> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

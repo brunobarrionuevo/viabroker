@@ -706,3 +706,4 @@
 - [x] Tornar campo Código fixo e não editável, gerado automaticamente pela plataforma
 - [x] Melhorar mensagem de erro quando credenciais do storage não estão disponíveis
 - [x] Implementar upload de imagens usando AWS S3 direto para funcionar no Render
+- [x] Implementar armazenamento de imagens diretamente no banco de dados TiDB

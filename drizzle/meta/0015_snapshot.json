@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "b78cc24f-19d2-45f2-9b40-6fd47c751a65",
-  "prevId": "959ad3fd-066c-43a3-a2ee-cebac4d2544e",
+  "id": "87d4c37c-7138-467e-8b93-f00218b29e82",
+  "prevId": "a1c89848-ac41-410f-ba0f-b67463728e29",
   "tables": {
     "activity_logs": {
       "name": "activity_logs",
@@ -84,87 +84,6 @@
       "compositePrimaryKeys": {
         "activity_logs_id": {
           "name": "activity_logs_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "ai_settings": {
-      "name": "ai_settings",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "model": {
-          "name": "model",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'gpt-4o-mini'"
-        },
-        "temperature": {
-          "name": "temperature",
-          "type": "decimal(3,2)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'0.7'"
-        },
-        "maxTokens": {
-          "name": "maxTokens",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": 1000
-        },
-        "descriptionPrompt": {
-          "name": "descriptionPrompt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "('Crie uma descrição imobiliária profissional e persuasiva para o seguinte imóvel:\n\n{propertyInfo}\n\nDiretrizes para a descrição:\n1. Escreva 2-3 parágrafos fluidos e bem conectados\n2. Comece destacando o principal diferencial do imóvel\n3. Descreva a localização e suas vantagens (comércio, transporte, segurança)\n4. Destaque os ambientes e suas características (iluminação, ventilação, acabamento)\n5. Mencione os diferenciais e comodidades de forma natural\n6. Use linguagem persuasiva mas honesta, sem exageros\n7. Transmita exclusividade e qualidade\n8. Finalize com um convite à visita\n9. Não use emojis\n10. Não invente informações que não foram fornecidas\n\nTom: Profissional, sofisticado e acolhedor')"
-        },
-        "systemPrompt": {
-          "name": "systemPrompt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "('Você é um copywriter especializado em imóveis de alto padrão.')"
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "ai_settings_id": {
-          "name": "ai_settings_id",
           "columns": [
             "id"
           ]
@@ -1684,12 +1603,26 @@
           "name": "url",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "fileKey": {
           "name": "fileKey",
           "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "imageData": {
+          "name": "imageData",
+          "type": "longtext",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "mimeType": {
+          "name": "mimeType",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
