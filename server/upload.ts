@@ -42,7 +42,9 @@ uploadRouter.post("/upload", upload.single("file"), async (req: MulterRequest, r
     const uniqueFilename = `properties/${nanoid()}.${extension}`;
 
     // Upload para S3
+    console.log(`[Upload] Iniciando upload: ${uniqueFilename}, tamanho: ${file.buffer.length} bytes, tipo: ${file.mimetype}`);
     const { url, key } = await storagePut(uniqueFilename, file.buffer, file.mimetype);
+    console.log(`[Upload] Upload concluído com sucesso: ${url}`);
 
     return res.json({ url, key });
   } catch (error) {

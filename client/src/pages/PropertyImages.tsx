@@ -491,7 +491,8 @@ export default function PropertyImages() {
         });
 
         if (!response.ok) {
-          throw new Error("Erro no upload");
+          const errorData = await response.json().catch(() => ({ error: response.statusText }));
+          throw new Error(errorData.error || "Erro no upload");
         }
 
         const { url, key } = await response.json();
@@ -509,7 +510,8 @@ export default function PropertyImages() {
       toast.success(`${filesToUpload.length} imagem(ns) enviada(s) com sucesso!`);
     } catch (error) {
       console.error("Erro no upload:", error);
-      toast.error("Erro ao enviar imagens");
+      const errorMessage = error instanceof Error ? error.message : "Erro ao enviar imagens";
+      toast.error(errorMessage);
     } finally {
       setUploading(false);
       setUploadProgress(0);

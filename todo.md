@@ -704,4 +704,4 @@
 ## Reorganização do Formulário de Imóveis (18/01/2026)
 - [x] Mover campo Descrição para o final do formulário de cadastro de imóveis
 - [x] Tornar campo Código fixo e não editável, gerado automaticamente pela plataforma
-- [x] Corrigir problema de upload de fotos na galeria de imagens (não está carregando)
+- [ ] Corrigir problema de upload de fotos na galeria de imagens (erro persiste: "erro ao enviar a imagem")
