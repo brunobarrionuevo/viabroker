@@ -1167,6 +1167,115 @@ export default function SiteCustomization() {
                           </Button>
                         )}
                       </div>
+                      
+                      {/* Instruções Detalhadas de Configuração */}
+                      <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                          <Globe className="w-5 h-5" />
+                          Como configurar seu domínio personalizado
+                        </h4>
+                        
+                        <div className="space-y-4 text-sm">
+                          {/* Passo 1 */}
+                          <div className="flex gap-3">
+                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
+                              1
+                            </div>
+                            <div>
+                              <p className="font-medium text-blue-900">Registre seu domínio</p>
+                              <p className="text-blue-700 text-xs mt-1">
+                                Se ainda não tem um domínio, registre em sites como <a href="https://registro.br" target="_blank" rel="noopener" className="underline font-medium">Registro.br</a>, <a href="https://godaddy.com" target="_blank" rel="noopener" className="underline font-medium">GoDaddy</a> ou <a href="https://hostgator.com.br" target="_blank" rel="noopener" className="underline font-medium">HostGator</a>.
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {/* Passo 2 */}
+                          <div className="flex gap-3">
+                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
+                              2
+                            </div>
+                            <div>
+                              <p className="font-medium text-blue-900">Acesse o painel DNS do seu provedor</p>
+                              <p className="text-blue-700 text-xs mt-1">
+                                Entre no site onde registrou o domínio e procure por "Gerenciar DNS", "Zona DNS" ou "Configurações de DNS".
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {/* Passo 3 - Configuração DNS */}
+                          <div className="flex gap-3">
+                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
+                              3
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium text-blue-900 mb-2">Configure os registros DNS</p>
+                              
+                              {/* Nameservers Cloudflare */}
+                              <div className="bg-white p-3 rounded border border-blue-300 mb-3">
+                                <p className="text-xs font-bold text-blue-900 mb-2">✅ OPÇÃO RECOMENDADA: Alterar Nameservers para Cloudflare</p>
+                                <p className="text-xs text-blue-700 mb-2">Substitua os nameservers atuais pelos do Cloudflare:</p>
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2">
+                                    <code className="bg-blue-100 px-2 py-1 rounded font-mono text-xs text-blue-900 flex-1">meg.ns.cloudflare.com</code>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-6 w-6"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText('meg.ns.cloudflare.com');
+                                        toast.success('Copiado!');
+                                      }}
+                                    >
+                                      <Copy className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <code className="bg-blue-100 px-2 py-1 rounded font-mono text-xs text-blue-900 flex-1">julian.ns.cloudflare.com</code>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-6 w-6"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText('julian.ns.cloudflare.com');
+                                        toast.success('Copiado!');
+                                      }}
+                                    >
+                                      <Copy className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                                <p className="text-xs text-blue-600 mt-2">
+                                  💡 Com essa opção, o SSL e todas as configurações são feitas automaticamente!
+                                </p>
+                              </div>
+                              
+
+                            </div>
+                          </div>
+                          
+                          {/* Passo 4 */}
+                          <div className="flex gap-3">
+                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
+                              4
+                            </div>
+                            <div>
+                              <p className="font-medium text-blue-900">Salve e aguarde a propagação</p>
+                              <p className="text-blue-700 text-xs mt-1">
+                                Após salvar, digite seu domínio acima e clique em "Salvar Configurações". A propagação pode levar de <strong>15 minutos até 48 horas</strong>.
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {/* Aviso importante */}
+                          <div className="bg-amber-50 border border-amber-300 rounded p-3 mt-3">
+                            <p className="text-xs text-amber-800">
+                              <strong>⚠️ Importante:</strong> Após configurar o DNS, entre em contato com nosso suporte para ativarmos seu domínio. Envie um email para <a href="mailto:suporte@viabroker.app" className="underline font-medium">suporte@viabroker.app</a> com o domínio que deseja ativar.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Domínio já configurado e verificado */}
@@ -1317,7 +1426,7 @@ export default function SiteCustomization() {
                     {/* Instruções manuais (mostrar apenas se automação não estiver configurada) */}
                     {settingsData.customDomain && !cloudflareStatus?.configured && (
                       <div className="space-y-4">
-                        {/* Instruções Detalhadas */}
+                        {/* Instruções Detalhadas - Apenas Nameservers */}
                         <div className="p-5 bg-blue-50 border-2 border-blue-200 rounded-lg space-y-4">
                           <div className="flex items-start gap-3">
                             <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">
@@ -1326,15 +1435,15 @@ export default function SiteCustomization() {
                             <div className="flex-1">
                               <h4 className="font-semibold text-blue-900 mb-2">Acesse o painel do seu provedor de domínio</h4>
                               <p className="text-sm text-blue-800 mb-2">
-                                Entre no site onde você registrou seu domínio (Registro.br, GoDaddy, HostGator, Locaweb, etc.) e faça login.
+                                Entre no site onde você registrou seu domínio e faça login.
                               </p>
                               <div className="bg-white/70 p-3 rounded border border-blue-300 text-xs">
-                                <p className="font-medium text-blue-900 mb-1">⚠️ Provedores comuns no Brasil:</p>
+                                <p className="font-medium text-blue-900 mb-1">Provedores comuns no Brasil:</p>
                                 <ul className="list-disc list-inside text-blue-800 space-y-0.5">
-                                  <li><strong>Registro.br:</strong> <a href="https://registro.br" target="_blank" rel="noopener" className="underline">registro.br</a></li>
-                                  <li><strong>GoDaddy:</strong> <a href="https://godaddy.com" target="_blank" rel="noopener" className="underline">godaddy.com</a></li>
-                                  <li><strong>HostGator:</strong> <a href="https://hostgator.com.br" target="_blank" rel="noopener" className="underline">hostgator.com.br</a></li>
-                                  <li><strong>Locaweb:</strong> <a href="https://locaweb.com.br" target="_blank" rel="noopener" className="underline">locaweb.com.br</a></li>
+                                  <li><a href="https://registro.br" target="_blank" rel="noopener" className="underline font-medium">Registro.br</a></li>
+                                  <li><a href="https://godaddy.com" target="_blank" rel="noopener" className="underline font-medium">GoDaddy</a></li>
+                                  <li><a href="https://hostgator.com.br" target="_blank" rel="noopener" className="underline font-medium">HostGator</a></li>
+                                  <li><a href="https://locaweb.com.br" target="_blank" rel="noopener" className="underline font-medium">Locaweb</a></li>
                                 </ul>
                               </div>
                             </div>
@@ -1345,9 +1454,12 @@ export default function SiteCustomization() {
                               2
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-semibold text-blue-900 mb-2">Localize a seção de gerenciamento de DNS</h4>
+                              <h4 className="font-semibold text-blue-900 mb-2">Localize a seção de Nameservers (DNS)</h4>
                               <p className="text-sm text-blue-800 mb-2">
-                                Procure por opções como: "Gerenciar DNS", "Zona DNS", "DNS Settings", "Configurações de DNS" ou "Registros DNS".
+                                Procure por opções como: "Alterar Nameservers", "Servidores DNS", "DNS Servers" ou "Nameservers".
+                              </p>
+                              <p className="text-xs text-blue-600">
+                                💡 No Registro.br, vá em "Meus Domínios" &gt; clique no domínio &gt; "Alterar servidores DNS"
                               </p>
                             </div>
                           </div>
@@ -1357,68 +1469,53 @@ export default function SiteCustomization() {
                               3
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-semibold text-blue-900 mb-2">Adicione o registro A (ou CNAME)</h4>
+                              <h4 className="font-semibold text-blue-900 mb-2">Altere os Nameservers para Cloudflare</h4>
                               <p className="text-sm text-blue-800 mb-3">
-                                Crie um novo registro DNS no seu provedor de domínio:
+                                Substitua os nameservers atuais pelos seguintes:
                               </p>
                               
-                              {/* Opção 1: Registro A (Recomendado para Registro.br) */}
-                              <div className="bg-white p-4 rounded border-2 border-blue-400 space-y-2 mb-3">
-                                <p className="text-xs font-bold text-blue-900 mb-2">✅ OPÇÃO 1: Registro A (Recomendado)</p>
-                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                                  <span className="font-bold text-blue-900">Tipo:</span>
-                                  <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">A</code>
-                                </div>
-                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                                  <span className="font-bold text-blue-900">Nome/Host:</span>
-                                  <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">@ (ou deixe vazio)</code>
-                                </div>
-                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                                  <span className="font-bold text-blue-900">Valor/IP:</span>
-                                  <div className="flex items-center gap-2">
-                                    <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900 flex-1">
-                                      216.24.57.1
-                                    </code>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8"
-                                      onClick={() => {
-                                        navigator.clipboard.writeText('216.24.57.1');
-                                        toast.success('IP copiado!');
-                                      }}
-                                      title="Copiar IP"
-                                    >
-                                      <Copy className="w-4 h-4" />
-                                    </Button>
+                              <div className="bg-white p-4 rounded border-2 border-blue-400 space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="text-xs text-blue-600 mb-1">Nameserver 1:</p>
+                                    <code className="bg-blue-100 px-3 py-2 rounded font-mono text-blue-900 font-bold text-lg">meg.ns.cloudflare.com</code>
                                   </div>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText('meg.ns.cloudflare.com');
+                                      toast.success('Copiado!');
+                                    }}
+                                  >
+                                    <Copy className="w-4 h-4 mr-1" />
+                                    Copiar
+                                  </Button>
                                 </div>
-                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                                  <span className="font-bold text-blue-900">TTL:</span>
-                                  <code className="bg-blue-100 px-2 py-1 rounded font-mono text-blue-900">3600 (ou padrão)</code>
+                                
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="text-xs text-blue-600 mb-1">Nameserver 2:</p>
+                                    <code className="bg-blue-100 px-3 py-2 rounded font-mono text-blue-900 font-bold text-lg">julian.ns.cloudflare.com</code>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText('julian.ns.cloudflare.com');
+                                      toast.success('Copiado!');
+                                    }}
+                                  >
+                                    <Copy className="w-4 h-4 mr-1" />
+                                    Copiar
+                                  </Button>
                                 </div>
                               </div>
                               
-                              {/* Opção 2: CNAME (apenas para subdomínios) */}
-                              <div className="bg-white p-4 rounded border-2 border-gray-300 space-y-2">
-                                <p className="text-xs font-bold text-gray-700 mb-2">OPÇÃO 2: CNAME (apenas se usar www.seudominio.com)</p>
-                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                                  <span className="font-bold text-gray-700">Tipo:</span>
-                                  <code className="bg-gray-100 px-2 py-1 rounded font-mono text-gray-700">CNAME</code>
-                                </div>
-                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                                  <span className="font-bold text-gray-700">Nome/Host:</span>
-                                  <code className="bg-gray-100 px-2 py-1 rounded font-mono text-gray-700">www</code>
-                                </div>
-                                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                                  <span className="font-bold text-gray-700">Valor/Destino:</span>
-                                  <code className="bg-gray-100 px-2 py-1 rounded font-mono text-gray-700">viabroker.onrender.com</code>
-                                </div>
-                              </div>
-                              
-                              <p className="text-xs text-blue-700 mt-3">
-                                💡 <strong>Registro.br:</strong> Use a <strong>Opção 1 (Registro A)</strong>, pois o Registro.br não permite CNAME no domínio raiz.
+                              <p className="text-xs text-green-700 mt-3 bg-green-50 p-2 rounded border border-green-200">
+                                ✅ Com os nameservers do Cloudflare, o SSL e todas as configurações são feitas automaticamente!
                               </p>
                             </div>
                           </div>
@@ -1428,15 +1525,34 @@ export default function SiteCustomization() {
                               4
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-semibold text-blue-900 mb-2">Salve as alterações e aguarde</h4>
+                              <h4 className="font-semibold text-blue-900 mb-2">Salve e aguarde a propagação</h4>
                               <p className="text-sm text-blue-800 mb-2">
-                                Após salvar o registro DNS, clique em "Salvar Configurações" aqui na plataforma.
+                                Após salvar os nameservers, digite seu domínio acima e clique em "Salvar Configurações".
                               </p>
                               <div className="bg-amber-50 border border-amber-300 rounded p-3 text-xs text-amber-800">
                                 <p className="font-medium mb-1">⏳ Tempo de propagação:</p>
-                                <p>A propagação do DNS pode levar de <strong>15 minutos até 48 horas</strong>. 
-                                Na maioria dos casos, funciona em 1-2 horas. Use o botão "Verificar Status" abaixo para checar.</p>
+                                <p>A propagação dos nameservers pode levar de <strong>15 minutos até 48 horas</strong>. 
+                                Na maioria dos casos, funciona em 1-4 horas.</p>
                               </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">
+                              5
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-green-900 mb-2">Entre em contato para ativação</h4>
+                              <p className="text-sm text-green-800 mb-2">
+                                Após configurar os nameservers, envie um email para ativarmos seu domínio:
+                              </p>
+                              <a 
+                                href="mailto:suporte@viabroker.app?subject=Ativação de Domínio Personalizado&body=Olá! Gostaria de ativar meu domínio personalizado.%0A%0ADomínio: %0AEmail da conta: "
+                                className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                                suporte@viabroker.app
+                              </a>
                             </div>
                           </div>
                         </div>

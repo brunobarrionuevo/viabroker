@@ -752,3 +752,10 @@
 - [x] Simplificar fluxos de navegação
 - [x] Corrigir erros de TypeScript (null vs undefined em imagens)
 - [x] Melhorar página inicial com design mais limpo e rápido
+
+
+## Domínio Personalizado (19/01/2026)
+- [x] Corrigir configuração automática de domínio personalizado
+- [x] Adicionar instruções de configuração DNS na página de domínio (apenas nameservers Cloudflare: meg.ns.cloudflare.com e julian.ns.cloudflare.com)
+
+- [ ] Adicionar instruções detalhadas de configuração de domínio personalizado na aba de domínio
