@@ -94,35 +94,49 @@ function SortableImage({ image, index, onDelete, onSetMain, onPreview, totalImag
         <GripVertical className="w-4 h-4" />
       </div>
 
-      {/* Overlay com ações */}
-      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none">
-        <Button
-          size="icon"
-          variant={image.isMain ? "default" : "secondary"}
-          className={`pointer-events-auto ${image.isMain ? "bg-yellow-500 hover:bg-yellow-600" : ""}`}
-          onClick={() => onSetMain(image.id)}
-          title={image.isMain ? "Foto principal" : "Definir como principal"}
-        >
-          <Star className={`w-4 h-4 ${image.isMain ? "fill-current" : ""}`} />
-        </Button>
-        <Button
-          size="icon"
-          variant="secondary"
-          className="pointer-events-auto"
-          onClick={() => onPreview(index)}
-          title="Visualizar"
-        >
-          <ZoomIn className="w-4 h-4" />
-        </Button>
-        <Button
-          size="icon"
-          variant="destructive"
-          className="pointer-events-auto"
-          onClick={() => onDelete(image.id)}
-          title="Remover foto"
-        >
-          <Trash2 className="w-4 h-4" />
-        </Button>
+      {/* Botões de ação - sempre visíveis no mobile, hover no desktop */}
+      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            size="sm"
+            variant={image.isMain ? "default" : "secondary"}
+            className={`h-8 px-2 ${image.isMain ? "bg-yellow-500 hover:bg-yellow-600" : "bg-white/90 hover:bg-white"}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSetMain(image.id);
+            }}
+            title={image.isMain ? "Foto principal" : "Definir como principal"}
+          >
+            <Star className={`w-4 h-4 ${image.isMain ? "fill-current" : ""}`} />
+            <span className="ml-1 text-xs hidden sm:inline">{image.isMain ? "Principal" : "Definir"}</span>
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-8 px-2 bg-white/90 hover:bg-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPreview(index);
+            }}
+            title="Visualizar"
+          >
+            <ZoomIn className="w-4 h-4" />
+            <span className="ml-1 text-xs hidden sm:inline">Zoom</span>
+          </Button>
+          <Button
+            size="sm"
+            variant="destructive"
+            className="h-8 px-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(image.id);
+            }}
+            title="Remover foto"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span className="ml-1 text-xs hidden sm:inline">Excluir</span>
+          </Button>
+        </div>
       </div>
 
       {/* Badge de foto principal */}
