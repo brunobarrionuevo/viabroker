@@ -1045,21 +1045,6 @@ export default function SiteCustomization() {
                   <CardDescription>Configure um domínio próprio para seu site imobiliário</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Status da Automação Cloudflare */}
-                  {cloudflareStatus?.configured && (
-                    <div className={`p-3 rounded-lg border ${cloudflareStatus.connected ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${cloudflareStatus.connected ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                        <span className={`text-sm font-medium ${cloudflareStatus.connected ? 'text-green-800' : 'text-yellow-800'}`}>
-                          {cloudflareStatus.connected ? '✨ Automação de domínios ativa' : '⚠️ Automação com problema'}
-                        </span>
-                      </div>
-                      {cloudflareStatus.accountName && (
-                        <p className="text-xs text-green-700 mt-1 ml-4">Conta: {cloudflareStatus.accountName}</p>
-                      )}
-                    </div>
-                  )}
-
                   {/* Free Domain */}
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                     <h3 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
