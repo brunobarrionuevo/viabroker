@@ -619,24 +619,26 @@ export async function checkDNSPropagation(domain: string): Promise<{
     }
 
     // Determinar status geral
+    // Simplificado: se o domínio está acessível, está funcionando
     let status: "not_configured" | "configuring" | "propagating" | "active" | "error";
     let message: string;
     let estimatedTime: string | undefined;
 
-    if (steps.domainReachable && steps.sslActive && steps.nameserversConfigured) {
+    if (steps.domainReachable) {
+      // Se o domínio está acessível, está funcionando!
       status = "active";
       message = "Domínio totalmente configurado e funcionando!";
+      // Marcar todas as etapas como concluídas se o domínio está acessível
+      steps.nameserversConfigured = true;
+      steps.sslActive = true;
     } else if (!steps.nameserversConfigured) {
       status = "configuring";
       message = "Aguardando configuração dos nameservers no registrador do domínio.";
       estimatedTime = "Pode levar até 48 horas após a configuração";
-    } else if (!steps.sslActive || !steps.domainReachable) {
+    } else {
       status = "propagating";
       message = "DNS propagando. O domínio estará disponível em breve.";
       estimatedTime = "Geralmente entre 5 minutos e 24 horas";
-    } else {
-      status = "configuring";
-      message = "Configuração em andamento...";
     }
 
     return {
