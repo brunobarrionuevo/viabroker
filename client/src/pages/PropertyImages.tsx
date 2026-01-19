@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Loader2, Upload, Trash2, Star, GripVertical, Image as ImageIcon, X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, Trash2, Star, GripVertical, Image as ImageIcon, X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, MoreVertical } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -23,10 +24,15 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
-  verticalListSortingStrategy,
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 
 const MAX_IMAGES = 20;
@@ -67,87 +73,97 @@ function SortableImage({ image, index, onDelete, onSetMain, onPreview, totalImag
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    // Compatibilidade Safari
+    WebkitTransform: CSS.Transform.toString(transform),
+    WebkitTransition: transition,
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative group rounded-lg overflow-hidden border-2 ${
-        image.isMain ? "border-yellow-500" : "border-transparent"
-      }`}
+      className={`relative rounded-lg overflow-hidden border-2 touch-manipulation ${
+        image.isMain ? "border-yellow-500" : "border-gray-200"
+      } ${isDragging ? "z-50 shadow-2xl" : ""}`}
     >
+      {/* Imagem */}
       <img
         src={image.url || ''}
         alt={image.caption || `Foto ${index + 1}`}
-        className="w-full aspect-square object-cover cursor-pointer"
+        className="w-full aspect-square object-cover"
         onClick={() => onPreview(index)}
+        draggable={false}
+        style={{ WebkitUserSelect: 'none', userSelect: 'none' }}
       />
       
-      {/* Drag handle */}
-      <div
-        {...attributes}
-        {...listeners}
-        className="absolute top-2 left-2 bg-black/70 text-white p-1.5 rounded cursor-move z-20"
-        title="Arrastar para reordenar"
-      >
-        <GripVertical className="w-4 h-4" />
+      {/* Barra superior com drag handle e menu */}
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-1.5 bg-gradient-to-b from-black/60 to-transparent">
+        {/* Drag handle - lado esquerdo */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="bg-white/90 text-gray-700 p-2 rounded-md cursor-grab active:cursor-grabbing touch-manipulation shadow-sm"
+          title="Arrastar para reordenar"
+          style={{ WebkitTouchCallout: 'none' }}
+        >
+          <GripVertical className="w-4 h-4" />
+        </div>
+
+        {/* Badge de foto principal */}
+        {image.isMain && (
+          <div className="bg-yellow-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow-sm">
+            Principal
+          </div>
+        )}
+
+        {/* Menu de ações - lado direito */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button 
+              className="bg-white/90 text-gray-700 p-2 rounded-md shadow-sm touch-manipulation"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem 
+              onClick={(e) => {
+                e.stopPropagation();
+                onPreview(index);
+              }}
+              className="cursor-pointer"
+            >
+              <ZoomIn className="w-4 h-4 mr-2" />
+              Visualizar
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={(e) => {
+                e.stopPropagation();
+                onSetMain(image.id);
+              }}
+              className="cursor-pointer"
+              disabled={image.isMain}
+            >
+              <Star className={`w-4 h-4 mr-2 ${image.isMain ? "fill-yellow-500 text-yellow-500" : ""}`} />
+              {image.isMain ? "Foto principal" : "Definir como principal"}
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(image.id);
+              }}
+              className="cursor-pointer text-red-600 focus:text-red-600"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Excluir foto
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {/* Botões de ação - sempre visíveis no mobile, hover no desktop */}
-      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            size="sm"
-            variant={image.isMain ? "default" : "secondary"}
-            className={`h-8 px-2 ${image.isMain ? "bg-yellow-500 hover:bg-yellow-600" : "bg-white/90 hover:bg-white"}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onSetMain(image.id);
-            }}
-            title={image.isMain ? "Foto principal" : "Definir como principal"}
-          >
-            <Star className={`w-4 h-4 ${image.isMain ? "fill-current" : ""}`} />
-            <span className="ml-1 text-xs hidden sm:inline">{image.isMain ? "Principal" : "Definir"}</span>
-          </Button>
-          <Button
-            size="sm"
-            variant="secondary"
-            className="h-8 px-2 bg-white/90 hover:bg-white"
-            onClick={(e) => {
-              e.stopPropagation();
-              onPreview(index);
-            }}
-            title="Visualizar"
-          >
-            <ZoomIn className="w-4 h-4" />
-            <span className="ml-1 text-xs hidden sm:inline">Zoom</span>
-          </Button>
-          <Button
-            size="sm"
-            variant="destructive"
-            className="h-8 px-2"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(image.id);
-            }}
-            title="Remover foto"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span className="ml-1 text-xs hidden sm:inline">Excluir</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Badge de foto principal */}
-      {image.isMain && (
-        <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
-          Principal
-        </div>
-      )}
-
-      {/* Número da foto */}
-      <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+      {/* Número da foto - canto inferior direito */}
+      <div className="absolute bottom-1.5 right-1.5 bg-black/70 text-white text-xs px-2 py-1 rounded-md">
         {index + 1}/{totalImages}
       </div>
     </div>
@@ -214,6 +230,30 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
     setIsDragging(false);
   };
 
+  // Touch events para Safari
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (zoom > 1 && e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({ 
+        x: e.touches[0].clientX - position.x, 
+        y: e.touches[0].clientY - position.y 
+      });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging && zoom > 1 && e.touches.length === 1) {
+      setPosition({
+        x: e.touches[0].clientX - dragStart.x,
+        y: e.touches[0].clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'ArrowLeft') handlePrevious();
     if (e.key === 'ArrowRight') handleNext();
@@ -222,15 +262,23 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown as any);
-    return () => window.removeEventListener('keydown', handleKeyDown as any);
+    // Prevenir scroll do body quando lightbox está aberto
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown as any);
+      document.body.style.overflow = '';
+    };
   }, [currentIndex, images.length]);
 
   const currentImage = images[currentIndex];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+    <div 
+      className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center touch-manipulation"
+      style={{ WebkitOverflowScrolling: 'touch' }}
+    >
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between bg-gradient-to-b from-black/50 to-transparent">
+      <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between bg-gradient-to-b from-black/50 to-transparent z-10">
         <div className="text-white">
           <p className="text-sm font-medium">
             Foto {currentIndex + 1} de {images.length}
@@ -242,7 +290,7 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
         <Button
           size="icon"
           variant="ghost"
-          className="text-white hover:bg-white/20 relative z-10"
+          className="text-white hover:bg-white/20"
           onClick={onClose}
         >
           <X className="w-6 h-6" />
@@ -256,7 +304,13 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{ 
+          cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
+          WebkitOverflowScrolling: 'touch'
+        }}
       >
         <img
           src={currentImage.url || ''}
@@ -265,6 +319,10 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
           style={{
             transform: `scale(${zoom}) translate(${position.x / zoom}px, ${position.y / zoom}px)`,
             transition: isDragging ? 'none' : 'transform 0.2s',
+            WebkitTransform: `scale(${zoom}) translate(${position.x / zoom}px, ${position.y / zoom}px)`,
+            WebkitTransition: isDragging ? 'none' : '-webkit-transform 0.2s',
+            WebkitUserSelect: 'none',
+            userSelect: 'none',
           }}
           draggable={false}
         />
@@ -275,20 +333,20 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
         <Button
           size="icon"
           variant="ghost"
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12"
+          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 w-10 h-10 md:w-12 md:h-12"
           onClick={handlePrevious}
         >
-          <ChevronLeft className="w-8 h-8" />
+          <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
         </Button>
       )}
       {currentIndex < images.length - 1 && (
         <Button
           size="icon"
           variant="ghost"
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12"
+          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 w-10 h-10 md:w-12 md:h-12"
           onClick={handleNext}
         >
-          <ChevronRight className="w-8 h-8" />
+          <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
         </Button>
       )}
 
@@ -317,8 +375,8 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
         </Button>
       </div>
 
-      {/* Thumbnails */}
-      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 bg-black/50 rounded-lg p-2 max-w-[90vw] overflow-x-auto">
+      {/* Thumbnails - hidden on very small screens */}
+      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 hidden sm:flex gap-2 bg-black/50 rounded-lg p-2 max-w-[90vw] overflow-x-auto">
         {images.map((img, idx) => (
           <button
             key={img.id}
@@ -327,7 +385,7 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
               setZoom(1);
               setPosition({ x: 0, y: 0 });
             }}
-            className={`w-16 h-16 rounded overflow-hidden flex-shrink-0 border-2 ${
+            className={`w-12 h-12 md:w-16 md:h-16 rounded overflow-hidden flex-shrink-0 border-2 ${
               idx === currentIndex ? 'border-white' : 'border-transparent'
             } hover:border-white/50 transition-colors`}
           >
@@ -411,8 +469,19 @@ export default function PropertyImages() {
     },
   });
 
+  // Sensores otimizados para touch e mouse
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Precisa mover 8px para ativar o drag
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200, // Delay de 200ms para diferenciar de tap
+        tolerance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -448,56 +517,35 @@ export default function PropertyImages() {
     const currentCount = images?.length || 0;
     const remainingSlots = MAX_IMAGES - currentCount;
     
-    if (remainingSlots <= 0) {
-      toast.error(`Limite de ${MAX_IMAGES} fotos atingido`);
-      return;
-    }
-
-    const filesToUpload = Array.from(files).slice(0, remainingSlots);
-    
     if (files.length > remainingSlots) {
-      toast.warning(`Apenas ${remainingSlots} fotos serão enviadas (limite de ${MAX_IMAGES})`);
+      toast.error(`Você pode enviar apenas mais ${remainingSlots} foto(s)`);
+      return;
     }
 
     setUploading(true);
     setUploadProgress(0);
 
     try {
+      const filesToUpload = Array.from(files).slice(0, remainingSlots);
+      
       for (let i = 0; i < filesToUpload.length; i++) {
         const file = filesToUpload[i];
-        setUploadProgress(Math.round(((i + 1) / filesToUpload.length) * 100));
+        setUploadProgress(Math.round(((i + 0.5) / filesToUpload.length) * 100));
 
-        // Validar tipo de arquivo
-        if (!file.type.startsWith("image/")) {
-          toast.error(`${file.name} não é uma imagem válida`);
-          continue;
-        }
+        // Comprimir imagem antes do upload
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
 
-        // Validar tamanho (máximo 10MB)
-        if (file.size > 10 * 1024 * 1024) {
-          toast.error(`${file.name} excede o limite de 10MB`);
-          continue;
-        }
-
-        // Comprimir imagem antes do upload com melhor qualidade
         let fileToUpload = file;
         try {
-          const options = {
-            maxSizeMB: 2, // Aumentado para 2MB para manter melhor qualidade
-            maxWidthOrHeight: 2560, // Aumentado para 2560px para imagens de alta resolução
-            useWebWorker: true,
-            initialQuality: 0.85, // Qualidade inicial de 85% (padrão era 75%)
-            alwaysKeepResolution: false,
-            fileType: 'image/jpeg',
-          };
           fileToUpload = await imageCompression(file, options);
-          console.log(`Imagem comprimida: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`);
-        } catch (error) {
-          console.error("Erro ao comprimir imagem:", error);
-          // Se falhar a compressão, usa o arquivo original
+        } catch (compressionError) {
+          console.warn("Erro na compressão, usando arquivo original:", compressionError);
         }
 
-        // Fazer upload para S3
         const formData = new FormData();
         formData.append("file", fileToUpload);
 
@@ -661,7 +709,7 @@ export default function PropertyImages() {
           <CardHeader>
             <CardTitle>Galeria de Fotos</CardTitle>
             <CardDescription>
-              Arraste as fotos para reorganizar a ordem. Clique na estrela para definir a foto principal. Clique na foto para visualizar em tela cheia.
+              Segure e arraste o ícone <GripVertical className="w-4 h-4 inline" /> para reorganizar. Toque no menu <MoreVertical className="w-4 h-4 inline" /> para mais opções.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -679,7 +727,7 @@ export default function PropertyImages() {
                   items={localImages.map(img => img.id)}
                   strategy={rectSortingStrategy}
                 >
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                     {localImages.map((image, index) => (
                       <SortableImage
                         key={image.id}

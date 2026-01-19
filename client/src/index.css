@@ -266,3 +266,98 @@
     aspect-ratio: 1 / 1;
   }
 }
+
+
+/* Safari and iOS Compatibility */
+@supports (-webkit-touch-callout: none) {
+  /* iOS specific fixes */
+  .touch-manipulation {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+  }
+  
+  /* Fix for Safari flexbox issues */
+  .flex {
+    -webkit-flex-shrink: 0;
+  }
+  
+  /* Smooth scrolling on iOS */
+  .overflow-auto,
+  .overflow-y-auto,
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Drag and drop styles */
+.dragging {
+  opacity: 0.5;
+  cursor: grabbing !important;
+}
+
+.drag-handle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Better touch feedback */
+@media (hover: none) and (pointer: coarse) {
+  /* Mobile-specific styles */
+  .group:active .group-hover\:opacity-100 {
+    opacity: 1;
+  }
+  
+  /* Larger touch targets on mobile */
+  button, 
+  [role="button"],
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Remove hover effects on touch devices */
+  .hover\:bg-white\/20:hover {
+    background-color: transparent;
+  }
+}
+
+/* Cross-browser image rendering */
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+/* Prevent text selection during drag */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Fix for Safari backdrop blur */
+.backdrop-blur-sm {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+/* Smooth animations across browsers */
+.transition-all {
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+/* Fix for Safari transform issues */
+.transform {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
