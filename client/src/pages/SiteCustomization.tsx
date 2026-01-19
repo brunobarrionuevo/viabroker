@@ -1037,33 +1037,34 @@ export default function SiteCustomization() {
             </TabsContent>
 
             {/* Domain Tab */}
-            <TabsContent value="domain" className="space-y-6">
+            <TabsContent value="domain" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Globe className="w-5 h-5" />
+                <CardHeader className="pb-3 sm:pb-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
                     Domínio Personalizado
                   </CardTitle>
-                  <CardDescription>Configure um domínio próprio para seu site imobiliário</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">Configure um domínio próprio para seu site imobiliário</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 sm:space-y-6">
                   {/* Free Domain */}
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <h3 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
-                      <Check className="w-5 h-5" />
+                  <div className="p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <h3 className="font-semibold text-green-800 mb-2 flex items-center gap-2 text-sm sm:text-base">
+                      <Check className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                       Domínio Gratuito Ativo
                     </h3>
-                    <p className="text-sm text-green-700 mb-3">
+                    <p className="text-xs sm:text-sm text-green-700 mb-2 sm:mb-3">
                       Seu site já está disponível gratuitamente em:
                     </p>
                     <div className="flex items-center gap-2">
-                      <code className="bg-white px-3 py-2 rounded border text-green-800 font-mono flex-1">
+                      <code className="bg-white px-2 sm:px-3 py-1.5 sm:py-2 rounded border text-green-800 font-mono text-xs sm:text-sm flex-1 truncate overflow-hidden">
                         {siteUrl || "Configure o slug da empresa"}
                       </code>
                       <Button
                         type="button"
                         variant="outline"
                         size="icon"
+                        className="flex-shrink-0 h-8 w-8 sm:h-9 sm:w-9"
                         onClick={() => {
                           if (siteUrl) {
                             window.open(siteUrl, '_blank');
@@ -1071,30 +1072,34 @@ export default function SiteCustomization() {
                         }}
                         title="Abrir site"
                       >
-                        <ExternalLink className="w-4 h-4" />
+                        <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </Button>
                     </div>
                     
                     {/* Edição do Slug */}
-                    <div className="mt-4 pt-4 border-t border-green-200">
-                      <Label htmlFor="slug" className="text-sm font-medium text-green-800">Personalizar URL do site</Label>
-                      <p className="text-xs text-green-600 mb-2">
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-green-200">
+                      <Label htmlFor="slug" className="text-xs sm:text-sm font-medium text-green-800">Personalizar URL do site</Label>
+                      <p className="text-xs text-green-600 mb-2 leading-tight">
                         Escolha um nome único para a URL do seu site (apenas letras minúsculas, números e hífens)
                       </p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-green-700 font-mono whitespace-nowrap">{window.location.origin}/site/</span>
-                        <Input
-                          id="slug"
-                          value={slugInput}
-                          onChange={(e) => setSlugInput(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                          placeholder="sua-imobiliaria"
-                          className="flex-1 font-mono bg-white"
-                          maxLength={100}
-                        />
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="flex items-center gap-1 flex-1">
+                          <span className="text-xs text-green-700 font-mono whitespace-nowrap hidden sm:inline">{window.location.origin}/site/</span>
+                          <span className="text-xs text-green-700 font-mono whitespace-nowrap sm:hidden">.../site/</span>
+                          <Input
+                            id="slug"
+                            value={slugInput}
+                            onChange={(e) => setSlugInput(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                            placeholder="sua-imobiliaria"
+                            className="flex-1 font-mono bg-white text-sm h-9"
+                            maxLength={100}
+                          />
+                        </div>
                         <Button
                           type="button"
                           variant="default"
                           size="sm"
+                          className="w-full sm:w-auto h-9"
                           disabled={!slugInput || slugInput === company?.slug || updatingSlug}
                           onClick={handleUpdateSlug}
                         >
@@ -1106,7 +1111,7 @@ export default function SiteCustomization() {
                         </Button>
                       </div>
                       {slugInput && slugInput !== company?.slug && (
-                        <p className="text-xs text-green-600 mt-1">
+                        <p className="text-xs text-green-600 mt-1 truncate">
                           Nova URL: {window.location.origin}/site/{slugInput}
                         </p>
                       )}
@@ -1114,27 +1119,28 @@ export default function SiteCustomization() {
                   </div>
 
                   {/* Custom Domain */}
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="customDomain" className="text-base font-semibold">Domínio Próprio (Opcional)</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Conecte seu próprio domínio para profissionalizar ainda mais seu site. 
+                      <Label htmlFor="customDomain" className="text-sm sm:text-base font-semibold">Domínio Próprio (Opcional)</Label>
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-tight">
+                        Conecte seu próprio domínio para profissionalizar ainda mais seu site.
                         {cloudflareStatus?.configured && cloudflareStatus?.connected && (
-                          <span className="text-green-600 font-medium"> A configuração será feita automaticamente!</span>
+                          <span className="text-green-600 font-medium block sm:inline"> A configuração será feita automaticamente!</span>
                         )}
                       </p>
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Input
                           id="customDomain"
                           value={settingsData.customDomain}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, customDomain: e.target.value.toLowerCase().trim() }))}
                           placeholder="www.suaimobiliaria.com.br"
-                          className="font-mono flex-1"
+                          className="font-mono flex-1 text-sm h-9"
                         />
                         {cloudflareStatus?.configured && cloudflareStatus?.connected && settingsData.customDomain && !siteSettings?.domainVerified && (
                           <Button
                             type="button"
                             variant="default"
+                            className="w-full sm:w-auto h-9 text-xs sm:text-sm"
                             disabled={setupDomainMutation.isPending}
                             onClick={() => {
                               setupDomainMutation.mutate({ domain: settingsData.customDomain });
@@ -1142,13 +1148,15 @@ export default function SiteCustomization() {
                           >
                             {setupDomainMutation.isPending ? (
                               <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Configurando...
+                                <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 animate-spin" />
+                                <span className="hidden sm:inline">Configurando...</span>
+                                <span className="sm:hidden">Aguarde...</span>
                               </>
                             ) : (
                               <>
-                                <Globe className="w-4 h-4 mr-2" />
-                                Configurar Automaticamente
+                                <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                                <span className="hidden sm:inline">Configurar Automaticamente</span>
+                                <span className="sm:hidden">Configurar</span>
                               </>
                             )}
                           </Button>
@@ -1156,108 +1164,106 @@ export default function SiteCustomization() {
                       </div>
                       
                       {/* Instruções Detalhadas de Configuração */}
-                      <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
-                          <Globe className="w-5 h-5" />
+                      <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h4 className="font-semibold text-blue-900 mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+                          <Globe className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                           Como configurar seu domínio personalizado
                         </h4>
                         
-                        <div className="space-y-4 text-sm">
+                        <div className="space-y-3 sm:space-y-4 text-xs sm:text-sm">
                           {/* Passo 1 */}
-                          <div className="flex gap-3">
-                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
+                          <div className="flex gap-2 sm:gap-3">
+                            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
                               1
                             </div>
-                            <div>
-                              <p className="font-medium text-blue-900">Registre seu domínio</p>
-                              <p className="text-blue-700 text-xs mt-1">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-blue-900 text-xs sm:text-sm">Registre seu domínio</p>
+                              <p className="text-blue-700 text-xs mt-0.5 sm:mt-1 leading-relaxed">
                                 Se ainda não tem um domínio, registre em sites como <a href="https://registro.br" target="_blank" rel="noopener" className="underline font-medium">Registro.br</a>, <a href="https://godaddy.com" target="_blank" rel="noopener" className="underline font-medium">GoDaddy</a> ou <a href="https://hostgator.com.br" target="_blank" rel="noopener" className="underline font-medium">HostGator</a>.
                               </p>
                             </div>
                           </div>
                           
                           {/* Passo 2 */}
-                          <div className="flex gap-3">
-                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
+                          <div className="flex gap-2 sm:gap-3">
+                            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
                               2
                             </div>
-                            <div>
-                              <p className="font-medium text-blue-900">Acesse o painel DNS do seu provedor</p>
-                              <p className="text-blue-700 text-xs mt-1">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-blue-900 text-xs sm:text-sm">Acesse o painel DNS do seu provedor</p>
+                              <p className="text-blue-700 text-xs mt-0.5 sm:mt-1 leading-relaxed">
                                 Entre no site onde registrou o domínio e procure por "Gerenciar DNS", "Zona DNS" ou "Configurações de DNS".
                               </p>
                             </div>
                           </div>
                           
                           {/* Passo 3 - Configuração DNS */}
-                          <div className="flex gap-3">
-                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
+                          <div className="flex gap-2 sm:gap-3">
+                            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
                               3
                             </div>
-                            <div className="flex-1">
-                              <p className="font-medium text-blue-900 mb-2">Configure os registros DNS</p>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-blue-900 mb-1.5 sm:mb-2 text-xs sm:text-sm">Configure os registros DNS</p>
                               
                               {/* Nameservers Cloudflare */}
-                              <div className="bg-white p-3 rounded border border-blue-300 mb-3">
-                                <p className="text-xs font-bold text-blue-900 mb-2">✅ OPÇÃO RECOMENDADA: Alterar Nameservers para Cloudflare</p>
+                              <div className="bg-white p-2 sm:p-3 rounded border border-blue-300">
+                                <p className="text-xs font-bold text-blue-900 mb-1.5 sm:mb-2 leading-tight">✅ OPÇÃO RECOMENDADA: Alterar Nameservers para Cloudflare</p>
                                 <p className="text-xs text-blue-700 mb-2">Substitua os nameservers atuais pelos do Cloudflare:</p>
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-2">
-                                    <code className="bg-blue-100 px-2 py-1 rounded font-mono text-xs text-blue-900 flex-1">meg.ns.cloudflare.com</code>
+                                <div className="space-y-1.5">
+                                  <div className="flex items-center gap-1.5 sm:gap-2">
+                                    <code className="bg-blue-100 px-1.5 sm:px-2 py-1 rounded font-mono text-xs text-blue-900 flex-1 truncate">meg.ns.cloudflare.com</code>
                                     <Button
                                       type="button"
                                       variant="ghost"
                                       size="icon"
-                                      className="h-6 w-6"
+                                      className="h-7 w-7 flex-shrink-0"
                                       onClick={() => {
                                         navigator.clipboard.writeText('meg.ns.cloudflare.com');
                                         toast.success('Copiado!');
                                       }}
                                     >
-                                      <Copy className="w-3 h-3" />
+                                      <Copy className="w-3.5 h-3.5" />
                                     </Button>
                                   </div>
-                                  <div className="flex items-center gap-2">
-                                    <code className="bg-blue-100 px-2 py-1 rounded font-mono text-xs text-blue-900 flex-1">julian.ns.cloudflare.com</code>
+                                  <div className="flex items-center gap-1.5 sm:gap-2">
+                                    <code className="bg-blue-100 px-1.5 sm:px-2 py-1 rounded font-mono text-xs text-blue-900 flex-1 truncate">julian.ns.cloudflare.com</code>
                                     <Button
                                       type="button"
                                       variant="ghost"
                                       size="icon"
-                                      className="h-6 w-6"
+                                      className="h-7 w-7 flex-shrink-0"
                                       onClick={() => {
                                         navigator.clipboard.writeText('julian.ns.cloudflare.com');
                                         toast.success('Copiado!');
                                       }}
                                     >
-                                      <Copy className="w-3 h-3" />
+                                      <Copy className="w-3.5 h-3.5" />
                                     </Button>
                                   </div>
                                 </div>
-                                <p className="text-xs text-blue-600 mt-2">
+                                <p className="text-xs text-blue-600 mt-2 leading-relaxed">
                                   💡 Com essa opção, o SSL e todas as configurações são feitas automaticamente!
                                 </p>
                               </div>
-                              
-
                             </div>
                           </div>
                           
                           {/* Passo 4 */}
-                          <div className="flex gap-3">
-                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
+                          <div className="flex gap-2 sm:gap-3">
+                            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">
                               4
                             </div>
-                            <div>
-                              <p className="font-medium text-blue-900">Salve e aguarde a propagação</p>
-                              <p className="text-blue-700 text-xs mt-1">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-blue-900 text-xs sm:text-sm">Salve e aguarde a propagação</p>
+                              <p className="text-blue-700 text-xs mt-0.5 sm:mt-1 leading-relaxed">
                                 Após salvar, digite seu domínio acima e clique em "Salvar Configurações". A propagação pode levar de <strong>15 minutos até 48 horas</strong>.
                               </p>
                             </div>
                           </div>
                           
                           {/* Aviso importante */}
-                          <div className="bg-amber-50 border border-amber-300 rounded p-3 mt-3">
-                            <p className="text-xs text-amber-800">
+                          <div className="bg-amber-50 border border-amber-300 rounded p-2 sm:p-3 mt-2 sm:mt-3">
+                            <p className="text-xs text-amber-800 leading-relaxed">
                               <strong>⚠️ Importante:</strong> Após configurar o DNS, entre em contato com nosso suporte para ativarmos seu domínio. Envie um email para <a href="mailto:suporte@viabroker.app" className="underline font-medium">suporte@viabroker.app</a> com o domínio que deseja ativar.
                             </p>
                           </div>
@@ -1278,12 +1284,12 @@ export default function SiteCustomization() {
                         />
                         
                         {/* Botão para remover domínio */}
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
-                          <div>
-                            <p className="text-sm text-gray-600">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 p-2.5 sm:p-3 bg-gray-50 rounded-lg border">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs sm:text-sm text-gray-600">
                               Deseja voltar para o domínio padrão da plataforma?
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 truncate">
                               Seu site continuará disponível em: viabroker.app/site/{company?.slug}
                             </p>
                           </div>
@@ -1291,7 +1297,7 @@ export default function SiteCustomization() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                            className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 w-full sm:w-auto flex-shrink-0 h-8 text-xs"
                             disabled={removeDomainMutation.isPending}
                             onClick={() => {
                               if (confirm('Tem certeza que deseja remover o domínio personalizado? Seu site continuará disponível em viabroker.app.')) {
@@ -1301,12 +1307,12 @@ export default function SiteCustomization() {
                           >
                             {removeDomainMutation.isPending ? (
                               <>
-                                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
                                 Removendo...
                               </>
                             ) : (
                               <>
-                                <X className="w-4 h-4 mr-1" />
+                                <X className="w-3.5 h-3.5 mr-1" />
                                 Remover Domínio
                               </>
                             )}
