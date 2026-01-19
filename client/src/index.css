@@ -361,3 +361,112 @@ img {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
+
+
+/* Safari/iOS Performance Optimizations */
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Force GPU acceleration for smoother animations on iOS */
+.gpu-accelerated,
+.animate-spin,
+.animate-pulse,
+[class*="transition"] {
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Fix Safari input styling */
+input,
+textarea,
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+textarea {
+  font-size: 16px; /* Prevents iOS zoom on focus */
+}
+
+/* Fix Safari button styling */
+button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Safari safe area support for notch devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Fix for Safari sticky positioning */
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+}
+
+/* Fix Safari flexbox gap support */
+@supports not (gap: 1rem) {
+  .flex.gap-1 > * + * { margin-left: 0.25rem; }
+  .flex.gap-2 > * + * { margin-left: 0.5rem; }
+  .flex.gap-3 > * + * { margin-left: 0.75rem; }
+  .flex.gap-4 > * + * { margin-left: 1rem; }
+}
+
+/* Prevent pull-to-refresh on iOS when not needed */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Fix Safari scroll container issues */
+.overflow-auto,
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Fix for Safari color-scheme */
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+/* Prevent double-tap zoom on iOS */
+* {
+  touch-action: manipulation;
+}
+
+/* Fix Safari grid gap */
+@supports not (gap: 1rem) {
+  .grid {
+    margin: -0.5rem;
+  }
+  .grid > * {
+    margin: 0.5rem;
+  }
+}

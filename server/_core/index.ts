@@ -36,6 +36,22 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
+  // Safari/iOS Cache Control Headers
+  app.use((req, res, next) => {
+    // Disable caching for HTML pages and API requests
+    if (req.path.endsWith('.html') || req.path.startsWith('/api/') || req.path === '/' || !req.path.includes('.')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Surrogate-Control', 'no-store');
+    }
+    // Allow caching for static assets (images, fonts, etc.)
+    else if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+    next();
+  });
+  
   // Stripe webhook DEVE ser registrado ANTES do express.json() para verificar assinatura
   app.use("/api/stripe/webhook", express.raw({ type: "application/json" }), stripeRouter);
   
