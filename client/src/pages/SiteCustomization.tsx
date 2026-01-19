@@ -1263,64 +1263,8 @@ export default function SiteCustomization() {
                       </div>
                     </div>
 
-                    {/* Domínio já configurado e verificado */}
-                    {siteSettings?.customDomain && siteSettings?.domainVerified && (
-                      <div className="p-4 bg-green-50 border-2 border-green-300 rounded-lg">
-                        <h4 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
-                          <Check className="w-5 h-5" />
-                          Domínio Personalizado Ativo
-                        </h4>
-                        <p className="text-sm text-green-700 mb-3">
-                          Seu site está disponível em:
-                        </p>
-                        <div className="flex items-center gap-2 mb-4">
-                          <code className="bg-white px-3 py-2 rounded border text-green-800 font-mono flex-1">
-                            https://{siteSettings.customDomain}
-                          </code>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => window.open(`https://${siteSettings.customDomain}`, '_blank')}
-                            title="Abrir site"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        <div className="flex items-center justify-between pt-3 border-t border-green-200">
-                          <p className="text-xs text-green-600">
-                            Também disponível em: viabroker.app/site/{company?.slug}
-                          </p>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            disabled={removeDomainMutation.isPending}
-                            onClick={() => {
-                              if (confirm('Tem certeza que deseja remover o domínio personalizado? Seu site continuará disponível em viabroker.app.')) {
-                                removeDomainMutation.mutate();
-                              }
-                            }}
-                          >
-                            {removeDomainMutation.isPending ? (
-                              <>
-                                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                                Removendo...
-                              </>
-                            ) : (
-                              <>
-                                <X className="w-4 h-4 mr-1" />
-                                Remover Domínio
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Indicador de Propagação DNS - Mostra quando há domínio configurado e automação ativa */}
-                    {siteSettings?.customDomain && cloudflareStatus?.configured && (
+                    {/* Status do Domínio - Mostra quando há domínio configurado */}
+                    {siteSettings?.customDomain && (
                       <div className="space-y-3">
                         <DNSPropagationStatus 
                           domain={siteSettings.customDomain}
@@ -1369,47 +1313,8 @@ export default function SiteCustomization() {
                       </div>
                     )}
 
-                    {/* Domínio configurado mas não verificado (sem automação) */}
-                    {siteSettings?.customDomain && !siteSettings?.domainVerified && !cloudflareStatus?.configured && (
-                      <div className="p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
-                        <h4 className="font-semibold text-yellow-800 mb-2 flex items-center gap-2">
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          Aguardando Ativação
-                        </h4>
-                        <p className="text-sm text-yellow-700 mb-3">
-                          O domínio <strong>{siteSettings.customDomain}</strong> foi configurado, mas ainda está aguardando ativação.
-                        </p>
-                        <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            disabled={checkDomainCloudflareMutation.isPending || verifyDomainMutation.isPending}
-                            onClick={() => {
-                              if (cloudflareStatus?.configured) {
-                                checkDomainCloudflareMutation.mutate();
-                              } else {
-                                verifyDomainMutation.mutate();
-                              }
-                            }}
-                          >
-                            {(checkDomainCloudflareMutation.isPending || verifyDomainMutation.isPending) ? (
-                              <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Verificando...
-                              </>
-                            ) : (
-                              <>
-                                <Globe className="w-4 h-4 mr-2" />
-                                Verificar Status
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Instruções manuais (mostrar apenas se automação não estiver configurada) */}
-                    {settingsData.customDomain && !cloudflareStatus?.configured && (
+                    {/* Instruções de configuração (mostrar apenas se não tiver domínio configurado ainda) */}
+                    {!siteSettings?.customDomain && settingsData.customDomain && (
                       <div className="space-y-4">
                         {/* Instruções Detalhadas - Apenas Nameservers */}
                         <div className="p-5 bg-blue-50 border-2 border-blue-200 rounded-lg space-y-4">
