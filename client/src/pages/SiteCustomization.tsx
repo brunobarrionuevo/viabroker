@@ -337,21 +337,21 @@ export default function SiteCustomization() {
     <AppLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-4">
           <div>
-            <h1 className="text-2xl font-bold">Personalização do Site</h1>
-            <p className="text-muted-foreground">Configure a aparência e funcionalidades do seu site público</p>
+            <h1 className="text-xl sm:text-2xl font-bold">Personalização do Site</h1>
+            <p className="text-sm text-muted-foreground">Configure a aparência e funcionalidades do seu site público</p>
           </div>
           {siteUrl && (
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleCopyUrl}>
-                {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
-                Copiar Link
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={handleCopyUrl} className="flex-1 sm:flex-none">
+                {copied ? <Check className="w-4 h-4 mr-1.5" /> : <Copy className="w-4 h-4 mr-1.5" />}
+                <span className="text-xs sm:text-sm">Copiar Link</span>
               </Button>
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
                 <a href={siteUrl} target="_blank" rel="noopener noreferrer">
-                  <Eye className="w-4 h-4 mr-2" />
-                  Visualizar Site
+                  <Eye className="w-4 h-4 mr-1.5" />
+                  <span className="text-xs sm:text-sm">Visualizar Site</span>
                 </a>
               </Button>
             </div>
@@ -360,23 +360,23 @@ export default function SiteCustomization() {
 
         {/* URL do Site */}
         <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
-          <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex-1">
-                <Label className="text-sm font-medium text-muted-foreground">Seu site está disponível em:</Label>
+          <CardContent className="pt-4 pb-4">
+            <div className="space-y-3">
+              <div>
+                <Label className="text-xs font-medium text-muted-foreground">Seu site está disponível em:</Label>
                 <div className="flex items-center gap-2 mt-1">
-                  <Globe className="w-5 h-5 text-primary" />
-                  <code className="text-lg font-mono bg-background px-3 py-1 rounded border">
+                  <Globe className="w-4 h-4 text-primary flex-shrink-0" />
+                  <code className="text-xs sm:text-sm font-mono bg-background px-2 py-1 rounded border truncate max-w-full overflow-hidden">
                     {siteUrl || "Configure o slug da empresa"}
                   </code>
                 </div>
               </div>
               {settingsData.customDomain && (
-                <div className="flex-1">
-                  <Label className="text-sm font-medium text-muted-foreground">Domínio personalizado:</Label>
+                <div>
+                  <Label className="text-xs font-medium text-muted-foreground">Domínio personalizado:</Label>
                   <div className="flex items-center gap-2 mt-1">
-                    <ExternalLink className="w-5 h-5 text-secondary" />
-                    <code className="text-lg font-mono bg-background px-3 py-1 rounded border">
+                    <ExternalLink className="w-4 h-4 text-secondary flex-shrink-0" />
+                    <code className="text-xs sm:text-sm font-mono bg-background px-2 py-1 rounded border truncate max-w-full overflow-hidden">
                       {settingsData.customDomain}
                     </code>
                   </div>
@@ -387,151 +387,153 @@ export default function SiteCustomization() {
         </Card>
 
         <form onSubmit={handleSubmit}>
-          <Tabs defaultValue="colors" className="space-y-6">
-            <TabsList className="grid grid-cols-2 sm:grid-cols-5 w-full">
-              <TabsTrigger value="colors" className="flex items-center gap-2">
-                <Palette className="w-4 h-4" />
-                <span className="hidden sm:inline">Cores</span>
-              </TabsTrigger>
-              <TabsTrigger value="branding" className="flex items-center gap-2">
-                <Image className="w-4 h-4" />
-                <span className="hidden sm:inline">Imagens</span>
-              </TabsTrigger>
-              <TabsTrigger value="layout" className="flex items-center gap-2">
-                <Layout className="w-4 h-4" />
-                <span className="hidden sm:inline">Layout</span>
-              </TabsTrigger>
-              <TabsTrigger value="social" className="flex items-center gap-2">
-                <Share2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Social</span>
-              </TabsTrigger>
-              <TabsTrigger value="domain" className="flex items-center gap-2">
-                <Globe className="w-4 h-4" />
-                <span className="hidden sm:inline">Domínio</span>
-              </TabsTrigger>
-            </TabsList>
+          <Tabs defaultValue="colors" className="space-y-4 sm:space-y-6">
+            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+              <TabsList className="inline-flex w-auto min-w-full sm:grid sm:grid-cols-5 sm:w-full gap-1">
+                <TabsTrigger value="colors" className="flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm whitespace-nowrap">
+                  <Palette className="w-4 h-4" />
+                  <span>Cores</span>
+                </TabsTrigger>
+                <TabsTrigger value="branding" className="flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm whitespace-nowrap">
+                  <Image className="w-4 h-4" />
+                  <span>Imagens</span>
+                </TabsTrigger>
+                <TabsTrigger value="layout" className="flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm whitespace-nowrap">
+                  <Layout className="w-4 h-4" />
+                  <span>Layout</span>
+                </TabsTrigger>
+                <TabsTrigger value="social" className="flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm whitespace-nowrap">
+                  <Share2 className="w-4 h-4" />
+                  <span>Social</span>
+                </TabsTrigger>
+                <TabsTrigger value="domain" className="flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm whitespace-nowrap">
+                  <Globe className="w-4 h-4" />
+                  <span>Domínio</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Colors Tab */}
-            <TabsContent value="colors" className="space-y-6">
+            <TabsContent value="colors" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Palette className="w-5 h-5" />
+                <CardHeader className="pb-3 sm:pb-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Palette className="w-4 h-4 sm:w-5 sm:h-5" />
                     Cores do Tema
                   </CardTitle>
-                  <CardDescription>Personalize as cores do seu site para combinar com sua marca</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">Personalize as cores do seu site para combinar com sua marca</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <CardContent className="space-y-4 sm:space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {/* Cor Primária */}
-                    <div className="space-y-2">
-                      <Label htmlFor="primaryColor">Cor Primária</Label>
-                      <p className="text-xs text-muted-foreground">Usada em botões e destaques principais</p>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="primaryColor" className="text-sm">Cor Primária</Label>
+                      <p className="text-xs text-muted-foreground leading-tight">Usada em botões e destaques</p>
                       <div className="flex gap-2">
                         <Input
                           id="primaryColor"
                           type="color"
                           value={settingsData.primaryColor}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, primaryColor: e.target.value }))}
-                          className="w-16 h-10 p-1 cursor-pointer"
+                          className="w-12 h-9 p-1 cursor-pointer flex-shrink-0"
                         />
                         <Input
                           value={settingsData.primaryColor}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, primaryColor: e.target.value }))}
                           placeholder="#0F52BA"
-                          className="flex-1 font-mono"
+                          className="flex-1 font-mono text-sm h-9"
                         />
                       </div>
                     </div>
 
                     {/* Cor Secundária */}
-                    <div className="space-y-2">
-                      <Label htmlFor="secondaryColor">Cor Secundária</Label>
-                      <p className="text-xs text-muted-foreground">Usada em elementos de suporte</p>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="secondaryColor" className="text-sm">Cor Secundária</Label>
+                      <p className="text-xs text-muted-foreground leading-tight">Usada em elementos de suporte</p>
                       <div className="flex gap-2">
                         <Input
                           id="secondaryColor"
                           type="color"
                           value={settingsData.secondaryColor}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, secondaryColor: e.target.value }))}
-                          className="w-16 h-10 p-1 cursor-pointer"
+                          className="w-12 h-9 p-1 cursor-pointer flex-shrink-0"
                         />
                         <Input
                           value={settingsData.secondaryColor}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, secondaryColor: e.target.value }))}
                           placeholder="#50C878"
-                          className="flex-1 font-mono"
+                          className="flex-1 font-mono text-sm h-9"
                         />
                       </div>
                     </div>
 
                     {/* Cor de Destaque */}
-                    <div className="space-y-2">
-                      <Label htmlFor="accentColor">Cor de Destaque</Label>
-                      <p className="text-xs text-muted-foreground">Usada em badges e alertas</p>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="accentColor" className="text-sm">Cor de Destaque</Label>
+                      <p className="text-xs text-muted-foreground leading-tight">Usada em badges e alertas</p>
                       <div className="flex gap-2">
                         <Input
                           id="accentColor"
                           type="color"
                           value={settingsData.accentColor}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, accentColor: e.target.value }))}
-                          className="w-16 h-10 p-1 cursor-pointer"
+                          className="w-12 h-9 p-1 cursor-pointer flex-shrink-0"
                         />
                         <Input
                           value={settingsData.accentColor}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, accentColor: e.target.value }))}
                           placeholder="#FF6B35"
-                          className="flex-1 font-mono"
+                          className="flex-1 font-mono text-sm h-9"
                         />
                       </div>
                     </div>
 
                     {/* Cor de Fundo */}
-                    <div className="space-y-2">
-                      <Label htmlFor="backgroundColor">Cor de Fundo</Label>
-                      <p className="text-xs text-muted-foreground">Cor de fundo do site</p>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="backgroundColor" className="text-sm">Cor de Fundo</Label>
+                      <p className="text-xs text-muted-foreground leading-tight">Cor de fundo do site</p>
                       <div className="flex gap-2">
                         <Input
                           id="backgroundColor"
                           type="color"
                           value={settingsData.backgroundColor}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, backgroundColor: e.target.value }))}
-                          className="w-16 h-10 p-1 cursor-pointer"
+                          className="w-12 h-9 p-1 cursor-pointer flex-shrink-0"
                         />
                         <Input
                           value={settingsData.backgroundColor}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, backgroundColor: e.target.value }))}
                           placeholder="#FFFFFF"
-                          className="flex-1 font-mono"
+                          className="flex-1 font-mono text-sm h-9"
                         />
                       </div>
                     </div>
 
                     {/* Cor do Texto */}
-                    <div className="space-y-2">
-                      <Label htmlFor="textColor">Cor do Texto</Label>
-                      <p className="text-xs text-muted-foreground">Cor principal dos textos</p>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="textColor" className="text-sm">Cor do Texto</Label>
+                      <p className="text-xs text-muted-foreground leading-tight">Cor principal dos textos</p>
                       <div className="flex gap-2">
                         <Input
                           id="textColor"
                           type="color"
                           value={settingsData.textColor}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, textColor: e.target.value }))}
-                          className="w-16 h-10 p-1 cursor-pointer"
+                          className="w-12 h-9 p-1 cursor-pointer flex-shrink-0"
                         />
                         <Input
                           value={settingsData.textColor}
                           onChange={(e) => setSettingsData(prev => ({ ...prev, textColor: e.target.value }))}
                           placeholder="#1F2937"
-                          className="flex-1 font-mono"
+                          className="flex-1 font-mono text-sm h-9"
                         />
                       </div>
                     </div>
 
                     {/* Fonte */}
-                    <div className="space-y-2">
-                      <Label htmlFor="fontFamily">Fonte</Label>
-                      <p className="text-xs text-muted-foreground">Tipografia do site</p>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="fontFamily" className="text-sm">Fonte</Label>
+                      <p className="text-xs text-muted-foreground leading-tight">Tipografia do site</p>
                       <Select
                         value={settingsData.fontFamily}
                         onValueChange={(value) => setSettingsData(prev => ({ ...prev, fontFamily: value }))}
@@ -551,34 +553,34 @@ export default function SiteCustomization() {
                   </div>
 
                   {/* Preview */}
-                  <div className="mt-6">
-                    <Label>Pré-visualização</Label>
+                  <div className="mt-4 sm:mt-6">
+                    <Label className="text-sm">Pré-visualização</Label>
                     <div 
-                      className="mt-2 p-6 border rounded-lg"
+                      className="mt-2 p-3 sm:p-6 border rounded-lg"
                       style={{ backgroundColor: settingsData.backgroundColor }}
                     >
-                      <div className="flex flex-wrap gap-4 items-center mb-4">
+                      <div className="flex flex-wrap gap-2 sm:gap-4 items-center mb-3 sm:mb-4">
                         <div 
-                          className="w-24 h-16 rounded-lg flex items-center justify-center text-white text-sm font-medium"
+                          className="w-16 sm:w-24 h-12 sm:h-16 rounded-lg flex items-center justify-center text-white text-xs sm:text-sm font-medium"
                           style={{ backgroundColor: settingsData.primaryColor }}
                         >
                           Primária
                         </div>
                         <div 
-                          className="w-24 h-16 rounded-lg flex items-center justify-center text-white text-sm font-medium"
+                          className="w-16 sm:w-24 h-12 sm:h-16 rounded-lg flex items-center justify-center text-white text-xs sm:text-sm font-medium"
                           style={{ backgroundColor: settingsData.secondaryColor }}
                         >
                           Secundária
                         </div>
                         <div 
-                          className="w-24 h-16 rounded-lg flex items-center justify-center text-white text-sm font-medium"
+                          className="w-16 sm:w-24 h-12 sm:h-16 rounded-lg flex items-center justify-center text-white text-xs sm:text-sm font-medium"
                           style={{ backgroundColor: settingsData.accentColor }}
                         >
                           Destaque
                         </div>
                       </div>
                       <p 
-                        className="text-lg"
+                        className="text-sm sm:text-lg"
                         style={{ color: settingsData.textColor, fontFamily: settingsData.fontFamily }}
                       >
                         Exemplo de texto com a fonte {settingsData.fontFamily}
@@ -590,17 +592,17 @@ export default function SiteCustomization() {
             </TabsContent>
 
             {/* Branding Tab */}
-            <TabsContent value="branding" className="space-y-6">
+            <TabsContent value="branding" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Image className="w-5 h-5" />
+                <CardHeader className="pb-3 sm:pb-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Image className="w-4 h-4 sm:w-5 sm:h-5" />
                     Imagens e Branding
                   </CardTitle>
-                  <CardDescription>Faça upload do logo, favicon e imagem de capa do seu site</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">Faça upload do logo, favicon e imagem de capa</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <CardContent className="space-y-4 sm:space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     {/* Logo Upload */}
                     <div className="space-y-2">
                       <Label>Logo</Label>
