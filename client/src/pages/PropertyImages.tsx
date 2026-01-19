@@ -98,15 +98,18 @@ function SortableImage({ image, index, onDelete, onSetMain, onPreview, totalImag
       
       {/* Barra superior com drag handle e menu */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-1.5 bg-gradient-to-b from-black/60 to-transparent">
-        {/* Drag handle - lado esquerdo */}
+        {/* Drag handle - lado esquerdo - Área maior para facilitar toque */}
         <div
           {...attributes}
           {...listeners}
-          className="bg-white/90 text-gray-700 p-2 rounded-md cursor-grab active:cursor-grabbing touch-manipulation shadow-sm"
-          title="Arrastar para reordenar"
-          style={{ WebkitTouchCallout: 'none' }}
+          className="bg-primary text-white p-3 rounded-md cursor-grab active:cursor-grabbing touch-manipulation shadow-md min-w-[44px] min-h-[44px] flex items-center justify-center active:scale-95 transition-transform"
+          title="Segure e arraste para reordenar"
+          style={{ 
+            WebkitTouchCallout: 'none',
+            touchAction: 'none',
+          }}
         >
-          <GripVertical className="w-4 h-4" />
+          <GripVertical className="w-5 h-5" />
         </div>
 
         {/* Badge de foto principal */}
@@ -470,16 +473,17 @@ export default function PropertyImages() {
   });
 
   // Sensores otimizados para touch e mouse
+  // TouchSensor com delay menor e tolerância maior para facilitar o arrastar
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Precisa mover 8px para ativar o drag
+        distance: 5, // Reduzido para ativar mais rápido
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 200, // Delay de 200ms para diferenciar de tap
-        tolerance: 5,
+        delay: 100, // Delay reduzido para 100ms - mais responsivo
+        tolerance: 10, // Tolerância maior para movimento durante o delay
       },
     }),
     useSensor(KeyboardSensor, {
@@ -709,7 +713,8 @@ export default function PropertyImages() {
           <CardHeader>
             <CardTitle>Galeria de Fotos</CardTitle>
             <CardDescription>
-              Segure e arraste o ícone <GripVertical className="w-4 h-4 inline" /> para reorganizar. Toque no menu <MoreVertical className="w-4 h-4 inline" /> para mais opções.
+              <span className="block mb-1"><strong>Para reorganizar:</strong> Segure o botão azul <span className="inline-flex items-center justify-center bg-primary text-white rounded px-1 py-0.5 mx-1"><GripVertical className="w-3 h-3" /></span> por 1 segundo e arraste.</span>
+              <span className="block"><strong>Para mais opções:</strong> Toque no menu <MoreVertical className="w-4 h-4 inline" /></span>
             </CardDescription>
           </CardHeader>
           <CardContent>
