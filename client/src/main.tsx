@@ -23,6 +23,56 @@ if (window.__CUSTOM_DOMAIN_REDIRECT__ && window.location.pathname === '/') {
   window.history.replaceState(null, '', window.__CUSTOM_DOMAIN_REDIRECT__);
 }
 
+// Safari iOS fix: Restore scroll position and prevent redirect to home on refresh
+// Safari sometimes loses the current route on refresh due to bfcache behavior
+if (typeof window !== 'undefined') {
+  // Update stored path on every navigation
+  const updateStoredPath = () => {
+    const currentPath = window.location.pathname + window.location.search;
+    if (currentPath !== '/') {
+      sessionStorage.setItem('__LAST_PATH__', currentPath);
+    }
+  };
+  
+  // Store current path before unload
+  window.addEventListener('beforeunload', updateStoredPath);
+  
+  // Also update on popstate (back/forward navigation)
+  window.addEventListener('popstate', updateStoredPath);
+  
+  // Update path periodically to catch programmatic navigation
+  setInterval(updateStoredPath, 1000);
+  
+  // Restore path on page show (handles Safari's bfcache)
+  window.addEventListener('pageshow', (event) => {
+    // Only restore if page was loaded from bfcache (persisted) or fresh load
+    const lastPath = sessionStorage.getItem('__LAST_PATH__');
+    const currentPath = window.location.pathname + window.location.search;
+    
+    // If we're at root but had a different path stored, restore it
+    if (lastPath && currentPath === '/' && lastPath !== '/') {
+      console.log('[Safari Fix] Restoring path from:', currentPath, 'to:', lastPath);
+      window.history.replaceState(null, '', lastPath);
+      // Force wouter to recognize the new path
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+  });
+  
+  // Also handle visibility change for Safari tab switching
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      const lastPath = sessionStorage.getItem('__LAST_PATH__');
+      const currentPath = window.location.pathname + window.location.search;
+      
+      if (lastPath && currentPath === '/' && lastPath !== '/') {
+        console.log('[Safari Fix] Visibility change - restoring path:', lastPath);
+        window.history.replaceState(null, '', lastPath);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }
+    }
+  });
+}
+
 const queryClient = new QueryClient();
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
