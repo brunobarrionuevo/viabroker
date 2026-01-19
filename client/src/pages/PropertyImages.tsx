@@ -185,6 +185,11 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  
+  // Swipe para navegar
+  const [swipeStart, setSwipeStart] = useState<{ x: number; y: number } | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const SWIPE_THRESHOLD = 50; // Mínimo de pixels para considerar um swipe
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -233,28 +238,68 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
     setIsDragging(false);
   };
 
-  // Touch events para Safari
+  // Touch events para Safari e Swipe
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (zoom > 1 && e.touches.length === 1) {
-      setIsDragging(true);
-      setDragStart({ 
-        x: e.touches[0].clientX - position.x, 
-        y: e.touches[0].clientY - position.y 
-      });
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      
+      if (zoom > 1) {
+        // Modo zoom - arrastar imagem
+        setIsDragging(true);
+        setDragStart({ 
+          x: touch.clientX - position.x, 
+          y: touch.clientY - position.y 
+        });
+      } else {
+        // Modo normal - iniciar swipe
+        setSwipeStart({ x: touch.clientX, y: touch.clientY });
+      }
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (isDragging && zoom > 1 && e.touches.length === 1) {
-      setPosition({
-        x: e.touches[0].clientX - dragStart.x,
-        y: e.touches[0].clientY - dragStart.y,
-      });
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      
+      if (isDragging && zoom > 1) {
+        // Modo zoom - arrastar imagem
+        setPosition({
+          x: touch.clientX - dragStart.x,
+          y: touch.clientY - dragStart.y,
+        });
+      } else if (swipeStart && zoom === 1) {
+        // Modo normal - calcular offset do swipe
+        const deltaX = touch.clientX - swipeStart.x;
+        const deltaY = Math.abs(touch.clientY - swipeStart.y);
+        
+        // Só considerar swipe horizontal
+        if (Math.abs(deltaX) > deltaY) {
+          setSwipeOffset(deltaX);
+          e.preventDefault(); // Prevenir scroll vertical
+        }
+      }
     }
   };
 
   const handleTouchEnd = () => {
+    if (swipeStart && zoom === 1) {
+      // Verificar se foi um swipe válido
+      if (swipeOffset > SWIPE_THRESHOLD && currentIndex > 0) {
+        // Swipe para direita - foto anterior
+        onNavigate(currentIndex - 1);
+        setZoom(1);
+        setPosition({ x: 0, y: 0 });
+      } else if (swipeOffset < -SWIPE_THRESHOLD && currentIndex < images.length - 1) {
+        // Swipe para esquerda - próxima foto
+        onNavigate(currentIndex + 1);
+        setZoom(1);
+        setPosition({ x: 0, y: 0 });
+      }
+    }
+    
     setIsDragging(false);
+    setSwipeStart(null);
+    setSwipeOffset(0);
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -320,12 +365,17 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
           alt={currentImage.caption || `Foto ${currentIndex + 1}`}
           className="max-w-full max-h-full object-contain select-none"
           style={{
-            transform: `scale(${zoom}) translate(${position.x / zoom}px, ${position.y / zoom}px)`,
-            transition: isDragging ? 'none' : 'transform 0.2s',
-            WebkitTransform: `scale(${zoom}) translate(${position.x / zoom}px, ${position.y / zoom}px)`,
-            WebkitTransition: isDragging ? 'none' : '-webkit-transform 0.2s',
+            transform: zoom > 1 
+              ? `scale(${zoom}) translate(${position.x / zoom}px, ${position.y / zoom}px)`
+              : `translateX(${swipeOffset * 0.5}px)`,
+            transition: (isDragging || swipeStart) ? 'none' : 'transform 0.3s ease-out',
+            WebkitTransform: zoom > 1 
+              ? `scale(${zoom}) translate(${position.x / zoom}px, ${position.y / zoom}px)`
+              : `translateX(${swipeOffset * 0.5}px)`,
+            WebkitTransition: (isDragging || swipeStart) ? 'none' : '-webkit-transform 0.3s ease-out',
             WebkitUserSelect: 'none',
             userSelect: 'none',
+            opacity: swipeOffset !== 0 ? Math.max(0.5, 1 - Math.abs(swipeOffset) / 300) : 1,
           }}
           draggable={false}
         />
@@ -521,8 +571,27 @@ export default function PropertyImages() {
     const currentCount = images?.length || 0;
     const remainingSlots = MAX_IMAGES - currentCount;
     
+    // Verificar se já atingiu o limite
+    if (remainingSlots <= 0) {
+      toast.error(`Limite de ${MAX_IMAGES} fotos atingido! Remova algumas fotos para adicionar novas.`, {
+        duration: 5000,
+      });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+    
+    // Verificar se selecionou mais do que o permitido
     if (files.length > remainingSlots) {
-      toast.error(`Você pode enviar apenas mais ${remainingSlots} foto(s)`);
+      toast.error(
+        `Você selecionou ${files.length} fotos, mas só pode adicionar mais ${remainingSlots}. ` +
+        `Limite máximo: ${MAX_IMAGES} fotos.`,
+        { duration: 5000 }
+      );
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       return;
     }
 
