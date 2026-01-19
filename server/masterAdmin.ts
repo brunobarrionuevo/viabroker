@@ -578,7 +578,7 @@ export const masterAdminRouter = router({
         const companyProperties = await database.select({ id: properties.id })
           .from(properties)
           .where(eq(properties.companyId, input.companyId));
-        const propertyIds = companyProperties.map(p => p.id);
+        const propertyIds = companyProperties.map((p: { id: number }) => p.id);
         console.log(`[deleteCompany] Encontrados ${propertyIds.length} imóveis`);
         
         // 2. Excluir property_images
@@ -592,7 +592,7 @@ export const masterAdminRouter = router({
         const companyLeads = await database.select({ id: leads.id })
           .from(leads)
           .where(eq(leads.companyId, input.companyId));
-        const leadIds = companyLeads.map(l => l.id);
+        const leadIds = companyLeads.map((l: { id: number }) => l.id);
         console.log(`[deleteCompany] Encontrados ${leadIds.length} leads`);
         
         // 4. Excluir interactions (dependem de leads)

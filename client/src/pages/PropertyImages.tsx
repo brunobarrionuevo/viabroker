@@ -34,8 +34,10 @@ const MAX_IMAGES = 20;
 interface PropertyImage {
   id: number;
   propertyId: number;
-  url: string;
+  url: string | null;
   fileKey: string | null;
+  imageData: string | null;
+  mimeType: string | null;
   caption: string | null;
   order: number;
   isMain: boolean;
@@ -76,7 +78,7 @@ function SortableImage({ image, index, onDelete, onSetMain, onPreview, totalImag
       }`}
     >
       <img
-        src={image.url}
+        src={image.url || ''}
         alt={image.caption || `Foto ${index + 1}`}
         className="w-full aspect-square object-cover cursor-pointer"
         onClick={() => onPreview(index)}
@@ -243,7 +245,7 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
         style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
       >
         <img
-          src={currentImage.url}
+          src={currentImage.url || ''}
           alt={currentImage.caption || `Foto ${currentIndex + 1}`}
           className="max-w-full max-h-full object-contain select-none"
           style={{
@@ -316,7 +318,7 @@ function Lightbox({ images, currentIndex, onClose, onNavigate }: LightboxProps) 
             } hover:border-white/50 transition-colors`}
           >
             <img
-              src={img.url}
+              src={img.url || ''}
               alt={`Miniatura ${idx + 1}`}
               className="w-full h-full object-cover"
             />

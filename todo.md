@@ -729,3 +729,26 @@
 
 ## Edição de Slug do Site (18/01/2026)
 - [x] Permitir edição do slug do site na página de configurações do cliente
+
+
+## Otimização de Performance e Mobile (18/01/2026)
+- [ ] Otimizar carregamento do site (lazy loading, code splitting)
+- [ ] Simplificar fluxo de navegação
+- [ ] Melhorar responsividade mobile
+- [ ] Otimizar imagens e assets
+- [ ] Reduzir bundle size
+
+
+## Otimização de Performance e Mobile (18/01/2026)
+- [ ] Otimizar carregamento do site (lazy loading, code splitting)
+- [ ] Simplificar fluxo de navegação
+- [ ] Melhorar responsividade mobile
+- [ ] Otimizar imagens e assets
+
+
+## Otimização de Performance e Mobile (18/01/2026)
+- [x] Implementar lazy loading para todas as páginas
+- [x] Otimizar navegação mobile com menu responsivo
+- [x] Simplificar fluxos de navegação
+- [x] Corrigir erros de TypeScript (null vs undefined em imagens)
+- [x] Melhorar página inicial com design mais limpo e rápido

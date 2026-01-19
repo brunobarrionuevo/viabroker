@@ -1111,7 +1111,7 @@ export async function getPartnershipsByCompany(companyId: number): Promise<any[]
     .orderBy(desc(partnerships.createdAt));
   
   // Enriquecer com nomes das empresas
-  const enriched = await Promise.all(results.map(async (p) => {
+  const enriched = await Promise.all(results.map(async (p: typeof results[0]) => {
     const requester = await getCompanyById(p.requesterId);
     const partner = await getCompanyById(p.partnerId);
     return {
@@ -1133,7 +1133,7 @@ export async function getPendingPartnerships(companyId: number): Promise<any[]> 
     .orderBy(desc(partnerships.createdAt));
   
   // Enriquecer com nomes das empresas
-  const enriched = await Promise.all(results.map(async (p) => {
+  const enriched = await Promise.all(results.map(async (p: typeof results[0]) => {
     const requester = await getCompanyById(p.requesterId);
     return {
       ...p,
@@ -1155,7 +1155,7 @@ export async function getAcceptedPartnerships(companyId: number): Promise<any[]>
     .orderBy(desc(partnerships.createdAt));
   
   // Enriquecer com nomes das empresas
-  const enriched = await Promise.all(results.map(async (p) => {
+  const enriched = await Promise.all(results.map(async (p: typeof results[0]) => {
     const requester = await getCompanyById(p.requesterId);
     const partner = await getCompanyById(p.partnerId);
     return {
@@ -1214,7 +1214,7 @@ export async function getPropertySharesByOwner(ownerCompanyId: number): Promise<
     .orderBy(desc(propertyShares.createdAt));
   
   // Enriquecer com dados do imóvel e parceiro
-  const enriched = await Promise.all(results.map(async (s) => {
+  const enriched = await Promise.all(results.map(async (s: typeof results[0]) => {
     const property = await getPropertyById(s.propertyId);
     const partner = await getCompanyById(s.partnerCompanyId);
     return {
@@ -1236,7 +1236,7 @@ export async function getPropertySharesByPartner(partnerCompanyId: number): Prom
     .orderBy(desc(propertyShares.createdAt));
   
   // Enriquecer com dados do imóvel e proprietário
-  const enriched = await Promise.all(results.map(async (s) => {
+  const enriched = await Promise.all(results.map(async (s: typeof results[0]) => {
     const property = await getPropertyById(s.propertyId);
     const owner = await getCompanyById(s.ownerCompanyId);
     return {
@@ -1258,7 +1258,7 @@ export async function getPendingPropertyShares(partnerCompanyId: number): Promis
     .orderBy(desc(propertyShares.createdAt));
   
   // Enriquecer com dados do imóvel e proprietário
-  const enriched = await Promise.all(results.map(async (s) => {
+  const enriched = await Promise.all(results.map(async (s: typeof results[0]) => {
     const property = await getPropertyById(s.propertyId);
     const owner = await getCompanyById(s.ownerCompanyId);
     return {
@@ -1280,7 +1280,7 @@ export async function getAcceptedPropertyShares(partnerCompanyId: number): Promi
     .orderBy(desc(propertyShares.createdAt));
   
   // Enriquecer com dados do imóvel e proprietário
-  const enriched = await Promise.all(results.map(async (s) => {
+  const enriched = await Promise.all(results.map(async (s: typeof results[0]) => {
     const property = await getPropertyById(s.propertyId);
     const owner = await getCompanyById(s.ownerCompanyId);
     return {
@@ -1321,25 +1321,25 @@ export async function getSharedPropertiesForPartner(partnerCompanyId: number): P
   
   // Buscar os imóveis correspondentes
   // Filtrar imóveis que não estão inativos (inativo não aparece em nenhum site)
-  const propertyIds = shares.map(s => s.propertyId);
+  const propertyIds = shares.map((s: typeof shares[0]) => s.propertyId);
   const sharedProperties = await db.select().from(properties)
     .where(and(
-      sql`${properties.id} IN (${sql.join(propertyIds.map(id => sql`${id}`), sql`, `)})`,
+      sql`${properties.id} IN (${sql.join(propertyIds.map((id: number) => sql`${id}`), sql`, `)})`,
       eq(properties.isPublished, true),
       sql`${properties.status} != 'inativo'`
     ));
   
   // Criar mapa de compartilhamentos para adicionar informações do parceiro
-  const shareMap = new Map(shares.map(s => [s.propertyId, s]));
+  const shareMap = new Map<number, typeof shares[0]>(shares.map((s: typeof shares[0]) => [s.propertyId, s]));
   
   // Buscar informações das empresas proprietárias
-  const ownerCompanyIds = Array.from(new Set(sharedProperties.map(p => p.companyId)));
+  const ownerCompanyIds = Array.from(new Set(sharedProperties.map((p: typeof sharedProperties[0]) => p.companyId)));
   const ownerCompanies = await db.select().from(companies)
     .where(sql`${companies.id} IN (${sql.join(ownerCompanyIds.map(id => sql`${id}`), sql`, `)})`);
-  const companyMap = new Map(ownerCompanies.map(c => [c.id, c]));
+  const companyMap = new Map<number, typeof ownerCompanies[0]>(ownerCompanies.map((c: typeof ownerCompanies[0]) => [c.id, c]));
   
   // Adicionar informações do parceiro proprietário a cada imóvel
-  return sharedProperties.map(property => {
+  return sharedProperties.map((property: typeof sharedProperties[0]) => {
     const share = shareMap.get(property.id);
     const ownerCompany = companyMap.get(property.companyId);
     return {
@@ -1434,7 +1434,7 @@ export async function getReceivedPropertyShares(partnerCompanyId: number): Promi
     .orderBy(desc(propertyShares.createdAt));
   
   // Enriquecer com dados do imóvel e proprietário
-  const enriched = await Promise.all(results.map(async (s) => {
+  const enriched = await Promise.all(results.map(async (s: typeof results[0]) => {
     const property = await getPropertyById(s.propertyId);
     const owner = await getCompanyById(s.ownerCompanyId);
     return {

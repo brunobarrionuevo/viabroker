@@ -278,7 +278,7 @@ export default function PublicPropertyDetail() {
               {hasImages && currentImage ? (
                 <>
                   <img
-                    src={currentImage.url}
+                    src={currentImage.url || ''}
                     alt={currentImage.caption || property.title}
                     className="w-full h-full object-cover"
                   />
@@ -352,7 +352,7 @@ export default function PublicPropertyDetail() {
                     }`}
                   >
                     <img
-                      src={image.url}
+                      src={image.url || ''}
                       alt={image.caption || `Foto ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -777,7 +777,7 @@ export default function PublicPropertyDetail() {
           )}
           
           <img
-            src={currentImage?.url}
+            src={currentImage?.url || ''}
             alt={currentImage?.caption || property.title}
             className="max-w-[95vw] max-h-[90vh] object-contain"
             onClick={(e) => e.stopPropagation()}
@@ -807,7 +807,7 @@ export default function PublicPropertyDetail() {
                 }`}
               >
                 <img
-                  src={image.url}
+                  src={image.url || ''}
                   alt={`Foto ${index + 1}`}
                   className="w-full h-full object-cover"
                 />

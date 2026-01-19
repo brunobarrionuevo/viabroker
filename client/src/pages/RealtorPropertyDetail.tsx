@@ -422,7 +422,7 @@ export default function RealtorPropertyDetail() {
                 {hasImages && currentImage ? (
                   <>
                     <img
-                      src={currentImage.url}
+                      src={currentImage.url || ''}
                       alt={currentImage.caption || property.title}
                       className="w-full h-full object-cover"
                     />
@@ -496,7 +496,7 @@ export default function RealtorPropertyDetail() {
                       !showVideo && idx === currentImageIndex ? "border-white" : "border-transparent opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <img src={img.url} alt="" className="w-full h-full object-cover" />
+                    <img src={img.url || ''} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
                 
@@ -895,7 +895,7 @@ export default function RealtorPropertyDetail() {
           >
             <img
               ref={imageRef}
-              src={images[currentImageIndex].url}
+              src={images[currentImageIndex].url || ''}
               alt=""
               className="max-h-[90vh] max-w-[90vw] object-contain transition-transform duration-200"
               style={{ 
