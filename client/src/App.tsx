@@ -37,6 +37,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const ResendVerification = lazy(() => import("./pages/ResendVerification"));
 const Plans = lazy(() => import("./pages/Plans"));
 const Partnerships = lazy(() => import("./pages/Partnerships"));
+const Marketing = lazy(() => import("./pages/Marketing"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading spinner component
@@ -174,6 +175,11 @@ function Router() {
         {/* Partnerships Route */}
         <Route path="/dashboard/partnerships">
           {() => <ProtectedRoute component={Partnerships} />}
+        </Route>
+        
+        {/* Marketing Route */}
+        <Route path="/dashboard/marketing">
+          {() => <ProtectedRoute component={Marketing} />}
         </Route>
         
         {/* Integrations Routes */}

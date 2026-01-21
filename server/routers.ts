@@ -1981,6 +1981,107 @@ Tom: Profissional, sofisticado e acolhedor`;
         return db.getReceivedPropertyShares(ctx.user.companyId);
       }),
   }),
+
+  // Marketing - Geração de posts para redes sociais
+  marketing: router({
+    generateSocialPost: protectedProcedure
+      .input(z.object({
+        propertyId: z.number(),
+        platform: z.enum(["instagram", "facebook"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+
+        // Buscar dados do imóvel
+        const property = await db.getPropertyById(input.propertyId);
+        if (!property) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Imóvel não encontrado" });
+        }
+
+        // Verificar se o imóvel pertence à empresa do usuário
+        if (property.companyId !== ctx.user.companyId) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Sem permissão para acessar este imóvel" });
+        }
+
+        // Formatar preço
+        const formatPrice = (value: number | string | null | undefined): string => {
+          if (value === null || value === undefined) return "Sob consulta";
+          const numValue = typeof value === "string" ? parseFloat(value) : value;
+          if (isNaN(numValue)) return "Sob consulta";
+          return new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          }).format(numValue);
+        };
+
+        // Montar informações do imóvel
+        const propertyInfo = {
+          tipo: property.type,
+          finalidade: property.purpose === "venda" ? "Venda" : property.purpose === "aluguel" ? "Aluguel" : "Venda ou Aluguel",
+          preco: formatPrice(property.salePrice || property.rentPrice),
+          area: property.totalArea ? `${property.totalArea}m²` : (property.builtArea ? `${property.builtArea}m²` : null),
+          quartos: property.bedrooms,
+          suites: property.suites,
+          banheiros: property.bathrooms,
+          vagas: property.parkingSpaces,
+          bairro: property.neighborhood,
+          cidade: property.city,
+          estado: property.state,
+        };
+
+        // Prompt otimizado para redes sociais
+        const platformHint = input.platform === "instagram" 
+          ? "Use emojis estratégicos, hashtags relevantes no final, e um texto envolvente que capture atenção nos primeiros segundos. Limite de 2200 caracteres."
+          : "Texto mais descritivo, profissional, com call-to-action claro. Pode ser um pouco mais longo.";
+
+        const prompt = `Você é um especialista em marketing imobiliário digital. Crie um texto persuasivo e curto para ${input.platform === "instagram" ? "Instagram" : "Facebook"} para anunciar o seguinte imóvel:
+
+Tipo: ${propertyInfo.tipo}
+Finalidade: ${propertyInfo.finalidade}
+Preço: ${propertyInfo.preco}
+${propertyInfo.area ? `Área: ${propertyInfo.area}` : ""}
+${propertyInfo.quartos ? `Quartos: ${propertyInfo.quartos}` : ""}
+${propertyInfo.suites ? `Suítes: ${propertyInfo.suites}` : ""}
+${propertyInfo.banheiros ? `Banheiros: ${propertyInfo.banheiros}` : ""}
+${propertyInfo.vagas ? `Vagas de garagem: ${propertyInfo.vagas}` : ""}
+Localização: ${propertyInfo.bairro}, ${propertyInfo.cidade} - ${propertyInfo.estado}
+
+Instruções:
+- ${platformHint}
+- Destaque os principais diferenciais do imóvel
+- Use linguagem persuasiva e emocional
+- Inclua um call-to-action convidando para entrar em contato
+- NÃO invente informações que não foram fornecidas
+- Seja conciso e direto ao ponto
+- Foque nos benefícios para o comprador/locatário
+
+Responda APENAS com o texto do post, sem explicações adicionais.`;
+
+        try {
+          const response = await invokeLLM({
+            messages: [
+              { role: "system", content: "Você é um copywriter especializado em marketing imobiliário para redes sociais. Crie textos persuasivos, curtos e envolventes." },
+              { role: "user", content: prompt },
+            ],
+          });
+
+          const content = response.choices[0]?.message?.content;
+          const generatedText = typeof content === "string" ? content : "";
+          
+          return { text: generatedText.trim() };
+        } catch (error) {
+          console.error("Erro ao gerar texto com IA:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Erro ao gerar descrição com IA. Tente novamente.",
+          });
+        }
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -759,3 +759,20 @@
 - [x] Adicionar instruções de configuração DNS na página de domínio (apenas nameservers Cloudflare: meg.ns.cloudflare.com e julian.ns.cloudflare.com)
 
 - [ ] Adicionar instruções detalhadas de configuração de domínio personalizado na aba de domínio
+
+## Aba Marketing (20/01/2026)
+- [ ] Criar página de Marketing e adicionar na navegação
+- [ ] Implementar gerador de descrição com IA para anúncios de redes sociais
+- [ ] Criar interface de conexão com Instagram e Facebook
+- [ ] Implementar seleção de imóveis para publicação
+- [ ] Criar preview de publicação com imagem e texto
+- [ ] Implementar publicação direta nas redes sociais
+
+
+## Aba Marketing (20/01/2026)
+- [x] Criar página de Marketing com navegação
+- [x] Implementar gerador de descrição com IA para anúncios
+- [x] Adicionar seleção de imóvel e plataforma (Instagram/Facebook)
+- [x] Criar interface de preview e compartilhamento
+- [ ] Integração direta com Instagram API (em breve)
+- [ ] Integração direta com Facebook API (em breve)
