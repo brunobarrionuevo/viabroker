@@ -12,6 +12,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { customDomainMiddleware } from "./customDomainMiddleware";
+import { facebookWebhookRouter } from "../facebookWebhook";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -66,6 +67,8 @@ async function startServer() {
   registerOAuthRoutes(app);
   // Google OAuth routes
   app.use(googleAuthRouter);
+  // Facebook Webhook routes
+  app.use(facebookWebhookRouter);
   // Upload routes
   app.use("/api", uploadRouter);
   // tRPC API

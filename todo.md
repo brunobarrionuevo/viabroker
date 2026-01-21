@@ -786,3 +786,11 @@
 - [ ] Implementar publicação direta no Facebook
 - [ ] Implementar publicação direta no Instagram
 - [ ] Gerenciar desconexão de contas
+
+
+## Configuração Facebook App (20/01/2026)
+- [x] Criar guia de configuração do Facebook App
+- [x] Implementar endpoint de verificação de Webhook do Facebook
+- [x] Implementar endpoint de callback OAuth do Facebook
+- [ ] Solicitar credenciais FACEBOOK_APP_ID e FACEBOOK_APP_SECRET
+- [ ] Testar conexão e publicação
