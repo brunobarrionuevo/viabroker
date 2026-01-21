@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { 
   Instagram, 
@@ -46,6 +47,45 @@ export default function Marketing() {
   const [copied, setCopied] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<"instagram" | "facebook">("instagram");
+  const [instagramConnected, setInstagramConnected] = useState(false);
+  const [instagramUsername, setInstagramUsername] = useState("");
+  const [, setLocation] = useLocation();
+  const searchParams = new URLSearchParams(window.location.search);
+
+  // Verificar se o Instagram foi conectado via callback
+  useEffect(() => {
+    const connected = searchParams.get('instagram_connected');
+    const username = searchParams.get('instagram_user');
+    const token = searchParams.get('instagram_token');
+    const userId = searchParams.get('instagram_user_id');
+    const error = searchParams.get('error');
+
+    if (error) {
+      toast.error(decodeURIComponent(error));
+      // Limpar URL
+      window.history.replaceState({}, '', '/marketing');
+    }
+
+    if (connected === 'true' && token) {
+      setInstagramConnected(true);
+      setInstagramUsername(username || 'Instagram');
+      // Salvar token no localStorage para uso posterior
+      localStorage.setItem('instagram_token', token);
+      localStorage.setItem('instagram_user_id', userId || '');
+      localStorage.setItem('instagram_username', username || '');
+      toast.success(`Instagram conectado: @${username}`);
+      // Limpar URL
+      window.history.replaceState({}, '', '/marketing');
+    }
+
+    // Verificar se já tem token salvo
+    const savedToken = localStorage.getItem('instagram_token');
+    const savedUsername = localStorage.getItem('instagram_username');
+    if (savedToken && savedUsername) {
+      setInstagramConnected(true);
+      setInstagramUsername(savedUsername);
+    }
+  }, []);
 
   // Buscar imóveis do corretor
   const { data: properties, isLoading: propertiesLoading } = trpc.properties.list.useQuery({
@@ -406,18 +446,45 @@ export default function Marketing() {
                     </div>
                     <div>
                       <h4 className="font-medium text-sm">Instagram Business</h4>
-                      <p className="text-xs text-muted-foreground">Publique fotos e vídeos diretamente</p>
+                      {instagramConnected ? (
+                        <p className="text-xs text-green-600">Conectado como @{instagramUsername}</p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">Publique fotos e vídeos diretamente</p>
+                      )}
                     </div>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      toast.info("A integração com Instagram requer uma conta Business conectada ao Facebook. Configure primeiro o Facebook.");
-                    }}
-                  >
-                    Conectar
-                  </Button>
+                  {instagramConnected ? (
+                    <div className="flex gap-2">
+                      <Badge variant="secondary" className="bg-green-100 text-green-700">
+                        <Check className="w-3 h-3 mr-1" />
+                        Conectado
+                      </Badge>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          localStorage.removeItem('instagram_token');
+                          localStorage.removeItem('instagram_user_id');
+                          localStorage.removeItem('instagram_username');
+                          setInstagramConnected(false);
+                          setInstagramUsername('');
+                          toast.success('Instagram desconectado');
+                        }}
+                      >
+                        Desconectar
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        window.location.href = '/api/oauth/instagram';
+                      }}
+                    >
+                      Conectar
+                    </Button>
+                  )}
                 </div>
 
                 {/* Facebook */}
