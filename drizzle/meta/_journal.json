@@ -113,6 +113,13 @@
       "when": 1768713594934,
       "tag": "0015_white_nico_minoru",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1768963341476,
+      "tag": "0016_huge_susan_delgado",
+      "breakpoints": true
     }
   ]
 }

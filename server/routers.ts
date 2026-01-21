@@ -2082,6 +2082,109 @@ Responda APENAS com o texto do post, sem explicações adicionais.`;
         }
       }),
   }),
+
+  // ==========================================
+  // SOCIAL MEDIA - Conexões e Publicação
+  // ==========================================
+  social: router({
+    // Obter URL de autorização do Facebook
+    getAuthUrl: protectedProcedure
+      .input(z.object({
+        platform: z.enum(["facebook", "instagram"]),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+
+        const { getFacebookAuthUrl } = await import("./socialMediaService");
+        
+        // Criar state com informações para o callback
+        const state = Buffer.from(JSON.stringify({
+          companyId: ctx.user.companyId,
+          platform: input.platform,
+          timestamp: Date.now(),
+        })).toString("base64");
+
+        return { url: getFacebookAuthUrl(state) };
+      }),
+
+    // Listar conexões ativas
+    listConnections: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+
+        const { getSocialConnections } = await import("./socialMediaService");
+        return getSocialConnections(ctx.user.companyId);
+      }),
+
+    // Remover conexão
+    removeConnection: protectedProcedure
+      .input(z.object({
+        connectionId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+
+        const { removeSocialConnection } = await import("./socialMediaService");
+        await removeSocialConnection(input.connectionId, ctx.user.companyId);
+        return { success: true };
+      }),
+
+    // Publicar post
+    publishPost: protectedProcedure
+      .input(z.object({
+        connectionId: z.number(),
+        propertyId: z.number().optional(),
+        content: z.string().min(1),
+        imageUrl: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+
+        const { 
+          publishToFacebook, 
+          publishToInstagram, 
+          saveSocialPost,
+          getSocialConnections 
+        } = await import("./socialMediaService");
+
+        // Buscar a conexão
+        const connections = await getSocialConnections(ctx.user.companyId);
+        const connection = connections.find((c: any) => c.id === input.connectionId);
+
+        if (!connection) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Conexão não encontrada" });
+        }
+
+        // Por enquanto, retornar que a funcionalidade requer configuração do Facebook App
+        // A publicação real requer FACEBOOK_APP_ID e FACEBOOK_APP_SECRET configurados
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Para publicar diretamente, é necessário configurar o Facebook App. Por enquanto, use o botão de copiar texto e cole manualmente na rede social.",
+        });
+      }),
+
+    // Histórico de posts
+    getPostHistory: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional().default(50),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user.companyId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Usuário não possui empresa" });
+        }
+
+        const { getSocialPostHistory } = await import("./socialMediaService");
+        return getSocialPostHistory(ctx.user.companyId, input.limit);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

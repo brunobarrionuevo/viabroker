@@ -776,3 +776,13 @@
 - [x] Criar interface de preview e compartilhamento
 - [ ] Integração direta com Instagram API (em breve)
 - [ ] Integração direta com Facebook API (em breve)
+
+
+## Integração Facebook/Instagram (20/01/2026)
+- [ ] Configurar Facebook App e permissões
+- [ ] Implementar OAuth para Facebook/Instagram
+- [ ] Armazenar tokens de acesso no banco de dados
+- [ ] Criar interface de conexão de contas
+- [ ] Implementar publicação direta no Facebook
+- [ ] Implementar publicação direta no Instagram
+- [ ] Gerenciar desconexão de contas

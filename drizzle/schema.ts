@@ -463,3 +463,69 @@ export const propertyShares = mysqlTable("propertyShares", {
 export type PropertyShare = typeof propertyShares.$inferSelect;
 export type InsertPropertyShare = typeof propertyShares.$inferInsert;
 
+
+// ==========================================
+// CONEXÕES DE REDES SOCIAIS
+// ==========================================
+
+export const socialConnections = mysqlTable("social_connections", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  platform: mysqlEnum("platform", ["facebook", "instagram"]).notNull(),
+  
+  // Identificadores da plataforma
+  platformUserId: varchar("platformUserId", { length: 100 }), // ID do usuário na plataforma
+  platformPageId: varchar("platformPageId", { length: 100 }), // ID da página (Facebook) ou conta business (Instagram)
+  platformPageName: varchar("platformPageName", { length: 255 }), // Nome da página/conta
+  platformUsername: varchar("platformUsername", { length: 100 }), // Username/handle
+  
+  // Tokens de acesso
+  accessToken: text("accessToken"), // Token de acesso (criptografado)
+  accessTokenExpires: timestamp("accessTokenExpires"), // Quando o token expira
+  refreshToken: text("refreshToken"), // Token de refresh (se disponível)
+  
+  // Status da conexão
+  isActive: boolean("isActive").default(true).notNull(),
+  lastUsedAt: timestamp("lastUsedAt"),
+  lastError: text("lastError"), // Último erro ocorrido
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SocialConnection = typeof socialConnections.$inferSelect;
+export type InsertSocialConnection = typeof socialConnections.$inferInsert;
+
+// ==========================================
+// HISTÓRICO DE POSTS EM REDES SOCIAIS
+// ==========================================
+
+export const socialPosts = mysqlTable("social_posts", {
+  id: int("id").autoincrement().primaryKey(),
+  companyId: int("companyId").notNull(),
+  connectionId: int("connectionId").notNull(), // Referência à conexão usada
+  propertyId: int("propertyId"), // Imóvel relacionado (opcional)
+  
+  platform: mysqlEnum("platform", ["facebook", "instagram"]).notNull(),
+  postType: mysqlEnum("postType", ["text", "photo", "video", "carousel"]).default("text").notNull(),
+  
+  // Conteúdo do post
+  content: text("content").notNull(), // Texto do post
+  mediaUrls: json("mediaUrls").$type<string[]>(), // URLs das mídias
+  
+  // Resposta da plataforma
+  platformPostId: varchar("platformPostId", { length: 100 }), // ID do post na plataforma
+  platformPostUrl: text("platformPostUrl"), // URL do post publicado
+  
+  // Status
+  status: mysqlEnum("status", ["draft", "scheduled", "published", "failed"]).default("draft").notNull(),
+  scheduledFor: timestamp("scheduledFor"), // Data agendada (se aplicável)
+  publishedAt: timestamp("publishedAt"), // Data de publicação
+  errorMessage: text("errorMessage"), // Mensagem de erro (se falhou)
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SocialPost = typeof socialPosts.$inferSelect;
+export type InsertSocialPost = typeof socialPosts.$inferInsert;

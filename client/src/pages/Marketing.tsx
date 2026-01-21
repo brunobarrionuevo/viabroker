@@ -399,53 +399,79 @@ export default function Marketing() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Instagram */}
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                       <Instagram className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-sm">Instagram</h4>
-                      <p className="text-xs text-muted-foreground">Não conectado</p>
+                      <h4 className="font-medium text-sm">Instagram Business</h4>
+                      <p className="text-xs text-muted-foreground">Publique fotos e vídeos diretamente</p>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" disabled>
-                    <AlertCircle className="w-4 h-4 mr-2" />
-                    Em breve
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      toast.info("A integração com Instagram requer uma conta Business conectada ao Facebook. Configure primeiro o Facebook.");
+                    }}
+                  >
+                    Conectar
                   </Button>
                 </div>
 
                 {/* Facebook */}
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center">
                       <Facebook className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-sm">Facebook</h4>
-                      <p className="text-xs text-muted-foreground">Não conectado</p>
+                      <h4 className="font-medium text-sm">Facebook Page</h4>
+                      <p className="text-xs text-muted-foreground">Publique em sua página do Facebook</p>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" disabled>
-                    <AlertCircle className="w-4 h-4 mr-2" />
-                    Em breve
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      toast.info("Para conectar o Facebook, é necessário configurar um Facebook App. Entre em contato com o suporte para ativar esta funcionalidade.");
+                    }}
+                  >
+                    Conectar
                   </Button>
                 </div>
 
-                {/* Aviso */}
-                <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                {/* Instruções */}
+                <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                   <div className="flex gap-3">
-                    <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <Share2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-sm text-amber-800 dark:text-amber-200">
-                        Funcionalidade em desenvolvimento
+                      <h4 className="font-medium text-sm text-blue-800 dark:text-blue-200">
+                        Como funciona a integração?
                       </h4>
-                      <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                        A conexão direta com Instagram e Facebook estará disponível em breve. 
-                        Por enquanto, você pode gerar o texto e copiar para publicar manualmente.
-                      </p>
+                      <ul className="text-xs text-blue-700 dark:text-blue-300 mt-2 space-y-1 list-disc list-inside">
+                        <li>Conecte sua Página do Facebook (não perfil pessoal)</li>
+                        <li>Para Instagram, vincule sua conta Business à Página do Facebook</li>
+                        <li>Após conectar, você poderá publicar diretamente da plataforma</li>
+                        <li>Suas credenciais são armazenadas de forma segura</li>
+                      </ul>
                     </div>
                   </div>
+                </div>
+
+                {/* Método Alternativo */}
+                <div className="p-4 bg-muted/50 border rounded-lg">
+                  <h4 className="font-medium text-sm mb-2">Método Alternativo (Recomendado)</h4>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Enquanto a integração direta não está disponível, use nosso gerador de texto com IA:
+                  </p>
+                  <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+                    <li>Vá para a aba "Criar Anúncio"</li>
+                    <li>Selecione o imóvel e a plataforma desejada</li>
+                    <li>Clique em "Gerar Descrição com IA"</li>
+                    <li>Copie o texto e cole diretamente no Instagram ou Facebook</li>
+                  </ol>
                 </div>
               </CardContent>
             </Card>
